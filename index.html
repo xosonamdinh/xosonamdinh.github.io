@@ -1,0 +1,2775 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Báo cáo thu tiền - XSKT Nam Định</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://www.minhngoc.net.vn/style/bangketqua_mini.css"/>
+    <script src="https://www.minhngoc.net.vn/jquery/jquery-1.7.2.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        /* --- BẢNG MÀU (THEME WINDOWS 11 2D) --- */
+        :root {
+            --primary-color: #0078d4;
+            --primary-dark: #005a9e;
+            --secondary-color: #f3f3f3;
+            --secondary-dark: #8a8886;
+            --header-bg: #f3f3f3;
+            --header-text: #201f1e;
+            --body-bg: #f3f3f3;
+            --container-bg: #ffffff;
+            --text-color: #201f1e;
+            --text-light: #605e5c;
+            --border-color: #e0e0e0;
+            --success-color: #107c41;
+            --danger-color: #c42b1c;
+            --warning-color: #d83b01;
+            --logo-color: #0078d4;
+        }
+
+        /* --- CÀI ĐẶT CHUNG --- */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; padding: 20px; padding-bottom: 80px;
+            background-color: var(--body-bg); color: var(--text-color);
+            font-size: 15px; line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page {
+            background-color: var(--container-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            position: relative; overflow: hidden;
+            border: 1px solid #d2d2d2;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        #homePage { max-width: 500px !important; margin: 40px auto; padding: 35px 30px; }
+        #mainPage { max-width: 1200px; margin: 0 auto; padding: 25px; }
+        #sellSection .controls-panel { max-width: 500px; margin: 0 auto; }
+
+        h2 { font-size: 24px; font-weight: 750; text-align: center; color: var(--text-color); margin-bottom: 20px; letter-spacing: -0.5px; }
+        h3 { font-size: 18px; font-weight: 700; text-align: center; color: var(--text-color); margin-bottom: 15px; }
+        h4 { margin-top: 0; text-align: center; color: var(--text-color); font-weight: 600;}
+        .report-date { text-align:center; font-weight: 500; margin-top: -10px; margin-bottom: 20px; color: var(--text-light); font-size: 14px; }
+
+        /* Logo Animation & SVG Styling */
+        .simple-animated-logo { text-align: center; margin-bottom: 20px; color: var(--logo-color); cursor: pointer; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .simple-animated-logo svg { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .simple-animated-logo svg:hover { transform: scale(1.06); }
+        .main-page-logo { margin-bottom: 10px; margin-top: 0; }
+
+        /* Online Badge */
+        .online-badge { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--text-color); background-color: #e5e5e5; padding: 4px 12px; border-radius: 4px; margin-top: 8px; vertical-align: middle; border: 1px solid #d2d2d2; }
+        .online-dot { width: 8px; height: 8px; background-color: #107c41; border-radius: 50%; box-shadow: 0 0 0 2px rgba(16, 124, 65, 0.2); animation: pulseDot 2s infinite; }
+        @keyframes pulseDot { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 124, 65, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 124, 65, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 124, 65, 0); } }
+
+        /* Panels & Inputs */
+        .controls-panel { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; padding: 20px; background: #fafafa; border-radius: 6px; border: 1px solid #d2d2d2; }
+        label { font-weight: 700; color: var(--text-color); font-size: 14px; margin-bottom: 5px; display: block; }
+        input[type="text"], input[type="number"], input[type="password"], select, textarea { padding: 10px 12px; border-radius: 4px; border: 1px solid #ababab; border-bottom: 1px solid #7a7a7a; width: 100%; font-size: 15px; transition: all 0.15s ease; background: #ffffff; color: var(--text-color); }
+        input:focus, textarea:focus, select:focus { border-color: var(--primary-color); border-bottom: 2px solid var(--primary-color); outline: none; box-shadow: none; padding-bottom: 9px; }
+        input[type="file"] { padding: 10px; background: #ffffff; border: 1px dashed #ababab; cursor: pointer; border-radius: 4px; width: 100%; font-size: 14px; transition: border-color 0.2s; }
+        input[type="file"]:hover { border-color: var(--primary-color); }
+
+        /* Buttons */
+        button { cursor: pointer; background: var(--primary-color); color: white; border: 1px solid rgba(0,0,0,0.1); border-bottom: 1px solid rgba(0,0,0,0.2); font-weight: 600; padding: 10px 20px; border-radius: 6px; transition: all 0.15s ease; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        button:hover { background-color: var(--primary-dark); }
+        button:active { background-color: #004b87; }
+        button.secondary { background-color: #ffffff; color: var(--text-color); border: 1px solid #cccccc; border-bottom: 1px solid #ababab; }
+        button.secondary:hover { background-color: #f3f3f3; }
+        button.success { background-color: var(--success-color); }
+        button.success:hover { background-color: #0b592e; }
+        button.danger { background-color: var(--danger-color); color: #ffffff !important; }
+        button.danger:hover { background-color: #a82318; }
+        button.warning { background-color: var(--warning-color); color: #fff; }
+        button.warning:hover { background-color: #b83201; }
+        button.info { background-color: #0078d4; color: white; }
+        button.info:hover { background-color: #005a9e; }
+
+        /* Tabs & Menus */
+        .mode-switch { display: flex; background: #eeeeee; border-radius: 6px; padding: 3px; gap: 2px; border: 1px solid #d2d2d2; }
+        .tab-btn { flex: 1; border-radius: 4px !important; padding: 8px 12px; font-size: 13px; border: none !important; background: transparent; color: var(--text-light); font-weight: 600; cursor: pointer; transition: all 0.15s ease; position: relative; }
+        .tab-btn:hover { background: rgba(0,0,0,0.04); color: var(--text-color); }
+        .tab-btn.active { background: white !important; color: var(--primary-color) !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1); font-weight: 700; }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: 2px; left: 20%; right: 20%; height: 2px; background-color: var(--primary-color); border-radius: 2px; }
+        .home-menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .home-menu-btn { padding: 12px; font-size: 13px; font-weight: 600; text-align: center; background-color: white; color: var(--text-color); border: 1px solid #cccccc; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: all 0.15s; }
+        .home-menu-btn:hover { border-color: var(--primary-color); color: var(--primary-color); background-color: #fcfcfc; }
+
+        /* Tables */
+        #summaryTableContainer { margin-top: 15px; width: 100%; max-height: 70vh; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border-color); border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        table { border-collapse: separate; border-spacing: 0; width: auto !important; min-width: 100%; background: white; margin: 0 auto; }
+        th, td { border-right: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; padding: 12px 10px; text-align: center; vertical-align: middle; font-size: 14px; white-space: nowrap; }
+        th { background: #eaeaea; color: var(--text-color); font-weight: 700; position: sticky; top: 0; z-index: 20; border-top: none; border-bottom: 2px solid #cccccc !important; }
+        #summaryTotalRow td { background-color: #eaeaea !important; color: var(--text-color) !important; font-weight: 700; position: sticky; bottom: 0; z-index: 20; border-top: 2px solid #ababab; }
+        .group-total-row td { background-color: #fafafa; font-weight: bold; }
+        .single-agent-row td { font-weight: 700; }
+        .group-member-row td { font-style: italic; font-weight: 400; color: #555; }
+        .code-cell-highlight { color: var(--primary-color) !important; font-weight: 800 !important; font-style: normal !important; }
+        .clickable-agent-code { cursor: pointer !important; }
+        .clickable-agent-code:hover { text-decoration: underline !important; opacity: 0.85; }
+        #summaryTableContainer table td:first-child { font-weight: 400 !important; font-style: normal !important; color: var(--text-color); }
+        .header { font-weight: 700; background: #fafafa; text-align: center !important; padding-left: 0 !important; }
+        .so-so { font-size: 24px !important; font-weight: 800; color: var(--primary-color); text-align: center; }
+        #tongCongRow { background-color: #e5e5e5; color: var(--text-color); font-weight: 700 !important; }
+        #tongCongRow td { color: var(--text-color); }
+        .added-ticket-row { background-color: #f4fdf8; }
+        .bang-chu-cell { text-align: center !important; font-style: italic; padding: 10px 15px !important; font-size: 13px; color: var(--text-light); background: #fff !important; white-space: normal !important; }
+        .remove-ticket-btn { background: #fff5f5; border: 1px solid #ffcccc; cursor: pointer; color: var(--danger-color); font-weight: bold; font-size: 12px; margin-left: 5px; padding: 2px 6px; border-radius: 4px; display: inline-block; vertical-align: middle; transition: all 0.2s; }
+        .remove-ticket-btn:hover { background-color: var(--danger-color); color: white; border-color: var(--danger-color); }
+        .negative-value { color: var(--danger-color); }
+        .final-amount-positive { background-color: var(--danger-color) !important; color: #ffffff !important; }
+        .final-amount-negative { background-color: var(--success-color) !important; color: #ffffff !important; }
+        tr.final-amount-positive td, tr.final-amount-negative td { font-size: 22px !important; font-weight: 700; padding: 15px 10px !important; }
+        #summaryTotalRow td.final-amount-positive { background-color: var(--danger-color) !important; color: #ffffff !important; border-top: 2px solid #600018; }
+        #summaryTotalRow td.final-amount-negative { background-color: var(--success-color) !important; color: #ffffff !important; border-top: 2px solid #1aa34a; }
+
+        /* Inputs within rows */
+        .input-group-row { display: flex; gap: 10px; width: 100%; align-items: center; flex-wrap: wrap; }
+        .input-group-row input#soSoInput, .input-group-row input#sellQuantityInput { width: 100px !important; min-width: 80px; flex: none; font-size: 16px; font-weight: 700; text-align: center; }
+        .input-group-row .buttons-container { display: flex; gap: 10px; flex: 1; min-width: 250px;}
+        .input-group-row .buttons-container button { flex: 1; padding: 10px 5px; white-space: nowrap; width: 100%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: bold; }
+        #btnAddTicket { flex: 1; padding: 0 20px; font-weight: 700; font-size: 15px; }
+        .dynamic-input { width: 100%; border: none !important; background: transparent !important; font-family: inherit; font-size: inherit; font-weight: bold; text-align: center; padding: 5px; outline: none !important; color: inherit; box-shadow: none !important; appearance: none; -webkit-appearance: none; resize: none; height: auto; overflow: hidden; }
+        .region-lock-container.locked #regionDefinitionsInput { display: none !important; }
+
+        /* Filter Tags */
+        .date-tag { padding: 6px 14px; font-size: 13px; border-radius: 20px; border: 1px solid #e5e5ea; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); background: #f1f2f6; color: var(--text-color); font-weight: 500; }
+        .date-tag.active { background-color: var(--success-color); color: white; border-color: #0b592e; box-shadow: 0 2px 4px rgba(16, 124, 65, 0.2); }
+        .detailed-date-btn { padding: 6px 14px; font-size: 13px; border-radius: 6px; border: 1px solid #dcdde1; cursor: pointer; transition: 0.2s; font-weight: bold; }
+        .detailed-date-btn.active { background-color: #107c41; color: white; border-color: #0b592e; box-shadow: 0 2px 4px rgba(16, 124, 65, 0.2); }
+        .detailed-date-btn:not(.active) { background-color: #fdfdfd; color: #333; }
+
+        /* Media Queries - Desktop */
+        @media (min-width: 768px) {
+            .filter-grid-container, .revenue-filter-grid { grid-template-columns: 1.5fr 1fr; gap: 20px; }
+            .revenue-filter-col-left { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+            .management-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+        }
+
+        /* Media Queries - Mobile */
+        @media (max-width: 768px) {
+            body { padding: 0 !important; padding-bottom: 80px !important; background-color: #f8f9fc; }
+            #homePage { margin: 15px 8px !important; padding: 25px 15px !important; width: auto !important; max-width: none !important; border-radius: 16px !important; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+            #mainPage { margin: 0 !important; width: 100% !important; max-width: 100% !important; padding: 5px 0 2px 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+            .controls-panel { margin: 0 0px 20px 0px; padding: 15px 10px; border-radius: 10px; }
+            .tab-btn { padding: 8px 4px !important; font-size: 13px !important; }
+            h2 { font-size: 22px; margin-top: 20px; }
+            #summaryTableContainer, #reportContainer { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 15px; border-left: none; border-right: none; border-radius: 0; }
+            table { width: auto !important; min-width: 100%; table-layout: auto !important; }
+            th, td { padding: 10px 4px !important; font-size: 13px !important; }
+            td:first-child, td:nth-child(2) { white-space: normal; min-width: 60px; }
+            tr.final-amount-positive td, tr.final-amount-negative td { font-size: 18px !important; padding: 12px 5px !important; }
+            .input-group-row input#soSoInput, .input-group-row input#sellQuantityInput { width: 80px !important; min-width: 80px; }
+            .input-group-row .buttons-container button { padding: 8px 2px; font-size: 14px; }
+            .simple-animated-logo { margin-top: 15px; }
+            .main-copyright { margin-top: 4px !important; margin-bottom: 4px !important; }
+            .management-grid { grid-template-columns: 1fr; }
+            .home-menu-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+            .home-menu-btn { padding: 10px 5px; font-size: 12px; }
+        }
+
+        /* Modals & Notifications */
+        .modal-overlay { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding-top: 60px; overflow: auto; animation: fadeIn 0.2s; }
+        .modal-content { background-color: #fff; margin: auto; padding: 25px; width: 95%; max-width: 600px; border-radius: 16px; position: relative; animation: slideIn 0.3s; box-shadow: 0 20px 40px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); }
+        .modal-close-btn { position: absolute; top: 12px; right: 18px; font-size: 28px; cursor: pointer; color: #aaa; z-index: 100; transition: color 0.2s; }
+        .modal-close-btn:hover { color: var(--danger-color); }
+        .preview-images-container { display: flex; flex-direction: column; gap: 15px; align-items: center; background: #f4f6f8; padding: 12px; border-radius: 10px; }
+        .preview-images-container img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #e5e5ea; display: block; -webkit-touch-callout: default !important; user-select: auto !important; -webkit-user-select: auto !important; }
+        .preview-image-item { width: 100%; background: #fff; padding: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; border-radius: 8px; }
+        .preview-image-item img { width: 100%; display: block; border-radius: 4px; -webkit-touch-callout: default !important; user-select: auto !important; -webkit-user-select: auto !important; }
+        .page-number { text-align: center; font-weight: bold; color: #7f8c8d; margin-bottom: 5px; font-size: 12px; }
+
+        #notification-area { position: fixed; top: 20px; right: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; }
+        .notification { padding: 14px 22px; border-radius: 10px; color: white; font-size: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); opacity: 0; transform: translateX(50px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-weight: 600; }
+        .notification.show { opacity: 1; transform: translateX(0); }
+        .notification.success { background-color: var(--success-color); }
+        .notification.error { background-color: var(--danger-color); }
+        .notification.info { background-color: #3498db; }
+
+        #loading-indicator { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(28,28,30,0.9); color: white; padding: 15px 30px; border-radius: 10px; z-index: 3000; font-weight: 700; box-shadow: 0 10px 25px rgba(0,0,0,0.2); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+        #scrollToTopBtn, #scrollToBottomBtn { display: none; position: fixed; left: 15px; width: 42px; height: 42px; background: rgba(128, 0, 32, 0.8); color: white; border: none; border-radius: 50%; text-align: center; line-height: 42px; cursor: pointer; z-index: 999; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: all 0.2s; }
+        #scrollToTopBtn:hover, #scrollToBottomBtn:hover { background: rgba(128, 0, 32, 1); transform: scale(1.05); }
+        #scrollToTopBtn { bottom: 80px; }
+        #scrollToBottomBtn { bottom: 30px; }
+
+        /* Print Styles */
+        @media print {
+            @page { size: A4; margin: 10mm; } 
+            body { padding: 0; background: white; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-size: 11pt; } 
+            body > * { display: none !important; }
+            #mainPage, #summarySection, #summaryTableContainer { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; position: static !important; visibility: visible !important; overflow: visible !important; max-height: none !important; box-shadow: none !important; }
+            th, tfoot td { position: static !important; border: 1px solid #000 !important; color: #000 !important; background: none !important; }
+            td { border: 1px solid #000 !important; }
+            #summaryTableContainer { border: none; }
+            #summaryTotalRow td { position: static !important; background-color: var(--primary-color) !important; color: #ffffff !important; font-weight: bold !important; border: 1px solid #000 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .controls-panel, .summary-actions, .home-menu-grid, .nav-header, .simple-animated-logo, #scrollToTopBtn, #scrollToBottomBtn, #notification-area, #btnCopySummary, #btnExportExcel, #themeSwitcher, .theme-switcher-float, .remove-ticket-btn, .main-copyright, #actionButtonContainer { display: none !important; }
+            #summaryTitle, #summaryDate { text-align: center !important; display: block !important; }
+            .dynamic-input { border: none !important; background: transparent !important; }
+            .remove-ticket-btn { display: none !important; }
+        }
+
+        /* Layout Grids */
+        .nav-header { border-bottom: 1px solid #f0f0f2; padding-bottom: 15px; margin-bottom: 20px; }
+        .summary-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; padding: 0 10px; }
+        .home-actions, .report-actions-grid { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+        #actionButtonContainer { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; padding: 0 10px;}
+        #actionChoices { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; grid-column: 1 / -1; }
+        .debt-mode-selector { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; background: #fff; padding: 10px; border-radius: 6px; border: 1px solid #eee; }
+        .ticket-type-selector { display: flex; flex-wrap: wrap; gap: 15px; }
+        .sell-row-container { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .sell-row-container > label { min-width: 80px; }
+        .main-copyright { text-align: center; margin-top: 30px; font-size: 12px; color: #aaa; font-weight: 500; }
+
+        /* Capture Image Styles */
+        #reportContainer.capturing-image { aspect-ratio: 1 / 1.414; display: flex; flex-direction: column; justify-content: flex-start; font-size: 22px !important; padding: 30px !important; background-color: white; box-shadow: none; }
+        #reportContainer.capturing-image table { height: 100%; width: 100%; }
+        #reportContainer.capturing-image h2 { font-size: 3em; }
+        #reportContainer.capturing-image .total-amount { font-size: 4em; }
+        #reportContainer.capturing-image .so-so { font-size: 4.5em !important; font-weight: 900; color: var(--logo-color); }
+        #reportContainer.capturing-image tr.final-amount-positive td, #reportContainer.capturing-image tr.final-amount-negative td { font-size: 4.5em !important; padding: 25px 10px !important; }
+        #reportContainer.capturing-image table th, #reportContainer.capturing-image table td { padding: 10px 10px; font-size: 1.1em; }
+        #reportContainer.capturing-image .report-table tr:not(#finalResultRow):not(#bangChuRow) td, #reportContainer.capturing-image .report-table th { font-size: 2.4em !important; padding: 20px 10px !important; font-weight: 600; }
+        #reportContainer.capturing-image #tongCongRow td { font-size: 2.4em !important; }
+        #reportContainer.capturing-image #bangChuRow td { font-size: 1.3em !important; font-style: italic; padding: 10px !important; font-weight: normal; }
+
+        /* --- THEME SWITCHER FLOATING WIDGET --- */
+        .theme-switcher-float { position: fixed; bottom: 20px; right: 20px; background: #ffffff; border: 1px solid #d2d2d2; padding: 4px; border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 2px; z-index: 2500; }
+        .theme-switch-btn { border: none !important; background: transparent; color: #605e5c; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 4px; cursor: pointer; transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 4px; box-shadow: none !important; }
+        .theme-switch-btn:hover { background: rgba(0,0,0,0.04); color: #201f1e; }
+        .theme-switch-btn.active { background: var(--primary-color) !important; color: white !important; }
+
+        /* --- EXCEL STYLE THEME VARIABLE OVERRIDES --- */
+        body.theme-excel { --primary-color: #107c41; --primary-dark: #0b592e; --secondary-color: #f3f2f1; --secondary-dark: #8a8886; --header-bg: #107c41; --header-text: #ffffff; --body-bg: #f3f2f1; --container-bg: #ffffff; --text-color: #323130; --text-light: #605e5c; --border-color: #cbd5e1; --success-color: #107c41; --danger-color: #a80000; --warning-color: #d83b01; --logo-color: #107c41; }
+        body.theme-excel .page { border-radius: 0px !important; border: 2px solid #107c41 !important; box-shadow: none !important; }
+        body.theme-excel .controls-panel { border-radius: 0px !important; border: 1px solid #107c41 !important; background: #fdfdfd !important; }
+        body.theme-excel input[type="text"], body.theme-excel input[type="number"], body.theme-excel input[type="password"], body.theme-excel select, body.theme-excel textarea { border-radius: 0px !important; border: 1px solid #797775 !important; }
+        body.theme-excel input:focus, body.theme-excel textarea:focus, body.theme-excel select:focus { border-color: #107c41 !important; border-bottom: 2px solid #107c41 !important; box-shadow: none !important; }
+        body.theme-excel button { border-radius: 0px !important; font-weight: 700; border: 1px solid rgba(0,0,0,0.1) !important; }
+        body.theme-excel .tab-btn { border-radius: 0px !important; }
+        body.theme-excel .tab-btn.active::after { background-color: #107c41 !important; }
+        body.theme-excel th { background: #107c41 !important; color: #ffffff !important; border-bottom: 2px solid #0b592e !important; }
+        body.theme-excel #summaryTotalRow td { background-color: #107c41 !important; color: #ffffff !important; border-top: 2px solid #0b592e !important; }
+        body.theme-excel #tongCongRow { background-color: #107c41 !important; color: #ffffff !important; }
+        body.theme-excel #tongCongRow td { color: #ffffff !important; }
+        body.theme-excel .mode-switch { border-radius: 0px !important; border-color: #107c41 !important; }
+
+        /* --- ROBO STYLE THEME OVERRIDES --- */
+        body.theme-robo { --primary-color: #c1121f; --primary-dark: #780000; --secondary-color: #ffd700; --secondary-dark: #ffd700; --header-bg: #151518; --header-text: #ffd700; --body-bg: #0c0c0e; --container-bg: #151518; --text-color: #f5f6fa; --text-light: #ffd700; --border-color: #ffd700; --success-color: #00f2fe; --danger-color: #ff4d4d; --warning-color: #ff9f43; --logo-color: #ffd700; }
+        body.theme-robo { color-scheme: dark; background-color: #0c0c0e !important; }
+        body.theme-robo .page { border-radius: 12px !important; border: 2px solid #ffd700 !important; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 5px 15px rgba(193, 18, 31, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.15) !important; background: #151518 !important; color: #f5f6fa !important; }
+        body.theme-robo .controls-panel { border-radius: 8px !important; border: 1px solid #c1121f !important; background: #1f1f25 !important; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(193, 18, 31, 0.2) !important; }
+        body.theme-robo input, body.theme-robo select, body.theme-robo textarea { border-radius: 6px !important; border: 1px solid #ffd700 !important; background: #121215 !important; color: #f5f6fa !important; }
+        body.theme-robo input:focus, body.theme-robo textarea:focus, body.theme-robo select:focus { border-color: #00f2fe !important; box-shadow: 0 0 10px rgba(0, 242, 254, 0.6) !important; }
+        body.theme-robo button { border-radius: 6px !important; font-weight: 700; background: linear-gradient(135deg, #c1121f, #780000) !important; color: #ffd700 !important; border: 1px solid #ffd700 !important; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(255, 215, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important; text-shadow: 0 1px 2px rgba(0,0,0,0.6) !important; transition: all 0.2s ease-in-out !important; }
+        body.theme-robo button:hover { background: linear-gradient(135deg, #ffd700, #ffb300) !important; color: #c1121f !important; box-shadow: 0 6px 12px rgba(255, 215, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2) !important; transform: translateY(-2px) !important; }
+        body.theme-robo .tab-btn { border-radius: 6px !important; color: #b2bec3 !important; background: transparent !important; border: none !important; box-shadow: none !important; transform: none !important; }
+        body.theme-robo .tab-btn.active { background: linear-gradient(135deg, #c1121f, #780000) !important; color: #ffd700 !important; border: 1px solid #ffd700 !important; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important; }
+        body.theme-robo .tab-btn.active::after { background-color: #00f2fe !important; }
+        body.theme-robo table { border-collapse: separate !important; border-spacing: 0 !important; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7) !important; border-radius: 8px !important; overflow: visible !important; border: 1px solid #ffd700 !important; background: #151518 !important; }
+        body.theme-robo th { background: linear-gradient(180deg, #c1121f, #780000) !important; color: #ffd700 !important; border-bottom: 2px solid #ffd700 !important; text-shadow: 0 1px 2px rgba(0,0,0,0.8) !important; font-weight: bold !important; padding: 10px 8px !important; }
+        body.theme-robo td { background: #151518 !important; color: #f5f6fa !important; border: 1px solid #282830 !important; text-shadow: 0 1px 1px rgba(0,0,0,0.8) !important; padding: 8px 6px !important; }
+        body.theme-robo tr:nth-child(even) td { background: #1e1e24 !important; }
+        body.theme-robo #summaryTotalRow td, body.theme-robo #tongCongRow td { background: linear-gradient(180deg, #780000, #c1121f) !important; color: #ffd700 !important; font-weight: bold !important; border-top: 2px solid #ffd700 !important; }
+        body.theme-robo td[style*="color: #000"], body.theme-robo td[style*="color: black"], body.theme-robo td[style*="color: #323130"], body.theme-robo td[style*="color: #333"] { color: #f5f6fa !important; }
+        body.theme-robo td[style*="color: green"], body.theme-robo td[style*="color: #107c41"], body.theme-robo span[style*="color: green"], body.theme-robo span[style*="color: #107c41"] { color: #00f2fe !important; }
+        body.theme-robo td[style*="color: red"], body.theme-robo td[style*="color: #a80000"], body.theme-robo span[style*="color: red"], body.theme-robo span[style*="color: #a80000"] { color: #ff4d4d !important; }
+        body.theme-robo .mode-switch { border-radius: 8px !important; border-color: #ffd700 !important; background: #121215 !important; }
+        body.theme-robo h2, body.theme-robo h3 { color: #ffd700 !important; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5) !important; }
+        body.theme-robo .theme-switcher-float { background: #151518 !important; border-color: #ffd700 !important; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4) !important; }
+        body.theme-robo .theme-switch-btn { color: #b2bec3; background: transparent !important; transform: none !important; box-shadow: none !important; border: none !important; }
+        body.theme-robo .theme-switch-btn:hover { background: rgba(255, 215, 0, 0.1) !important; color: #ffd700 !important; }
+        body.theme-robo #advancedToolsContainer { background: #1f1f25 !important; border: 1px solid #ffd700 !important; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important; color: #f5f6fa !important; }
+        body.theme-robo #advancedToolsContainer label, body.theme-robo #advancedToolsContainer div, body.theme-robo #advancedToolsContainer span { color: #f5f6fa !important; }
+        body.theme-robo #globalDatesList { background: #121215 !important; border: 1px solid #c1121f !important; }
+        body.theme-robo #datePickerContainer { background: #121215 !important; border: 1px solid #ffd700 !important; }
+        body.theme-robo #advancedToolsContainer div[style*="background: #f8f9fa"] { background: #121215 !important; border: 1px solid #2d2d35 !important; }
+        body.theme-robo .debt-mode-selector { background: #121215 !important; border: 1px solid #c1121f !important; box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important; }
+        body.theme-robo .debt-mode-selector label, body.theme-robo .debt-mode-selector span { color: #f5f6fa !important; }
+        body.theme-robo .modal-content { background-color: #151518 !important; border: 1px solid #ffd700 !important; color: #f5f6fa !important; box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 0 20px rgba(255,215,0,0.2) !important; }
+        body.theme-robo .modal-content h2, body.theme-robo .modal-content h3 { color: #ffd700 !important; }
+        body.theme-robo .modal-content label { color: #f5f6fa !important; }
+        body.theme-robo .modal-content hr { border-color: #c1121f !important; }
+        body.theme-robo .home-menu-btn { background-color: #1f1f25 !important; color: #f5f6fa !important; border-color: #c1121f !important; }
+        body.theme-robo .home-menu-btn:hover { background-color: #282835 !important; border-color: #ffd700 !important; }
+
+        @media screen {
+            #summaryTableContainer { overflow-y: auto; max-height: calc(100vh - 370px); min-height: 400px !important; }
+            #summaryTableContainer table { border-collapse: separate !important; border-spacing: 0 !important; }
+            #summaryTableContainer table thead th { position: sticky !important; top: 0 !important; z-index: 100 !important; background-color: #eaeaea; box-shadow: inset 0 -1px 0 var(--border-color), 0 2px 5px rgba(0,0,0,0.15) !important; }
+            #summaryTableContainer table #summaryTotalRow td { position: sticky !important; bottom: -1px !important; z-index: 100 !important; background-color: #5d4037; color: white; box-shadow: inset 0 1px 0 var(--border-color), 0 -2px 5px rgba(0,0,0,0.15) !important; }
+            #summaryTableContainer table tbody td { background-clip: padding-box !important; }
+        }
+
+        .back-btn { padding: 6px 12px !important; font-size: 13px !important; border-radius: 4px !important; }
+        .main-section .nav-header { padding-bottom: 4px !important; margin-bottom: 6px !important; }
+        .main-page-logo { font-size: 22px !important; margin-top: 4px !important; margin-bottom: 4px !important; padding: 0 !important; }
+        .main-page-logo .online-badge { padding: 1px 6px !important; font-size: 10px !important; }
+        #mainPage { max-width: 1200px; margin: 0 auto; padding: 12px 20px !important; }
+        .main-copyright { text-align: center; margin-top: 6px !important; margin-bottom: 2px !important; padding: 2px 0 !important; font-size: 11px !important; color: #aaa; font-weight: 500; }
+        .main-section .nav-header { padding-bottom: 6px !important; margin-bottom: 8px !important; display: flex !important; }
+        .main-section .nav-header .back-btn, .back-btn { background-color: #107c41 !important; color: #ffffff !important; padding: 6px 16px !important; font-size: 13px !important; font-weight: 700 !important; border-radius: 4px !important; border: none !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; gap: 6px !important; box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important; }
+    </style>
+</head>
+<body>
+    <script>
+        (function() {
+            document.body.classList.add('theme-excel');
+        })();
+    </script>
+
+
+
+    <div id="notification-area"></div>
+    <div id="loading-indicator">Đang xử lý...</div>
+
+    <div id="homePage" class="page">
+        <!-- Logo SVG dùng chung trên Trang Chủ -->
+        <div class="simple-animated-logo" onclick="window.location.href = window.location.pathname; return false;" title="Nhấn để tải lại trang chủ">
+            <div style="width: 75px; height: 75px; display: inline-block;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+                <defs>
+                  <clipPath id="inner-circle-clip-home">
+                    <circle cx="250" cy="250" r="162" />
+                  </clipPath>
+                  <path id="text-arc-path-home" d="M 52,250 A 198,198 0 0,0 448,250" fill="none" />
+                </defs>
+                <circle cx="250" cy="250" r="245" fill="#E31A1A" stroke="#0B3C85" stroke-width="7" />
+                <circle cx="250" cy="250" r="162" fill="#FFFFFF" stroke="#0B3C85" stroke-width="6" />
+                <polygon points="250,32 258,58 284,58 263,73 271,98 250,83 229,98 237,73 216,58 242,58" fill="#FFEB3B" />
+                <text font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-weight="800" font-size="28" fill="#FFEE00" letter-spacing="2">
+                  <textPath href="#text-arc-path-home" startOffset="50%" text-anchor="middle">
+                    XỔ SỐ KIẾN THIẾT NAM ĐỊNH
+                  </textPath>
+                </text>
+                <g clip-path="url(#inner-circle-clip-home)">
+                  <path d="M 125,120 L 195,120 L 375,380 L 305,380 Z" fill="#0C4DA2" />
+                  <path d="M 260,172 Q 315,142 375,142" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
+                  <path d="M 260,192 Q 315,162 375,162" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
+                  <path d="M 260,212 Q 315,182 375,182" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
+                  <path d="M 240,328 Q 185,358 125,358" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
+                  <path d="M 240,308 Q 185,338 125,338" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
+                  <path d="M 240,288 Q 185,318 125,318" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
+                  <g>
+                    <polygon points="175,380 325,380 318,368 182,368" fill="#E0692A" />
+                    <rect x="180" y="362" width="140" height="6" fill="#F8A060" />
+                    <polygon points="185,362 315,362 310,352 190,352" fill="#E0692A" />
+                    <rect x="188" y="347" width="124" height="5" fill="#F8A060" />
+                    <rect x="195" y="328" width="110" height="19" fill="#E0692A" />
+                    <rect x="192" y="325" width="116" height="3" fill="#F8A060" />
+                    <path d="M 235,347 A 15,15 0 0,1 265,347 V 347 H 235 Z" fill="#0C4DA2" />
+                    <rect x="201" y="308" width="98" height="17" fill="#E0692A" />
+                    <rect x="198" y="305" width="104" height="3" fill="#F8A060" />
+                    <path d="M 237,325 A 13,13 0 0,1 263,325 V 325 H 237 Z" fill="#0C4DA2" />
+                    <rect x="207" y="290" width="86" height="15" fill="#E0692A" />
+                    <rect x="204" y="287" width="92" height="3" fill="#F8A060" />
+                    <path d="M 239,305 A 11,11 0 0,1 261,305 V 239 Z" fill="#0C4DA2" />
+                    <rect x="212" y="274" width="76" height="13" fill="#E0692A" />
+                    <rect x="209" y="271" width="82" height="3" fill="#F8A060" />
+                    <path d="M 241,287 A 9,9 0 0,1 259,287 V 287 H 241 Z" fill="#0C4DA2" />
+                    <rect x="216" y="259" width="68" height="12" fill="#E0692A" />
+                    <rect x="214" y="256" width="72" height="3" fill="#F8A060" />
+                    <path d="M 242,271 A 8,8 0 0,1 258,271 V 271 H 242 Z" fill="#0C4DA2" />
+                    <rect x="220" y="245" width="60" height="11" fill="#E0692A" />
+                    <rect x="218" y="242" width="64" height="3" fill="#F8A060" />
+                    <path d="M 243,256 A 7,7 0 0,1 257,256 V 256 H 243 Z" fill="#0C4DA2" />
+                    <rect x="224" y="232" width="52" height="10" fill="#E0692A" />
+                    <rect x="222" y="229" width="56" height="3" fill="#F8A060" />
+                    <path d="M 244,242 A 6,6 0 0,1 256,242 V 242 H 244 Z" fill="#0C4DA2" />
+                    <rect x="228" y="220" width="44" height="9" fill="#E0692A" />
+                    <rect x="226" y="217" width="48" height="3" fill="#F8A060" />
+                    <path d="M 245,229 A 5,5 0 0,1 255,229 V 229 H 245 Z" fill="#0C4DA2" />
+                    <rect x="231" y="209" width="38" height="8" fill="#E0692A" />
+                    <rect x="229" y="206" width="42" height="3" fill="#F8A060" />
+                    <path d="M 246,217 A 4,4 0 0,1 254,217 V 217 H 246 Z" fill="#0C4DA2" />
+                    <rect x="234" y="199" width="32" height="7" fill="#E0692A" />
+                    <rect x="232" y="196" width="36" height="3" fill="#F8A060" />
+                    <path d="M 247,206 A 3,3 0 0,1 253,206 V 206 H 247 Z" fill="#0C4DA2" />
+                    <rect x="237" y="190" width="26" height="6" fill="#E0692A" />
+                    <rect x="235" y="187" width="30" height="3" fill="#F8A060" />
+                    <rect x="240" y="182" width="20" height="5" fill="#E0692A" />
+                    <rect x="238" y="179" width="24" height="3" fill="#F8A060" />
+                    <rect x="242" y="174" width="16" height="5" fill="#E0692A" />
+                    <rect x="240" y="171" width="20" height="3" fill="#F8A060" />
+                    <polygon points="250,128 255,145 257,171 243,171 245,145" fill="#E0692A" />
+                    <circle cx="250" cy="132" r="5" fill="#F8A060" />
+                  </g>
+                </g>
+              </svg>
+            </div>
+           
+        </div>
+        <h2>Báo cáo Thu Tiền</h2>
+
+        <div class="controls-panel">
+            <div class="mode-switch">
+                <button id="tabExcel" class="tab-btn active">Nhập Excel</button>
+                <button id="tabConfigHome" class="tab-btn" onclick="showSection('configSection')">⚙️ Quản lý cấu hình</button>
+            </div>
+
+            <div id="panelExcel" style="margin-top: 15px;">
+                <label for="excelFile1">Chọn file Biểu 31 (Lô tô) [Có thể chọn nhiều]:</label>
+                <input type="file" id="excelFile1" accept=".xls,.xlsx" multiple>
+                <div style="height: 10px;"></div>
+                <label for="excelFile2">Chọn file Biểu 35 (XSKT - Tùy chọn) [Có thể chọn nhiều file]:</label>
+                <input type="file" id="excelFile2" accept=".xls,.xlsx" multiple>
+            </div>
+
+            <div id="homeActionContainer" class="home-actions" style="margin-top: 20px; grid-template-columns: 1fr;">
+                <button id="btnLoadData" class="success" style="width: 100%;">Nạp dữ liệu & Xem báo cáo</button>
+            </div>
+        </div>
+        <div class="main-copyright">© 2026 ZENG FINANCE</div>
+    </div>
+
+    <div id="mainPage" class="page" style="display: none;">
+        <!-- Logo SVG dùng chung trên Trang trong -->
+        <div class="simple-animated-logo main-page-logo" onclick="window.location.href = window.location.pathname; return false;" title="Quay về trang chủ">
+            <div style="width: 60px; height: 60px; display: inline-block;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+                <defs>
+                  <clipPath id="inner-circle-clip-main">
+                    <circle cx="250" cy="250" r="162" />
+                  </clipPath>
+                  <path id="text-arc-path-main" d="M 52,250 A 198,198 0 0,0 448,250" fill="none" />
+                </defs>
+                <circle cx="250" cy="250" r="245" fill="#E31A1A" stroke="#0B3C85" stroke-width="7" />
+                <circle cx="250" cy="250" r="162" fill="#FFFFFF" stroke="#0B3C85" stroke-width="6" />
+                <polygon points="250,32 258,58 284,58 263,73 271,98 250,83 229,98 237,73 216,58 242,58" fill="#FFEB3B" />
+                <text font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-weight="800" font-size="28" fill="#FFEE00" letter-spacing="2">
+                  <textPath href="#text-arc-path-main" startOffset="50%" text-anchor="middle">
+                    XỔ SỐ KIẾN THIẾT NAM ĐỊNH
+                  </textPath>
+                </text>
+                <g clip-path="url(#inner-circle-clip-main)">
+                  <path d="M 125,120 L 195,120 L 375,380 L 305,380 Z" fill="#0C4DA2" />
+                  <path d="M 260,172 Q 315,142 375,142" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
+                  <path d="M 260,192 Q 315,162 375,162" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
+                  <path d="M 260,212 Q 315,182 375,182" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
+                  <path d="M 240,328 Q 185,358 125,358" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
+                  <path d="M 240,308 Q 185,338 125,338" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
+                  <path d="M 240,288 Q 185,318 125,318" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
+                  <g>
+                    <polygon points="175,380 325,380 318,368 182,368" fill="#E0692A" />
+                    <rect x="180" y="362" width="140" height="6" fill="#F8A060" />
+                    <polygon points="185,362 315,362 310,352 190,352" fill="#E0692A" />
+                    <rect x="188" y="347" width="124" height="5" fill="#F8A060" />
+                    <rect x="195" y="328" width="110" height="19" fill="#E0692A" />
+                    <rect x="192" y="325" width="116" height="3" fill="#F8A060" />
+                    <path d="M 235,347 A 15,15 0 0,1 265,347 V 347 H 235 Z" fill="#0C4DA2" />
+                    <rect x="201" y="308" width="98" height="17" fill="#E0692A" />
+                    <rect x="198" y="305" width="104" height="3" fill="#F8A060" />
+                    <path d="M 237,325 A 13,13 0 0,1 263,325 V 325 H 237 Z" fill="#0C4DA2" />
+                    <rect x="207" y="290" width="86" height="15" fill="#E0692A" />
+                    <rect x="204" y="287" width="92" height="3" fill="#F8A060" />
+                    <path d="M 239,305 A 11,11 0 0,1 261,305 V 239 Z" fill="#0C4DA2" />
+                    <rect x="212" y="274" width="76" height="13" fill="#E0692A" />
+                    <rect x="209" y="271" width="82" height="3" fill="#F8A060" />
+                    <path d="M 241,287 A 9,9 0 0,1 259,287 V 287 H 241 Z" fill="#0C4DA2" />
+                    <rect x="216" y="259" width="68" height="12" fill="#E0692A" />
+                    <rect x="214" y="256" width="72" height="3" fill="#F8A060" />
+                    <path d="M 242,271 A 8,8 0 0,1 258,271 V 271 H 242 Z" fill="#0C4DA2" />
+                    <rect x="220" y="245" width="60" height="11" fill="#E0692A" />
+                    <rect x="218" y="242" width="64" height="3" fill="#F8A060" />
+                    <path d="M 243,256 A 7,7 0 0,1 257,256 V 256 H 243 Z" fill="#0C4DA2" />
+                    <rect x="224" y="232" width="52" height="10" fill="#E0692A" />
+                    <rect x="222" y="229" width="56" height="3" fill="#F8A060" />
+                    <path d="M 244,242 A 6,6 0 0,1 256,242 V 242 H 244 Z" fill="#0C4DA2" />
+                    <rect x="228" y="220" width="44" height="9" fill="#E0692A" />
+                    <rect x="226" y="217" width="48" height="3" fill="#F8A060" />
+                    <path d="M 245,229 A 5,5 0 0,1 255,229 V 229 H 245 Z" fill="#0C4DA2" />
+                    <rect x="231" y="209" width="38" height="8" fill="#E0692A" />
+                    <rect x="229" y="206" width="42" height="3" fill="#F8A060" />
+                    <path d="M 246,217 A 4,4 0 0,1 254,217 V 217 H 246 Z" fill="#0C4DA2" />
+                    <rect x="234" y="199" width="32" height="7" fill="#E0692A" />
+                    <rect x="232" y="196" width="36" height="3" fill="#F8A060" />
+                    <path d="M 247,206 A 3,3 0 0,1 253,206 V 206 H 247 Z" fill="#0C4DA2" />
+                    <rect x="237" y="190" width="26" height="6" fill="#E0692A" />
+                    <rect x="235" y="187" width="30" height="3" fill="#F8A060" />
+                    <rect x="240" y="182" width="20" height="5" fill="#E0692A" />
+                    <rect x="238" y="179" width="24" height="3" fill="#F8A060" />
+                    <rect x="242" y="174" width="16" height="5" fill="#E0692A" />
+                    <rect x="240" y="171" width="20" height="3" fill="#F8A060" />
+                    <polygon points="250,128 255,145 257,171 243,171 245,145" fill="#E0692A" />
+                    <circle cx="250" cy="132" r="5" fill="#F8A060" />
+                  </g>
+                </g>
+              </svg>
+            </div>
+
+        </div>
+
+        <!-- SUMMARY SECTION -->
+        <div id="summarySection" class="main-section" style="display: none;">
+            <div class="nav-header" style="display: flex; gap: 10px; align-items: center;">
+                <button class="back-btn" id="btnBackFromSummary">⬅ Quay lại Tra cứu</button>
+            </div>
+
+            <div class="controls-panel">
+                <div id="toggleAdvancedTools" style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px dashed #dcdde1; margin-bottom: 5px;">
+                    <label style="margin: 0; color: #7f8c8d; font-size: 14px; cursor: pointer; font-weight: bold;">🛠️ Công cụ Nâng cao (Nợ, Vé...)</label>
+                    <button class="secondary" style="padding: 2px 10px; font-size: 14px; width: auto; font-weight: bold;">↓</button>
+                </div>
+
+                <div id="advancedToolsContainer" style="display: none; background: #fff; border: 1px solid #eee; border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+                    <div id="regionLockContainer" class="region-lock-container" style="display: none !important;">
+                        <button id="btnSaveRegions"></button>
+                        <textarea id="regionDefinitionsInput"></textarea>
+                    </div>
+
+                    <div class="management-grid">
+                        <div id="debtContainer" style="margin: 0;">
+                            <label style="color: var(--danger-color); font-weight: 700;">1. Quản lý Nợ cũ:</label>
+                            <div class="debt-mode-selector">
+                                <div class="options">
+                                    <label><input type="radio" name="debtMode" value="manual"> Thủ công</label>
+                                    <label><input type="radio" name="debtMode" value="excel"> Excel</label>
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    <button id="btnApplyDebt" class="warning" style="display:none; padding: 6px 15px; width: auto; font-size: 13px;">Cập nhật</button>
+                                    <button id="btnClearDebt" class="danger" style="padding: 6px 15px; width: auto; font-size: 13px;">Xóa Nợ</button>
+                                </div>
+                            </div>
+                            <div id="debtManualContainer" style="display: none; margin-top: 10px;"><textarea id="debtInput" rows="2" placeholder="Mã+Tiền (980 1000)"></textarea></div>
+                            <div id="debtExcelContainer" style="display: none; margin-top: 10px;"><input type="file" id="debtFile" accept=".xls,.xlsx"></div>
+                            <div id="debtStatusMsg" style="font-size: 13px; color: var(--success-color); font-weight: 600; margin-top: 5px; display: none;"></div>
+                        </div>
+
+                        <div id="veBocContainer" style="margin: 0;">
+                            <label style="color: #8e44ad; font-weight: 700;">2. Quản lý Vé Bóc (5k):</label>
+                            <div class="debt-mode-selector">
+                                <div class="options">
+                                    <label><input type="radio" name="veBocMode" value="manual"> Thủ công</label>
+                                    <label><input type="radio" name="veBocMode" value="excel"> Excel</label>
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    <button id="btnApplyVeBoc" class="warning" style="display:none; padding: 6px 15px; width: auto; font-size: 13px;">Cập nhật</button>
+                                    <button id="btnClearVeBoc" class="danger" style="padding: 6px 15px; width: auto; font-size: 13px;">Xóa Vé</button>
+                                </div>
+                            </div>
+                            <div id="veBocManualContainer" style="display: none; margin-top: 10px;"><textarea id="veBocInput" rows="2" placeholder="Mã+SL (980 10)"></textarea></div>
+                            <div id="veBocExcelContainer" style="display: none; margin-top: 10px;">
+                                <input type="file" id="veBocFile" accept=".xls,.xlsx">
+                            </div>
+                            <div id="veBocStatusMsg" style="font-size: 13px; color: var(--success-color); font-weight: 600; margin-top: 5px; display: none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="revenue-filter-grid" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #dcdde1; grid-template-columns: 1fr;">
+                        <div class="revenue-filter-col-left filter-column" style="grid-template-columns: 1fr 1fr 1fr;">
+                            <div class="filter-column"><label>3. Sắp xếp:</label><select id="sortSelect"><option value="default">Mặc định</option><option value="revenue_desc">Doanh số (Cao-Thấp)</option><option value="revenue_asc">Doanh số (Thấp-Cao)</option></select></div>
+                            <div class="filter-column"><label>Doanh số từ:</label><input type="text" id="minRevenueInput" class="manual-currency" inputmode="numeric" placeholder="VD: 300"></div>
+                            <div class="filter-column"><label>Đến:</label><input type="text" id="maxRevenueInput" class="manual-currency" inputmode="numeric" placeholder="Tối đa"></div>
+                        </div>
+                    </div>
+
+                    <!-- MỤC TÙY CHỈNH NGÀY DÀNH RIÊNG NẰM TRONG MENU NÂNG CAO -->
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #dcdde1;">
+                        <div style="background: #f8f9fa; border: 1px solid #dcdde1; padding: 12px; border-radius: 8px;">
+                            <label style="font-size: 13px; color: var(--danger-color); font-weight: bold;">Tùy chỉnh ngày cho riêng Đại lý (Ghi đè lọc chung):</label>
+                            <div style="margin-top: 10px;">
+                                <select id="agentDateSelect" style="width: 100%; border: 1px solid var(--primary-color); font-weight: bold;">
+                                    <option value="">-- Bước 1: Chọn Riêng Đại Lý --</option>
+                                </select>
+                            </div>
+                            <div id="datePickerContainer" style="display: none; margin-top: 12px; padding: 10px; background: #fff; border-radius: 6px; border: 1px solid #eee;">
+                                <label style="font-size: 12px; color: #7f8c8d; display: block; margin-bottom: 8px;">Bước 2: Chọn ngày của riêng đại lý này:</label>
+                                <div id="availableDatesList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                            </div>
+                            <div id="activeRulesSummary" style="margin-top: 10px; display: flex; flex-direction: column; gap: 5px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lọc ngày chung (Để ngoài) -->
+                <div class="date-filter-grid" style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #dcdde1;">
+                    <label style="color: #2980b9; font-weight: 700;">Lọc Ngày (Chọn ngày hiển thị):</label>
+                    <div style="margin-top: 10px;">
+                        <label style="font-size: 12px; color: #7f8c8d; margin-bottom: 5px;">Bật/tắt các ngày để hiển thị trên toàn hệ thống:</label>
+                        <div id="globalDatesList" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; background: #fdfdfd; border: 1px solid #dcdde1; border-radius: 6px;">
+                            <span style="font-size: 12px; color: #aaa; font-style: italic;">(Hãy nạp dữ liệu trước để hiện ngày)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 10px;">
+                        <label style="color: var(--danger-color); font-size: 15px; font-weight: bold;">Lọc theo Đơn vị/Tổ <span style="color:#e67e22"></span>:</label>
+                        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                            <label style="font-size: 14px; color: #2980b9; font-weight: bold; display: flex; align-items: center; gap: 5px; white-space: nowrap;">
+                                Chế độ Chi Nhánh: <span style="color:#8e44ad"></span>
+                                <select id="selBranchMode" style="padding: 4px 8px; font-size: 13px; border-radius: 6px; border: 1px solid #ccc; font-weight: bold; color: #2c3e50; cursor: pointer;">
+                                    <option value="all">Xem Tất Cả</option>
+                                </select>
+                            </label>
+                            <label title="Đưa các loại hình Lô tô, Lô cặp, Lô 2/27, Lô 3/23, Thưởng về 0 -- Giữ lại: Doanh số XSKT, Vé bóc và Nợ cũ của đại lý bán vé" style="font-size: 14px; cursor: pointer; color: var(--danger-color); font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" id="cbExcludeNumeric" style="width: 18px; height: 18px;"> Bỏ Dsố Bán Vé
+                            </label>
+                            <label title="Đưa Doanh số và Hoa hồng XSKT về 0" style="font-size: 14px; cursor: pointer; color: #d35400; font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" id="cbExcludeXSKT" style="width: 18px; height: 18px;"> Bỏ XSKT
+                            </label>
+                            <label title="Đưa Doanh số và Hoa hồng Vé Bóc về 0" style="font-size: 14px; cursor: pointer; color: #8e44ad; font-weight: bold; display: flex; align-items: center; gap: 5px;">
+                                <input type="checkbox" id="cbExcludeVeBoc" style="width: 18px; height: 18px;"> Bỏ Vbóc
+                            </label>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; height: 45px; align-items: center; margin-top: 5px;">
+                        <select id="regionSelect" style="flex-grow: 1; height: 100%; border: 2px solid var(--primary-color); font-weight: 600;">
+                            <option value="all">--- Tất cả ---</option>
+                        </select>
+                        <button id="btnClearRevenueFilter" class="secondary" style="padding: 0 20px; width: auto; height: 100%; font-weight:bold; color: var(--danger-color); border: 2px solid #dcdde1;" title="Đặt lại tất cả bộ lọc">XÓA LỌC</button>
+                    </div>
+                </div>
+            </div>
+
+            <h3 id="summaryTitle" style="margin-top: 20px;">Bảng Báo Cáo Tổng Hợp:</h3>
+            <h4 id="summaryDate" class="report-date"></h4>
+            <div id="summaryTableContainer"></div>
+
+            <div class="summary-actions">
+                <button id="btnCopySummary" class="success">📷 Copy Ảnh</button>
+                <button id="btnPrintReport" class="secondary">🖨️ In</button>
+                <button id="btnExportExcel" class="success" style="background-color: #217346;">Excel</button>
+            </div>
+        </div>
+
+        <!-- REPORT SECTION -->
+        <div id="reportSection" class="main-section" style="display: none;">
+            <div class="home-menu-grid">
+                <button class="home-menu-btn" id="btnGoToSummary">📊 Xem Tổng hợp</button>
+                <button class="home-menu-btn" id="btnGoToSell">🎫 Bán thêm Vé</button>
+            </div>
+            <h3>Tra cứu & Tạo Báo Cáo</h3>
+
+            <div class="controls-panel">
+                <div style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 15px;">
+                    <label style="font-size: 13px; color: #2980b9; font-weight: bold; display: flex; align-items: center; gap: 5px; margin-bottom: 0; white-space: nowrap;">
+                        Chế độ Chi Nhánh: <span style="color:#8e44ad"></span>
+                        <select id="selBranchMode_Detailed" style="padding: 2px 6px; font-size: 12px; border-radius: 4px; border: 1px solid #ccc; font-weight: bold; color: #2c3e50; cursor: pointer;">
+                            <option value="all">Xem Tất Cả</option>
+                        </select>
+                    </label>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <label title="Đưa các loại hình Lô tô... về 0" style="font-size: 13px; cursor: pointer; color: var(--danger-color); font-weight: bold; display: flex; align-items: center; gap: 5px; margin-bottom: 0;">
+                            <input type="checkbox" id="cbExcludeNumeric_Detailed" style="width: 16px; height: 16px;"> Bỏ Dsố Bán Vé
+                        </label>
+                        <label title="Đưa Doanh số và Hoa hồng XSKT về 0" style="font-size: 13px; cursor: pointer; color: #d35400; font-weight: bold; display: flex; align-items: center; gap: 5px; margin-bottom: 0;">
+                            <input type="checkbox" id="cbExcludeXSKT_Detailed" style="width: 16px; height: 16px;"> Bỏ XSKT
+                        </label>
+                        <label title="Đưa Doanh số và Hoa hồng Vé Bóc về 0" style="font-size: 13px; cursor: pointer; color: #8e44ad; font-weight: bold; display: flex; align-items: center; gap: 5px; margin-bottom: 0;">
+                            <input type="checkbox" id="cbExcludeVeBoc_Detailed" style="width: 16px; height: 16px;"> Bỏ Vbóc
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="input-group-row" style="display: flex; align-items: center; gap: 10px;">
+                    <label for="soSoInput" style="margin-bottom: 0; white-space: nowrap; font-weight: bold; font-size: 14px;">Nhập số sổ:</label>
+                    <input type="text" id="soSoInput" inputmode="numeric" placeholder="919" style="width: 100px; text-align: center; font-weight: bold;">
+                    <div class="buttons-container" style="display: flex; gap: 10px; flex: 1;">
+                        <button id="btnCreateDailyReport" class="success" style="flex: 1; font-weight: bold;">Báo cáo chi tiết</button>
+                        <button id="btnCreateSummaryReport" class="danger" style="flex: 1; font-weight: bold;">Công nợ</button>
+                    </div>
+                </div>
+                
+                <div id="detailedDatePickerContainer" style="display: none; border-top: 1px dashed #dcdde1; padding-top: 10px; margin-top: 10px;">
+                    <label style="font-size: 12px; color: #7f8c8d; font-weight: bold; margin-bottom: 8px; display: block;">Click để bật/tắt ngày hiển thị cho báo cáo này:</label>
+                    <div id="detailedDatesList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                </div>
+            </div>
+
+            <div id="reportContainer"></div>
+
+            <div id="actionButtonContainer">
+                <button id="btnCopyReport" class="success">📷 Copy Ảnh</button>
+                <button id="toggleChoicesBtn" class="secondary">Thêm tiền Thưởng/Nợ</button>
+                <div id="actionChoices"></div>
+            </div>
+        </div>
+
+        <div id="sellSection" class="main-section" style="display: none;">
+            <div class="nav-header"><button class="back-btn" id="btnBackFromSell">⬅ Quay lại</button></div>
+            <h3>Bán thêm Vé</h3>
+            <div id="sellTicketControls" class="controls-panel">
+                <div class="sell-row-container">
+                    <label>Loại hình:</label>
+                    <div class="ticket-type-selector">
+                        <label><input type="radio" name="sellTicketType" value="xo-so" checked> Xổ số</label>
+                        <label><input type="radio" name="sellTicketType" value="ve-boc"> Vé bóc</label>
+                        <label><input type="radio" name="sellTicketType" value="custom-name"> Khác</label>
+                    </div>
+                </div>
+                <div style="padding-left: 90px; margin-bottom: 10px;"><input type="text" id="customTicketName" placeholder="Nhập tên..." style="display:none;"></div>
+
+                <div class="sell-row-container">
+                    <label>Giá bán:</label>
+                    <div class="ticket-type-selector">
+                        <label><input type="radio" name="sellPrice" value="10000" checked> 10k</label>
+                        <label><input type="radio" name="sellPrice" value="20000"> 20k</label>
+                        <label><input type="radio" name="sellPrice" value="5000"> 5k</label>
+                        <label><input type="radio" name="sellPrice" value="custom-price"> Khác</label>
+                    </div>
+                </div>
+                <div style="padding-left: 90px; margin-bottom: 10px;"><input type="text" id="customTicketPrice" inputmode="numeric" placeholder="Nhập giá..." style="display:none;"></div>
+
+                <div class="sell-row-container">
+                    <label>Hoa hồng:</label>
+                    <div class="ticket-type-selector">
+                        <label><input type="radio" name="sellRate" value="10" checked> 10%</label>
+                        <label><input type="radio" name="sellRate" value="12"> 12%</label>
+                        <label><input type="radio" name="sellRate" value="custom-rate"> Khác</label>
+                    </div>
+                </div>
+                <div style="padding-left: 90px; margin-bottom: 10px;"><input type="number" id="customTicketRate" placeholder="Nhập %..." style="display:none;"></div>
+
+                <div class="sell-row-container">
+                    <label>Số lượng:</label>
+                    <div class="input-group-row">
+                        <input type="number" id="sellQuantityInput" placeholder="SL..." min="0">
+                        <div class="buttons-container"><button id="btnAddTicket" class="success">Thêm</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="configSection" class="main-section" style="display: none;">
+            <div class="nav-header" style="display: flex; gap: 10px; align-items: center; margin-bottom: 8px;">
+                <button class="back-btn" onclick="window.location.href = window.location.pathname;">&#11013; Quay lại Trang Chủ</button>
+            </div>
+            
+            <div style="width:100%; min-height:550px; border-radius: 12px; border: 1px solid var(--border-color); background-color: var(--container-bg); padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); font-family: inherit;" class="flex flex-col relative select-none">
+                <h3 style="text-align: center; color: var(--primary-color); font-size: 22px; font-weight: 750; margin-bottom: 20px; letter-spacing: -0.5px;">⚙️ QUẢN LÝ CẤU HÌNH HỆ THỐNG</h3>
+                
+                <div style="background: var(--body-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                    <div style="flex: 1; min-width: 280px;">
+                        <label style="font-weight: 600; font-size: 13.5px; color: var(--text-light); display: block; margin-bottom: 6px;">GitHub Personal Access Token (PAT):</label>
+                        <input type="text" id="cfgGithubPat" placeholder="Nhập GitHub PAT (classic hoặc fine-grained)..." style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13.5px; -webkit-text-security: disc;" onchange="saveGithubToken()">
+                    </div>
+                    <div style="min-width: 180px;">
+                        <label style="font-weight: 600; font-size: 13.5px; color: var(--text-light); display: block; margin-bottom: 6px;">Chọn Tệp Quản Lý:</label>
+                        <select id="cfgFileSelect" onchange="loadConfigFile()" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13.5px; font-weight: 600;">
+                            <option value="donvi.txt">donvi.txt (Danh sách tổ/nhánh)</option>
+                            <option value="xemma.txt">xemma.txt (Quyền xem dữ liệu)</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 20px;">
+                        <button onclick="loadConfigFile()" class="btn secondary" style="padding: 8px 14px; font-size: 13px; font-weight: 600; height: 38px;">🔄 Tải lại</button>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                    <h4 id="cfgEditorTitle" style="font-size: 16px; font-weight: 700; color: var(--text-color); margin: 0;">Đang tải danh sách...</h4>
+                    <button onclick="addNewConfigRow()" class="btn success" style="padding: 6px 12px; font-size: 12.5px; font-weight: 600; border-radius: 4px;">➕ Thêm mới</button>
+                </div>
+
+                <div style="flex: 1; max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; background: var(--body-bg); padding: 10px; margin-bottom: 20px;">
+                    <div id="cfgEditorList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                    <div>
+                        <label style="font-weight: 600; font-size: 13.5px; color: var(--text-light); display: block; margin-bottom: 4px;">Commit Message:</label>
+                        <input type="text" id="cfgCommitMsg" placeholder="Cập nhật cấu hình qua Tiện ích..." style="width: 320px; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px;">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="downloadConfigFile()" class="btn secondary" style="padding: 10px 18px; font-weight: 600; font-size: 13.5px; display: inline-flex; align-items: center; gap: 6px;">
+                            📥 Tải file về máy
+                        </button>
+                        <button onclick="commitConfigFile()" class="btn primary" style="padding: 10px 24px; font-weight: 700; font-size: 13.5px; display: inline-flex; align-items: center; gap: 6px; background-color: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            🚀 Lưu & Commit GitHub
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modals -->
+    <div id="imagePreviewModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 95%; width: auto; background-color: #f8f9fa;">
+            <span id="closePreviewModalBtn" class="modal-close-btn">&times;</span>
+            <h4 style="margin-top:0; text-align:center; color: #2c3e50;">Sao chép Ảnh</h4>
+            <div style="text-align: center; margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                <button id="btnSaveAllImages" class="success" style="padding: 10px 20px; font-size: 14px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">💾 LƯU TẤT CẢ ẢNH</button>
+                <button id="btnShareImage" class="info" style="padding: 10px 20px; font-size: 14px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;">📤 CHIA SẺ ẢNH</button>
+            </div>
+            <div id="imagePreviewHolder" class="preview-images-container"></div>
+            <p style="text-align:center; font-size:13.5px; color:#555; margin-top: 15px; line-height: 1.5; background: #e8f0fe; padding: 10px; border-radius: 8px;">
+                <span style="display:block; font-weight: bold; color: var(--primary-dark); margin-bottom: 5px;">💡 Hướng dẫn cho Safari / Điện thoại:</span>
+                • <b>Điện thoại:</b> Nhấn giữ vào ảnh khoảng 2 giây, chọn <b>Sao chép</b> hoặc <b>Thêm vào Ảnh</b>.<br>
+                • <b>Máy tính:</b> Click chuột phải vào ảnh và chọn <b>Sao chép hình ảnh</b>.<br>
+                • Hoặc click nút tải ảnh để tải trực tiếp file ảnh PNG.
+            </p>
+        </div>
+    </div>
+
+    <button id="scrollToTopBtn">⬆</button>
+    <button id="scrollToBottomBtn">⬇</button>
+
+<script>
+'use strict';
+(function() {
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'F5' || (e.ctrlKey && (e.key === 'r' || e.key === 'R'))) {
+            e.preventDefault();
+            window.location.href = window.location.pathname;
+        }
+    });
+
+    if (performance.navigation.type === 1) { window.location.hash = ''; }
+
+    let appMode = 'excel';
+    let excelData1 = [], excelData2 = [];
+    let rawDataMap = new Map();
+    let dateRangeText = "Chưa có ngày";
+    let regionDefinitions = {};
+    let debtData = new Map();
+    let veBocData = new Map();
+    let currentGeneratedImages = [];
+    let currentReportType = 'detailed';
+    let bieu35DateRange = '';  // Ngày tháng của Biểu 35 (XSKT)
+
+    window.manuallyAddedAgents = new Set();
+
+    let branchModes = {
+        'all': { label: 'Xem Tất Cả', prefixes: [] }
+    };
+
+    let globalSelectedDates = [];
+    let agentDateRules = {};
+    let currentSearchSelectedDates = [];
+    let currentSearchAgentCode = null;
+
+    const state = {
+        currentSoSo: null, baseTongDT: 0, baseTongHH: 0, baseThuong: 0,
+        extraBonus: 0, extraDebt: 0, addedTickets: [], accountCodes: new Set(), debtFromData: 0
+    };
+
+    const DOM = {
+        homePage: document.getElementById('homePage'), mainPage: document.getElementById('mainPage'),
+        excelFile1: document.getElementById('excelFile1'), excelFile2: document.getElementById('excelFile2'), btnLoadData: document.getElementById('btnLoadData'),
+        tabExcel: document.getElementById('tabExcel'), 
+        panelExcel: document.getElementById('panelExcel'), 
+        homeActionContainer: document.getElementById('homeActionContainer'),
+        btnGoToSummary: document.getElementById('btnGoToSummary'), btnGoToSell: document.getElementById('btnGoToSell'),
+        btnBackFromSummary: document.getElementById('btnBackFromSummary'), btnBackFromSell: document.getElementById('btnBackFromSell'),
+        summarySection: document.getElementById('summarySection'), reportSection: document.getElementById('reportSection'), sellSection: document.getElementById('sellSection'),
+        summaryTableContainer: document.getElementById('summaryTableContainer'), summaryDate: document.getElementById('summaryDate'), summaryTitle: document.getElementById('summaryTitle'),
+        soSoInput: document.getElementById('soSoInput'),
+        btnCreateDailyReport: document.getElementById('btnCreateDailyReport'),
+        btnCreateSummaryReport: document.getElementById('btnCreateSummaryReport'),
+        reportContainer: document.getElementById('reportContainer'),
+        actionButtonContainer: document.getElementById('actionButtonContainer'), actionChoices: document.getElementById('actionChoices'), toggleChoicesBtn: document.getElementById('toggleChoicesBtn'),
+        btnCopySummary: document.getElementById('btnCopySummary'), btnPrintReport: document.getElementById('btnPrintReport'), btnExportExcel: document.getElementById('btnExportExcel'),
+        btnCopyReport: document.getElementById('btnCopyReport'),
+        btnAddTicket: document.getElementById('btnAddTicket'), sellQuantityInput: document.getElementById('sellQuantityInput'),
+        customTicketName: document.getElementById('customTicketName'), customTicketPrice: document.getElementById('customTicketPrice'), customTicketRate: document.getElementById('customTicketRate'),
+        notificationArea: document.getElementById('notification-area'), loadingIndicator: document.getElementById('loading-indicator'),
+        imagePreviewModal: document.getElementById('imagePreviewModal'), closePreviewModalBtn: document.getElementById('closePreviewModalBtn'), imagePreviewHolder: document.getElementById('imagePreviewHolder'),
+        scrollToTopBtn: document.getElementById('scrollToTopBtn'), scrollToBottomBtn: document.getElementById('scrollToBottomBtn'),
+        regionLockContainer: document.getElementById('regionLockContainer'), regionDefinitionsInput: document.getElementById('regionDefinitionsInput'), btnSaveRegions: document.getElementById('btnSaveRegions'), regionSelect: document.getElementById('regionSelect'),
+        sortSelect: document.getElementById('sortSelect'), minRevenueInput: document.getElementById('minRevenueInput'), maxRevenueInput: document.getElementById('maxRevenueInput'), btnClearRevenueFilter: document.getElementById('btnClearRevenueFilter'),
+        debtInput: document.getElementById('debtInput'), debtManualContainer: document.getElementById('debtManualContainer'), debtExcelContainer: document.getElementById('debtExcelContainer'), debtFile: document.getElementById('debtFile'),
+        debtModeRadios: document.querySelectorAll('input[name="debtMode"]'), btnClearDebt: document.getElementById('btnClearDebt'), debtStatusMsg: document.getElementById('debtStatusMsg'), btnApplyDebt: document.getElementById('btnApplyDebt'),
+        btnSaveAllImages: document.getElementById('btnSaveAllImages'), btnShareImage: document.getElementById('btnShareImage'),
+        veBocInput: document.getElementById('veBocInput'), veBocManualContainer: document.getElementById('veBocManualContainer'), veBocExcelContainer: document.getElementById('veBocExcelContainer'), veBocFile: document.getElementById('veBocFile'), veBocModeRadios: document.querySelectorAll('input[name="veBocMode"]'), btnClearVeBoc: document.getElementById('btnClearVeBoc'), veBocStatusMsg: document.getElementById('veBocStatusMsg'), btnApplyVeBoc: document.getElementById('btnApplyVeBoc'),
+        toggleAdvancedTools: document.getElementById('toggleAdvancedTools'), advancedToolsContainer: document.getElementById('advancedToolsContainer'),
+        selBranchMode: document.getElementById('selBranchMode'), cbExcludeNumeric: document.getElementById('cbExcludeNumeric'), cbExcludeXSKT: document.getElementById('cbExcludeXSKT'), cbExcludeVeBoc: document.getElementById('cbExcludeVeBoc'),
+        selBranchMode_Detailed: document.getElementById('selBranchMode_Detailed'), cbExcludeNumeric_Detailed: document.getElementById('cbExcludeNumeric_Detailed'), cbExcludeXSKT_Detailed: document.getElementById('cbExcludeXSKT_Detailed'), cbExcludeVeBoc_Detailed: document.getElementById('cbExcludeVeBoc_Detailed'),
+        agentDateSelect: document.getElementById('agentDateSelect'), datePickerContainer: document.getElementById('datePickerContainer'), availableDatesList: document.getElementById('availableDatesList'), activeRulesSummary: document.getElementById('activeRulesSummary'),
+        detailedDatePickerContainer: document.getElementById('detailedDatePickerContainer'), detailedDatesList: document.getElementById('detailedDatesList')
+    };
+
+    function showNotification(message, type = 'info', duration = 3000) {
+        const n = document.createElement('div'); n.className = `notification ${type}`; n.textContent = message;
+        DOM.notificationArea.appendChild(n); n.offsetHeight; n.classList.add('show');
+        setTimeout(() => { n.classList.remove('show'); n.addEventListener('transitionend', () => n.remove()); }, duration);
+    }
+    function showLoading() { DOM.loadingIndicator.style.display = 'block'; }
+    function hideLoading() { DOM.loadingIndicator.style.display = 'none'; }
+    function formatNumberHiddenK(num) { num = parseFloat(num); if(isNaN(num) || num === 0 || Math.abs(num) < 1000) return "0"; return parseInt(num / 1000).toLocaleString("vi-VN"); }
+    function formatCommissionCellHiddenK(rev, com) { return formatNumberHiddenK(com); }
+    function getBaseId(code) { const match = String(code).match(/\d+$/); return match ? match[0] : code; }
+    function removeVietnameseTones(str) { return str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g,"a").replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g,"e").replace(/ì|í|ị|ỉ|ĩ/g,"i").replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g,"o").replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g,"u").replace(/ỳ|ý|ỵ|ỷ|ỹ/g,"y").replace(/đ/g,"d").replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A").replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E").replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I").replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O").replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U").replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y").replace(/Đ/g, "D"); }
+
+    function docso(numberStr) {
+        const num = String(numberStr).replace(/[.,]/g, ''); if(num === '0') return 'Không'; if(num === '' || isNaN(parseInt(num))) return '';
+        const words = ["không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
+        const units = ["", "nghìn", "triệu", "tỷ"];
+        const readChunk = (s, first) => {
+            if(!s || parseInt(s, 10) === 0) return "";
+            let n = s.padStart(3, '0').split('').map(Number);
+            if(s.length < 3 && first) { if(s.length === 1) n = [0, 0, Number(s)]; else n = [0, Number(s[0]), Number(s[1])]; }
+            const [tr, ch, dv] = n; let str = "";
+            if(tr > 0) str += words[tr] + " trăm "; else if(!first && (ch > 0 || dv > 0)) str += "không trăm ";
+            if(ch === 0 && dv !== 0) { if(tr > 0 || !first) str += "linh "; } else if(ch === 1) str += "mười "; else if(ch > 1) str += words[ch] + " mươi ";
+            if(dv > 0) { if(ch === 0) { if((tr > 0 || !first) && parseInt(s, 10) > 0) str += words[dv]; else if(first) str += words[dv]; } else if(ch === 1) { if(dv === 1) str += "một"; else if(dv === 5) str += "lăm"; else str += words[dv]; } else { if(dv === 1) str += "mốt"; else if(dv === 5) str += "lăm"; else str += words[dv]; } }
+            return str.trim();
+        };
+        const chunks = []; let tmp = num;
+        while(tmp.length > 3) { chunks.unshift(tmp.substring(Math.max(0, tmp.length - 3))); tmp = tmp.substring(0, tmp.length - 3); } chunks.unshift(tmp);
+        if(chunks.length > units.length) return "Số quá lớn";
+        let res = chunks.map((c, i) => { const t = readChunk(c, i === 0); return t ? t + " " + units[chunks.length - 1 - i] : ""; }).filter(Boolean).join(" ").replace(/\s+/g, ' ').trim();
+        return res.charAt(0).toUpperCase() + res.slice(1);
+    }
+
+    // Diễn giải ngày thông minh
+    function getFormattedDateRange(datesArray) {
+        if (!datesArray || datesArray.length === 0) return dateRangeText;
+        if (datesArray.length === 1) return `Ngày ${datesArray[0]}`;
+        
+        const parseDate = (dStr) => {
+            const p = dStr.split('/');
+            let y = p.length === 3 ? parseInt(p[2], 10) : new Date().getFullYear();
+            if (y < 100) y += 2000;
+            return new Date(y, parseInt(p[1], 10) - 1, parseInt(p[0], 10)).getTime();
+        };
+        
+        let sortedDates = [...datesArray].sort((a, b) => parseDate(a) - parseDate(b));
+        let isConsecutive = true;
+        const oneDay = 24 * 60 * 60 * 1000;
+        
+        for (let i = 1; i < sortedDates.length; i++) {
+            let diff = Math.round((parseDate(sortedDates[i]) - parseDate(sortedDates[i-1])) / oneDay);
+            if (diff !== 1) { 
+                isConsecutive = false; 
+                break; 
+            }
+        }
+        
+        return isConsecutive ? `Từ ${sortedDates[0]} đến ${sortedDates[sortedDates.length - 1]}` : `Ngày ${sortedDates.join(', ')}`;
+    }
+
+    async function readExcelFileAsync(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const wb = XLSX.read(data, {type: "array"});
+                    const ws = wb.Sheets[wb.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(ws, {defval: ""});
+                    resolve({ json, filename: file.name });
+                } catch(err) { reject(err); }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+    }
+
+    DOM.excelFile1.addEventListener('change', async function(e) {
+        const files = e.target.files;
+        if (!files.length) return;
+        showLoading();
+        excelData1 = [];
+        let allParsedDates = new Set();
+        let errorMsg = '';
+
+        for (let i = 0; i < files.length; i++) {
+            try {
+                const data = await readExcelFileAsync(files[i]);
+                const json = data.json;
+                if(!json.length) continue;
+                
+                let foundDateStr = null;
+                for(let j = 0; j < Math.min(json.length, 20); j++) {
+                    let rowVals = Object.values(json[j]);
+                    for(let v of rowVals) {
+                        if(typeof v === "string") {
+                            let dates = v.match(/\d{1,2}\/\d{1,2}(?:\/\d{2,4})?/g);
+                            if(dates && dates.length > 0) {
+                                let parts = dates[0].split('/');
+                                if (parts.length === 3 && parts[2].length === 4) { 
+                                    foundDateStr = `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2].substring(2)}`; 
+                                } else {
+                                    foundDateStr = dates[0];
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    if(foundDateStr) break;
+                }
+                
+                if (foundDateStr) {
+                    allParsedDates.add(foundDateStr);
+                    json.forEach(row => { row._parsedDate = foundDateStr; });
+                }
+                excelData1 = excelData1.concat(json);
+            } catch (err) {
+                errorMsg += `Lỗi đọc ${files[i].name}: ${err.message}\n`;
+            }
+        }
+        
+        if (allParsedDates.size > 0) {
+            let sortedDates = Array.from(allParsedDates).sort();
+            dateRangeText = getFormattedDateRange(sortedDates);
+            globalSelectedDates = [...sortedDates];
+            renderGlobalDatePicker();
+        }
+
+        DOM.excelFile1.classList.add('loaded');
+        if (errorMsg) showNotification(errorMsg, 'warning');
+        else showNotification(`Đã nạp thành công ${files.length} file Biểu 31!`, 'success');
+        hideLoading();
+    });
+
+    DOM.excelFile2.addEventListener('change', async function(e) {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+        showLoading();
+        try {
+            // Đọc và parse từng file tuần tự
+            const allResults = [];
+            const allDateTexts = [];
+            for (const file of files) {
+                const data = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = ev => resolve(new Uint8Array(ev.target.result));
+                    reader.onerror = () => reject(new Error('Không đọc được file: ' + file.name));
+                    reader.readAsArrayBuffer(file);
+                });
+                const wb = XLSX.read(data, { type: 'array' });
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                const { data: parsed, dateText } = parseBieu35(ws);
+                allResults.push(...parsed);
+                if (dateText) allDateTexts.push(dateText);
+            }
+
+            // Lưu ngày tháng của Biểu 35
+            bieu35DateRange = allDateTexts.length > 0 ? allDateTexts.join(', ') : '';
+
+            // Merge: cộng dồn xskt theo mã đại lý
+            const mergeMap = new Map();
+            for (const item of allResults) {
+                const key = item.code.toUpperCase().trim();
+                if (mergeMap.has(key)) {
+                    mergeMap.get(key).xskt += item.xskt;
+                } else {
+                    mergeMap.set(key, { code: item.code, xskt: item.xskt });
+                }
+            }
+            excelData2 = Array.from(mergeMap.values());
+
+            DOM.excelFile2.classList.add('loaded');
+            if (files.length > 1) {
+                showNotification(`Đã nạp và gộp ${files.length} file Biểu 35! (${excelData2.length} đại lý)`, 'success');
+            } else {
+                showNotification(`Đã nạp file Biểu 35! (${excelData2.length} đại lý)`, 'success');
+            }
+        } catch(err) {
+            showNotification('Lỗi đọc file Biểu 35: ' + err.message, 'error');
+        } finally {
+            hideLoading();
+        }
+    });
+
+    function parseBieu35(ws) {
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+        if (rows.length < 5) return { data: [], dateText: '' };
+        let xsktColIndex = -1, codeColIndex = -1, headerRowIndex = -1;
+        for (let rIdx = 0; rIdx < Math.min(rows.length, 15); rIdx++) {
+            const row = rows[rIdx];
+            for (let cIdx = 0; cIdx < row.length; cIdx++) {
+                const cleanVal = removeVietnameseTones(String(row[cIdx] || '').trim()).replace(/\s+/g, '').toUpperCase();
+                if (cleanVal === 'XSKT') { xsktColIndex = cIdx; headerRowIndex = rIdx; break; }
+            }
+            if (xsktColIndex !== -1) break;
+        }
+        for (let rIdx = 0; rIdx < Math.min(rows.length, 15); rIdx++) {
+            const row = rows[rIdx];
+            for (let cIdx = 0; cIdx < row.length; cIdx++) {
+                const cleanVal = removeVietnameseTones(String(row[cIdx] || '').trim()).replace(/\s+/g, '').toUpperCase();
+                if (cleanVal === 'MADL' || cleanVal === 'MADAILY' || cleanVal === 'MAD.LY' || cleanVal === 'MADONVI') { codeColIndex = cIdx; break; }
+            }
+            if (codeColIndex !== -1) break;
+        }
+        if (xsktColIndex === -1) { xsktColIndex = 8; headerRowIndex = 4; }
+        if (codeColIndex === -1) { codeColIndex = 1; }
+
+        // --- Trích xuất ngày tháng từ các hàng header ---
+        let dateText = '';
+        const datePattern = /(\d{1,2})[\/-](\d{1,2})(?:[\/-](\d{2,4}))?/g;
+        const tuDenPattern = /t[\u01b0u][\s]+(\d{1,2}[\/-]\d{1,2}(?:[\/-]\d{2,4})?)\s*[\u0111d][\u1ebf\u1ecde]n\s+(\d{1,2}[\/-]\d{1,2}(?:[\/-]\d{2,4})?)/i;
+        for (let rIdx = 0; rIdx < Math.min(rows.length, headerRowIndex + 1 || 10); rIdx++) {
+            for (const cell of rows[rIdx]) {
+                const cellStr = String(cell || '').trim();
+                if (!cellStr) continue;
+                // Tìm dạng "từ ... đến ..."
+                const tuDen = cellStr.match(tuDenPattern);
+                if (tuDen) { dateText = `Từ ${tuDen[1]} đến ${tuDen[2]}`; break; }
+                // Tìm các ngày rời rạc
+                const dates = cellStr.match(datePattern);
+                if (dates && dates.length >= 2) {
+                    dateText = `Từ ${dates[0]} đến ${dates[dates.length - 1]}`; break;
+                } else if (dates && dates.length === 1 && cellStr.length < 30) {
+                    dateText = `Ngày ${dates[0]}`;
+                }
+            }
+            if (dateText) break;
+        }
+
+        const dataList = [];
+        for (let i = headerRowIndex + 1; i < rows.length; i++) {
+            const row = rows[i];
+            let code = '';
+            if (codeColIndex !== -1 && row[codeColIndex] !== undefined && row[codeColIndex] !== null) code = String(row[codeColIndex]).trim();
+            if (!code || !/\d/.test(code)) continue;
+            const upper = code.toUpperCase();
+            if (upper.includes("TỔNG") || upper.includes("CỘNG") || upper.includes("CÔNG") || upper.includes("TOTAL")) continue;
+            dataList.push({ code: code, xskt: parseFloat(row[xsktColIndex]) || 0 });
+        }
+        return { data: dataList, dateText };
+    }
+
+    function renderGlobalDatePicker() {
+        const list = document.getElementById('globalDatesList'); list.innerHTML = '';
+        let allDates = new Set();
+        if (appMode === 'excel') {
+            excelData1.forEach(r => { if (r._parsedDate) allDates.add(r._parsedDate); });
+        }
+        
+        if (allDates.size === 0) { list.innerHTML = '<span style="font-size: 12px; color: #aaa; font-style: italic;">(Hãy nạp dữ liệu trước để hiện ngày)</span>'; return; }
+        
+        const uniqueDates = Array.from(allDates).sort();
+        if (globalSelectedDates.length === 0) { globalSelectedDates = [...uniqueDates]; }
+        uniqueDates.forEach(d => {
+            const btn = document.createElement('div'); btn.className = 'date-tag'; btn.textContent = d;
+            if (globalSelectedDates.includes(d)) {
+                btn.classList.add('active');
+            }
+            btn.onclick = () => {
+                const idx = globalSelectedDates.indexOf(d);
+                if (idx > -1) { globalSelectedDates.splice(idx, 1); } else { globalSelectedDates.push(d); }
+                btn.classList.toggle('active'); generateSummaryView();
+            };
+            list.appendChild(btn);
+        });
+    }
+
+    function refreshAgentDropdown() {
+        const selectEl = DOM.agentDateSelect; if (!selectEl) return;
+        const currentVal = selectEl.value; selectEl.innerHTML = '<option value="">-- Bước 1: Chọn Nhóm Đại Lý --</option>';
+        const baseIds = new Set();
+        if (appMode === 'excel') {
+            excelData1.forEach(r => {
+                const c = String(r.__EMPTY||'').trim(); 
+                if(c && /\d/.test(c)) baseIds.add(getBaseId(c));
+            });
+        }
+        Array.from(baseIds).sort((a,b) => parseInt(a) - parseInt(b)).forEach(baseId => {
+            const opt = document.createElement('option'); opt.value = baseId; opt.text = "Nhóm " + baseId; selectEl.add(opt);
+        });
+        if (baseIds.has(currentVal)) selectEl.value = currentVal;
+    }
+
+    DOM.agentDateSelect.onchange = function() {
+        const baseId = this.value;
+        if (!baseId) { DOM.datePickerContainer.style.display = 'none'; return; }
+        DOM.datePickerContainer.style.display = 'block'; DOM.availableDatesList.innerHTML = '';
+        const allDates = new Set();
+        if (appMode === 'excel') {
+            excelData1.forEach(r => {
+                const c = String(r.__EMPTY||'').trim(); 
+                if (getBaseId(c) === baseId && r._parsedDate) allDates.add(r._parsedDate);
+            });
+        }
+        
+        const uniqueDates = Array.from(allDates).sort();
+        uniqueDates.forEach(date => {
+            const btn = document.createElement('button'); btn.textContent = date;
+            btn.className = 'detailed-date-btn';
+            const isSelected = agentDateRules[baseId] && agentDateRules[baseId].includes(date);
+            if (isSelected) { btn.classList.add('active'); }
+            btn.onclick = () => {
+                if (!agentDateRules[baseId]) agentDateRules[baseId] = [];
+                const index = agentDateRules[baseId].indexOf(date);
+                if (index > -1) { agentDateRules[baseId].splice(index, 1); } else { agentDateRules[baseId].push(date); }
+                if (agentDateRules[baseId].length === 0) delete agentDateRules[baseId];
+                
+                const nowSelected = agentDateRules[baseId]?.includes(date);
+                if (nowSelected) { btn.classList.add('active'); }
+                else { btn.classList.remove('active'); }
+                renderActiveRules(); generateSummaryView();
+            };
+            DOM.availableDatesList.appendChild(btn);
+        });
+    };
+
+    function renderActiveRules() {
+        DOM.activeRulesSummary.innerHTML = '';
+        Object.keys(agentDateRules).forEach(baseId => {
+            const span = document.createElement('div');
+            span.style.cssText = 'font-size: 12px; background: #e8f4fd; padding: 5px 10px; border-radius: 4px; border-left: 3px solid #3498db; display: flex; justify-content: space-between;';
+            span.innerHTML = `<span><b style="color:#2c3e50">Nhóm ${baseId}:</b> ${agentDateRules[baseId].join(', ')}</span><span style="color:#e74c3c; cursor:pointer; font-weight:bold" onclick="removeAgentRule('${baseId}')">✕</span>`;
+            DOM.activeRulesSummary.appendChild(span);
+        });
+    }
+
+    window.removeAgentRule = (baseId) => {
+        delete agentDateRules[baseId]; renderActiveRules();
+        if(DOM.agentDateSelect.value === baseId) { DOM.agentDateSelect.onchange(); }
+        generateSummaryView();
+    };
+
+    function processSummaryData(regionRules, revFilter) {
+        let groups = new Map();
+        let totals = {rev:0, com:0, th:0, debt:0, final:0, lotoDB:0, lotoCap:0, c227:0, c323:0, xskt:0, veBoc:0};
+        const map = new Map();
+        const init = (c) => { if(!map.has(c)) map.set(c,{totRev:0,totCom:0,lotoDB:0,lotoCap:0,c227:0,c323:0,xskt:0,xsktCom:0,thuong:0,debt:0, veBoc:0, veBocCom:0}); };
+
+        if(appMode === 'excel') {
+            excelData1.forEach(r => {
+                const c = String(r.__EMPTY||'').trim(); if(!c||!/\d/.test(c)) return;
+                if (r._parsedDate) {
+                    const baseId = getBaseId(c);
+                    let isAllowed = true;
+                    if (agentDateRules[baseId] && agentDateRules[baseId].length > 0) {
+                        if (!agentDateRules[baseId].includes(r._parsedDate)) isAllowed = false;
+                    } else if (globalSelectedDates.length > 0) {
+                        if (!globalSelectedDates.includes(r._parsedDate)) isAllowed = false;
+                    }
+                    if (!isAllowed) return;
+                }
+
+                init(c); const d = map.get(c);
+                const ldb = parseFloat(r.__EMPTY_2)||0, lc = parseFloat(r.__EMPTY_6)||0, c2 = parseFloat(r.__EMPTY_8)||0, c3 = parseFloat(r.__EMPTY_10)||0, th = parseFloat(r.__EMPTY_14)||0;
+                d.lotoDB += ldb; d.lotoCap += lc; d.c227 += c2; d.c323 += c3; d.thuong += th;
+                d.totRev += ldb+lc+c2+c3; d.totCom += (ldb*0.08)+(lc*0.1)+(c2*0.1)+(c3*0.1);
+            });
+
+            excelData2.forEach(item => {
+                const baseNum = parseInt(getBaseId(item.code), 10);
+                if (isNaN(baseNum)) return;
+                let targetKey = "";
+                if (map.has(item.code)) { targetKey = item.code; } 
+                else {
+                    let matches = [];
+                    map.forEach((v, k) => { if (parseInt(getBaseId(k), 10) === baseNum) matches.push(k); });
+                    if (matches.length > 0) { const pureNumeric = matches.find(k => /^\d+$/.test(k)); targetKey = pureNumeric || matches[0]; }
+                }
+                if (!targetKey) targetKey = item.code;
+                init(targetKey); const d = map.get(targetKey);
+                const x = item.xskt * 1000;
+                d.xskt += x; d.xsktCom += x*0.1; d.totRev += x; d.totCom += x*0.1;
+            });
+            debtData.forEach((v,k) => { init(k); map.get(k).debt = v; });
+            veBocData.forEach((v,k) => { init(k); const d = map.get(k); d.veBoc += v.rev; d.veBocCom += v.com; d.totRev += v.rev; d.totCom += v.com; });
+            const keys = [...map.keys()];
+            keys.forEach(k => { const d = map.get(k); if(d.totRev===0 && d.debt===0 && d.thuong===0 && d.veBoc===0) map.delete(k); });
+        }
+
+        let filteredMap = new Map();
+        const isExcludeNumeric = DOM.cbExcludeNumeric ? DOM.cbExcludeNumeric.checked : false;
+        const isExcludeXSKT = DOM.cbExcludeXSKT ? DOM.cbExcludeXSKT.checked : false;
+        const isExcludeVeBoc = DOM.cbExcludeVeBoc ? DOM.cbExcludeVeBoc.checked : false;
+        const selectedBranchMode = DOM.selBranchMode ? DOM.selBranchMode.value : 'all';
+        const branchPrefixes = branchModes[selectedBranchMode]?.prefixes || [];
+
+        map.forEach((v,k) => {
+            const strCode = String(k).toUpperCase();
+            if (selectedBranchMode !== 'all') {
+                const matchesPrefix = branchPrefixes.some(pref => strCode.startsWith(pref));
+                if (!matchesPrefix) return; 
+            }
+            let item = { ...v };
+            if (isExcludeNumeric && /^\d+$/.test(strCode)) {
+                item.lotoDB = 0; item.lotoCap = 0; item.c227 = 0; item.c323 = 0; item.thuong = 0;
+                item.totRev = item.xskt + item.veBoc;
+                item.totCom = item.xsktCom + item.veBocCom;
+            }
+            if (isExcludeXSKT) { item.totRev -= item.xskt; item.totCom -= item.xsktCom; item.xskt = 0; item.xsktCom = 0; }
+            if (isExcludeVeBoc) { item.totRev -= item.veBoc; item.totCom -= item.veBocCom; item.veBoc = 0; item.veBocCom = 0; }
+
+            if(regionRules) {
+                const numMatch = strCode.match(/\d+$/);
+                if(numMatch){
+                    const n = parseInt(numMatch[0],10);
+                    if(regionRules.some(r => n >= r.min && n <= r.max)) filteredMap.set(k, item);
+                }
+            } else {
+                filteredMap.set(k, item);
+            }
+        });
+
+        const sortedKeys = [...filteredMap.keys()].sort((a,b) => {
+            const sa = String(a), sb = String(b);
+            const na = parseInt(sa.match(/\d+$/)?.[0]||0, 10), nb = parseInt(sb.match(/\d+$/)?.[0]||0, 10);
+            if (na !== nb) return na - nb;
+            const pureA = /^\d+$/.test(sa), pureB = /^\d+$/.test(sb);
+            if (pureA && !pureB) return -1;
+            if (!pureA && pureB) return 1;
+            return sa.localeCompare(sb);
+        });
+
+        sortedKeys.forEach(k => {
+            const gk = parseInt(String(k).match(/\d+$/)?.[0]||k);
+            if(!groups.has(gk)) groups.set(gk,{agents:[],gt:0,gr:0,gth:0,gdb:0,gx:0});
+            const g = groups.get(gk), d = filteredMap.get(k), final = (d.totRev-d.totCom-d.thuong)+d.debt;
+            g.agents.push({code:k,data:d}); g.gt += final; g.gr += d.totRev; g.gth += d.thuong; g.gdb += d.lotoDB; g.gx += d.xskt;
+        });
+
+        const finalGroups = new Map();
+        if(revFilter) groups.forEach((v,k) => { if(v.gr >= revFilter.min && v.gr <= revFilter.max) finalGroups.set(k,v); });
+        else return {groups, totals:{}};
+
+        finalGroups.forEach(g => {
+            g.agents.forEach(a => {
+                const d = a.data; totals.rev += d.totRev; totals.th += d.thuong; totals.debt += d.debt;
+                totals.com += (d.lotoDB*0.08)+(d.lotoCap*0.1)+(d.c227*0.1)+(d.c323*0.1)+(d.xskt*0.1)+(d.veBoc*0.12);
+                totals.lotoDB += d.lotoDB; totals.lotoCap += d.lotoCap; totals.c227 += d.c227; totals.c323 += d.c323; totals.xskt += d.xskt; totals.veBoc += d.veBoc;
+                totals.final += (d.totRev-d.totCom-d.thuong)+d.debt;
+            });
+        });
+
+        return {groups:finalGroups, totals};
+    }
+
+    function generateSummaryView() {
+        if(!excelData1.length && !excelData2.length && debtData.size===0 && veBocData.size===0) return;
+        const regVal = DOM.regionSelect.value, rules = regVal !== 'all' ? regionDefinitions[regVal] : null;
+        const minV = parseFloat(DOM.minRevenueInput.dataset.value)||0, maxV = parseFloat(DOM.maxRevenueInput.dataset.value)||Infinity;
+        const {groups, totals} = processSummaryData(rules, {min:minV*1000, max:maxV*1000});
+
+        const hasXSKT = excelData2.length > 0; const hasDebt = debtData.size > 0; const hasVeBoc = veBocData.size > 0;
+        let html = `<thead><tr><th width="8%">STT</th><th width="12%">ĐL</th><th>LTô</th><th>LCặp</th><th>Lô 3/23</th><th>Lô 2/27</th>${hasXSKT?'<th>XSKT</th>':''}${hasVeBoc?'<th>VBóc</th>':''}<th>Dsố</th><th>Thưởng</th>${hasDebt?'<th>Nợ cũ</th>':''}<th>Tiền nộp</th></tr></thead><tbody>`;
+
+        let stt = 1, sortedGroups = [...groups.entries()];
+        const sortMode = DOM.sortSelect.value;
+        if(sortMode === 'revenue_desc') sortedGroups.sort((a,b)=>b[1].gr - a[1].gr); else if(sortMode === 'revenue_asc') sortedGroups.sort((a,b)=>a[1].gr - b[1].gr);
+
+        sortedGroups.forEach(([gk, g]) => {
+            const isGroup = g.agents.length > 1;
+            g.agents.forEach((ag, idx) => {
+                const d = ag.data, final = (d.totRev-d.totCom-d.thuong)+d.debt;
+                const rowClass = isGroup ? 'group-member-row' : 'single-agent-row';
+
+                let displayCode = ag.code;
+                let codeClass = ' class="clickable-agent-code"';
+
+                if (!isGroup) {
+                    let base = getBaseId(ag.code);
+                    const selectedBranchMode = DOM.selBranchMode ? DOM.selBranchMode.value : 'all';
+                    const branchPrefixes = branchModes[selectedBranchMode]?.prefixes || [];
+                    if (selectedBranchMode !== 'all' && branchPrefixes.some(p => isNaN(parseInt(p, 10)))) {
+                        displayCode = ag.code;
+                    } else {
+                        displayCode = /^\d+$/.test(base) ? String(parseInt(base, 10)).padStart(3, '0') : base;
+                    }
+                    codeClass = ' class="code-cell-highlight clickable-agent-code"';
+                }
+
+                html += `<tr class="${rowClass}"><td>${idx===0?stt:''}</td><td${codeClass} onclick="window.viewAgentDetail('${ag.code}')">${displayCode}</td><td>${formatNumberHiddenK(d.lotoDB)}</td><td>${formatNumberHiddenK(d.lotoCap)}</td><td>${formatNumberHiddenK(d.c323)}</td><td>${formatNumberHiddenK(d.c227)}</td>${hasXSKT?`<td>${formatNumberHiddenK(d.xskt)}</td>`:''}${hasVeBoc?`<td>${formatNumberHiddenK(d.veBoc)}</td>`:''}<td>${formatNumberHiddenK(d.totRev)}</td><td>${formatNumberHiddenK(d.thuong)}</td>${hasDebt?`<td>${formatNumberHiddenK(d.debt)}</td>`:''}<td>${final<0?`<span class="negative-value">`:''}${formatNumberHiddenK(final)}${final<0?'</span>':''}</td></tr>`;
+            });
+            if (isGroup) {
+                let sumDebt = 0, sumCom = 0;
+                g.agents.forEach(ag => { sumDebt += ag.data.debt; sumCom += ag.data.totCom; });
+                let sumLoto = 0, sumCap = 0, sumC3 = 0, sumC2 = 0, sumXskt = 0, sumVeBoc = 0;
+                g.agents.forEach(ag => { sumLoto+=ag.data.lotoDB; sumCap+=ag.data.lotoCap; sumC3+=ag.data.c323; sumC2+=ag.data.c227; sumXskt+=ag.data.xskt; sumVeBoc+=ag.data.veBoc; });
+                html += `<tr class="group-total-row"><td></td><td class="code-cell-highlight clickable-agent-code" onclick="window.viewAgentDetail('${gk}')">${String(gk).padStart(3, '0')}</td><td>${formatNumberHiddenK(sumLoto)}</td><td>${formatNumberHiddenK(sumCap)}</td><td>${formatNumberHiddenK(sumC3)}</td><td>${formatNumberHiddenK(sumC2)}</td>${hasXSKT?`<td>${formatNumberHiddenK(sumXskt)}</td>`:''}${hasVeBoc?`<td>${formatNumberHiddenK(sumVeBoc)}</td>`:''}<td>${formatNumberHiddenK(g.gr)}</td><td>${formatNumberHiddenK(g.gth)}</td>${hasDebt?`<td>${formatNumberHiddenK(sumDebt)}</td>`:''}<td style="color:#c0392b;">${formatNumberHiddenK(g.gt)}</td></tr>`;
+            }
+            stt++;
+        });
+
+        html += `<tr id="summaryTotalRow" class="group-total-row" style="background-color:#5d4037;color:white;font-weight:bold;"><td colspan="2">TỔNG</td><td>${formatNumberHiddenK(totals.lotoDB)}</td><td>${formatNumberHiddenK(totals.lotoCap)}</td><td>${formatNumberHiddenK(totals.c323)}</td><td>${formatNumberHiddenK(totals.c227)}</td>${hasXSKT?`<td>${formatNumberHiddenK(totals.xskt)}</td>`:''}${hasVeBoc?`<td>${formatNumberHiddenK(totals.veBoc)}</td>`:''}<td>${formatNumberHiddenK(totals.rev)}</td><td>${formatNumberHiddenK(totals.th)}</td>${hasDebt?`<td>${formatNumberHiddenK(totals.debt)}</td>`:''}<td class="${totals.final>=0?'final-amount-positive':'final-amount-negative'}">${formatNumberHiddenK(totals.final)}</td></tr></tbody>`;
+
+        DOM.summaryTableContainer.innerHTML = `<table border="1">${html}</table>`;
+        const displayRegion = regVal === 'all' ? 'Tất Cả' : regVal;
+        DOM.summaryTitle.innerHTML = `Bảng Tổng Hợp: <span style="color:var(--primary-color)">${displayRegion}</span>`;
+
+        let displayGlobalDate = getFormattedDateRange(globalSelectedDates);
+        let percent = totals.rev > 0 ? (totals.th / totals.rev * 100) : 0;
+        let pString = `<span style="color:${percent<=50?'var(--success-color)':'var(--danger-color)'}">(${percent.toFixed(1)}%)</span>`;
+
+        // Hiển thị ngày XSKT riêng nếu lệch với Biểu 31
+        let xsktDateLine = '';
+        if (hasXSKT && bieu35DateRange && bieu35DateRange !== displayGlobalDate) {
+            xsktDateLine = `<br><span style="font-size:12px; color:#e67e22; font-weight:600;">&#x1F4C5; XSKT: ${bieu35DateRange}</span>`;
+        }
+
+        DOM.summaryDate.innerHTML = `${displayGlobalDate}${xsktDateLine}<br>Doanh số: <b style="color:var(--danger-color)">${formatNumberHiddenK(totals.rev)}</b> - Thưởng: <b style="color:var(--primary-dark)">${formatNumberHiddenK(totals.th)}</b> ${pString}`;
+    }
+
+    window.viewAgentDetail = (code) => {
+        if (DOM.selBranchMode && DOM.selBranchMode_Detailed) DOM.selBranchMode_Detailed.value = DOM.selBranchMode.value;
+        if (DOM.cbExcludeNumeric && DOM.cbExcludeNumeric_Detailed) DOM.cbExcludeNumeric_Detailed.checked = DOM.cbExcludeNumeric.checked;
+        if (DOM.cbExcludeXSKT && DOM.cbExcludeXSKT_Detailed) DOM.cbExcludeXSKT_Detailed.checked = DOM.cbExcludeXSKT.checked;
+        if (DOM.cbExcludeVeBoc && DOM.cbExcludeVeBoc_Detailed) DOM.cbExcludeVeBoc_Detailed.checked = DOM.cbExcludeVeBoc.checked;
+        DOM.soSoInput.value = getBaseId(code);
+        DOM.soSoInput.dispatchEvent(new Event('input'));
+        showSection('reportSection');
+        currentReportType = 'summary';
+        createReport();
+    };
+
+    DOM.soSoInput.addEventListener('input', function() {
+        const searchCode = this.value.trim().toUpperCase();
+        let baseId = null; let availableDates = new Set();
+        if (searchCode) {
+            const inputNum = searchCode.replace(/\D/g, '') || searchCode;
+            excelData1.forEach(r => {
+                const c = String(r.__EMPTY||'').trim(); 
+                const keyBase = getBaseId(c);
+                if (c.toUpperCase() === searchCode || keyBase === inputNum) {
+                    baseId = keyBase;
+                    if (r._parsedDate) availableDates.add(r._parsedDate);
+                }
+            });
+        }
+        renderDetailedDatePicker(baseId, Array.from(availableDates).sort());
+    });
+
+    function renderDetailedDatePicker(baseId, dates) {
+        if (!baseId || dates.length === 0) { DOM.detailedDatePickerContainer.style.display = 'none'; return; }
+        DOM.detailedDatePickerContainer.style.display = 'block'; DOM.detailedDatesList.innerHTML = '';
+        if (currentSearchAgentCode !== baseId) { currentSearchAgentCode = baseId; currentSearchSelectedDates = [...dates]; }
+        dates.forEach(date => {
+            const btn = document.createElement('button'); btn.textContent = date;
+            btn.className = 'detailed-date-btn';
+            const isSelected = currentSearchSelectedDates.includes(date);
+            if (isSelected) { btn.classList.add('active'); }
+            btn.onclick = () => {
+                const idx = currentSearchSelectedDates.indexOf(date);
+                if (idx > -1) { currentSearchSelectedDates.splice(idx, 1); } else { currentSearchSelectedDates.push(date); }
+                
+                Array.from(DOM.detailedDatesList.children).forEach(b => {
+                    if(currentSearchSelectedDates.includes(b.textContent)) { b.classList.add('active'); } 
+                    else { b.classList.remove('active'); }
+                });
+
+                if (DOM.reportContainer.innerHTML !== '') {
+                    createReport();
+                }
+            };
+            DOM.detailedDatesList.appendChild(btn);
+        });
+    }
+
+    function processDetailedReport(soSo) {
+        const selectedBranchMode = DOM.selBranchMode_Detailed ? DOM.selBranchMode_Detailed.value : 'all';
+        const branchPrefixes = branchModes[selectedBranchMode]?.prefixes || [];
+        const isExclude = DOM.cbExcludeNumeric_Detailed ? DOM.cbExcludeNumeric_Detailed.checked : false;
+        const isExcludeXSKT = DOM.cbExcludeXSKT_Detailed ? DOM.cbExcludeXSKT_Detailed.checked : false;
+        const isExcludeVeBoc = DOM.cbExcludeVeBoc_Detailed ? DOM.cbExcludeVeBoc_Detailed.checked : false;
+
+        const targetNum = parseInt(soSo, 10); if (isNaN(targetNum)) return null;
+
+        let detailedItems = [];
+
+        const filterLoto = (r) => {
+            const c = String(r.__EMPTY || r.__EMPTY_1 || '').trim();
+            const match = c.match(/(\d+)$/);
+            if (!match || parseInt(match[1], 10) !== targetNum) return false;
+            if (selectedBranchMode !== 'all') {
+                const matchesPrefix = branchPrefixes.some(pref => c.toUpperCase().startsWith(pref));
+                if (!matchesPrefix) return false;
+            }
+            if (isExclude && /^\d+$/.test(c)) return false;
+            if (r._parsedDate && currentSearchSelectedDates.length > 0 && !currentSearchSelectedDates.includes(r._parsedDate)) {
+                return false;
+            }
+            return true;
+        };
+
+        const filterXSKT = (item) => {
+            if (isExcludeXSKT) return false;
+            const c = String(item.code).trim();
+            const match = c.match(/(\d+)$/);
+            if (!match || parseInt(match[1], 10) !== targetNum) return false;
+            if (selectedBranchMode !== 'all') { return branchPrefixes.some(pref => c.toUpperCase().startsWith(pref)); }
+            return true;
+        };
+
+        const f1 = excelData1.filter(filterLoto); const f2 = excelData2.filter(filterXSKT);
+
+        let debtAmt = 0;
+        debtData.forEach((val, key) => {
+            const strKey = String(key);
+            const match = strKey.match(/(\d+)$/);
+            if (match && parseInt(match[1], 10) === targetNum) {
+                if (selectedBranchMode !== 'all') {
+                    const matchesPrefix = branchPrefixes.some(pref => strKey.toUpperCase().startsWith(pref));
+                    if (!matchesPrefix) return;
+                }
+                debtAmt += val;
+                state.accountCodes.add(key);
+            }
+        });
+
+        let veBocStats = { rev: 0, com: 0 };
+        if (!isExcludeVeBoc) {
+            veBocData.forEach((val, key) => {
+                const strKey = String(key);
+                const match = strKey.match(/(\d+)$/);
+                if (match && parseInt(match[1], 10) === targetNum) {
+                    if (selectedBranchMode !== 'all') {
+                        const matchesPrefix = branchPrefixes.some(pref => strKey.toUpperCase().startsWith(pref));
+                        if (!matchesPrefix) return;
+                    }
+                    veBocStats.rev += val.rev;
+                    veBocStats.com += val.com;
+                    state.accountCodes.add(key);
+                }
+            });
+        }
+
+        if (!f1.length && !f2.length && debtAmt === 0 && veBocStats.rev === 0) return null;
+
+        state.currentSoSo = soSo; state.baseTongDT = 0; state.baseTongHH = 0; state.baseThuong = 0;
+        state.extraBonus = 0; state.extraDebt = 0; state.addedTickets = []; state.accountCodes = new Set(); state.debtFromData = 0;
+        
+        const t = {lotoDB: 0, loCap: 0, c227: 0, c323: 0, thuong: 0, xskt: 0, veBoc: 0};
+        f1.forEach(r => {
+            const name = String(r.__EMPTY).trim(); if(name) state.accountCodes.add(name);
+            const date = r._parsedDate || 'Khác';
+            const ldb = parseFloat(r.__EMPTY_2) || 0;
+            const lc = parseFloat(r.__EMPTY_6) || 0;
+            const c2 = parseFloat(r.__EMPTY_8) || 0;
+            const c3 = parseFloat(r.__EMPTY_10) || 0;
+            const th = parseFloat(r.__EMPTY_14) || 0;
+
+            t.lotoDB += ldb; t.loCap += lc; t.c227 += c2; t.c323 += c3; t.thuong += th;
+
+            if(ldb !== 0 || th !== 0) detailedItems.push({date, type: 'LT', rev: ldb, com: ldb*0.08, bonus: th, net: ldb - ldb*0.08 - th});
+            if(lc !== 0) detailedItems.push({date, type: 'LC', rev: lc, com: lc*0.1, bonus: 0, net: lc - lc*0.1});
+            if(c2 !== 0) detailedItems.push({date, type: 'L2', rev: c2, com: c2*0.1, bonus: 0, net: c2 - c2*0.1});
+            if(c3 !== 0) detailedItems.push({date, type: 'L3', rev: c3, com: c3*0.1, bonus: 0, net: c3 - c3*0.1});
+        });
+
+        f2.forEach(item => {
+            const baseNum = parseInt(getBaseId(item.code), 10);
+            let name = item.code;
+            let matchingF1 = f1.find(r => { const c = String(r.__EMPTY || '').trim(); return parseInt(getBaseId(c), 10) === baseNum; });
+            if (matchingF1) name = String(matchingF1.__EMPTY).trim();
+            if(name) state.accountCodes.add(name);
+            const x = item.xskt * 1000;
+            t.xskt += x;
+            if(x > 0) detailedItems.push({date: 'Khác', type: 'XSKT', rev: x, com: x*0.1, bonus: 0, net: x - x*0.1});
+        });
+        
+        t.veBoc = veBocStats.rev;
+        if (!isExcludeVeBoc && veBocStats.rev > 0) {
+            detailedItems.push({date: 'Khác', type: 'Vé Bóc', rev: veBocStats.rev, com: veBocStats.com, bonus: 0, net: veBocStats.rev - veBocStats.com});
+        }
+
+        const c = { ldb: t.lotoDB * 0.08, lc: t.loCap * 0.1, c2: t.c227 * 0.1, c3: t.c323 * 0.1, x: t.xskt * 0.1, vb: veBocStats.com };
+        state.baseTongDT = t.lotoDB + t.loCap + t.c227 + t.c323 + t.xskt + t.veBoc; state.baseTongHH = c.ldb + c.lc + c.c2 + c.c3 + c.x + c.vb; state.baseThuong = t.thuong; state.debtFromData = debtAmt;
+        
+        return {t, c, detailedItems};
+    }
+
+    function updateDetailedView() {
+        if(!state.currentSoSo) return;
+        const addRev = state.addedTickets.reduce((s,t) => s+t.dt, 0), addCom = state.addedTickets.reduce((s,t) => s+t.hh, 0);
+        const totDT = state.baseTongDT + addRev, totHH = state.baseTongHH + addCom;
+        const final = (totDT - totHH - state.baseThuong) + state.debtFromData - state.extraBonus + state.extraDebt;
+
+        document.getElementById('tongDT').textContent = formatNumberHiddenK(totDT);
+        document.getElementById('tongHH').textContent = formatNumberHiddenK(totHH);
+
+        const rRow = document.getElementById('finalResultRow'), lbl = document.getElementById('ketQuaLabel'), val = document.getElementById('ketQuaValue'), txt = document.getElementById('ketQuaBangChu');
+        rRow.className = final >= 0 ? 'final-amount-positive' : 'final-amount-negative';
+
+        if(final >= 0) { const round = Math.ceil(final/1000)*1000; lbl.textContent = 'Nộp'; val.textContent = formatNumberHiddenK(round); txt.textContent = docso(round) + " đồng"; }
+        else { const abs = Math.abs(final), round = parseInt(abs/1000)*1000; lbl.textContent = 'Lấy về'; val.textContent = formatNumberHiddenK(round); txt.textContent = docso(round) + " đồng"; }
+    }
+
+    function renderDetailedReport(d, reportType = 'summary') {
+        const debtHtml = state.debtFromData > 0 ? `<tr style="color:var(--danger-color); font-weight:bold;"><td style="text-align: left; padding-left: 15px;">Nợ cũ</td><td colspan="${reportType === 'summary' ? 2 : 4}">${formatNumberHiddenK(state.debtFromData)}</td></tr>` : '';
+        const agentNameDisplay = [...state.accountCodes].filter(n => n && n.trim()).join(', ') || state.currentSoSo;
+        
+        let reportDate = getFormattedDateRange(currentSearchSelectedDates);
+
+        if (reportType === 'summary') {
+            const t = d.t, c = d.c;
+            const xsktHtml = t.xskt > 0 ? `<tr><td>XSKT</td><td>${formatNumberHiddenK(t.xskt)}</td><td>${formatCommissionCellHiddenK(t.xskt, c.x)}</td></tr>` : '';
+            const veBocHtml = t.veBoc > 0 ? `<tr><td style="color:#8e44ad; font-weight:bold;">Vé Bóc</td><td>${formatNumberHiddenK(t.veBoc)}</td><td>${formatCommissionCellHiddenK(t.veBoc, c.vb)}</td></tr>` : '';
+
+            DOM.reportContainer.innerHTML = `
+            <table class="report-table" style="border: 1px solid var(--border-color);">
+                <colgroup><col style="width: 30%;"><col style="width: 35%;"><col style="width: 35%;"></colgroup>
+                <tbody>
+                    <tr><td class="header" style="font-weight:bold;">Đại Lý:</td><td colspan="2" class="so-so" style="text-align:center;">${agentNameDisplay}</td></tr>
+                    <tr><td class="header" style="font-weight:bold;">Đợt:</td><td colspan="2" style="font-weight:500;">${reportDate}</td></tr>
+                    <tr style="background:#f1f2f6"><th>Loại hình</th><th>Doanh thu</th><th>Hoa hồng</th></tr>
+                    <tr><td>Lôtô ĐB</td><td>${formatNumberHiddenK(t.lotoDB)}</td><td>${formatCommissionCellHiddenK(t.lotoDB, c.ldb)}</td></tr>
+                    <tr><td>Lôtô cặp</td><td>${formatNumberHiddenK(t.loCap)}</td><td>${formatCommissionCellHiddenK(t.loCap, c.lc)}</td></tr>
+                    <tr><td>Lô 2/27</td><td>${formatNumberHiddenK(t.c227)}</td><td>${formatCommissionCellHiddenK(t.c227, c.c2)}</td></tr>
+                    <tr><td>Lô 3/23</td><td>${formatNumberHiddenK(t.c323)}</td><td>${formatCommissionCellHiddenK(t.c323, c.c3)}</td></tr>
+                    ${xsktHtml}
+                    ${veBocHtml}
+                    <tr id="tongCongRow" style="border-top: 2px solid #bdc3c7;"><td>Tổng</td><td id="tongDT"></td><td id="tongHH"></td></tr>
+                    <tr id="mainBonusRow" style="background-color: var(--success-color); color: white; font-weight: bold;"><td>Thưởng</td><td colspan="2" style="color: #fff;">${formatNumberHiddenK(state.baseThuong)}</td></tr>
+                    ${debtHtml}
+                    <tr id="finalResultRow"><td id="ketQuaLabel"></td><td colspan="2" id="ketQuaValue"></td></tr>
+                    <tr id="bangChuRow"><td class="header" style="font-size:13px;">Bằng chữ</td><td colspan="2" id="ketQuaBangChu" class="bang-chu-cell"></td></tr>
+                </tbody>
+            </table>`;
+        } else {
+            const groupByDate = new Map();
+            d.detailedItems.forEach(item => { 
+                if(!groupByDate.has(item.date)) groupByDate.set(item.date, []); 
+                groupByDate.get(item.date).push(item); 
+            });
+            let rowsHtml = ''; 
+            const typeNameMap = { 'LT': 'Ltô ĐB', 'LC': 'LCặp', 'L2': 'Lô 2/27', 'L3': 'Lô 3/23', 'XSKT': 'XSKT', 'Vé Bóc': 'Vé Bóc' };
+            groupByDate.forEach((items, dateStr) => {
+                const isSingleItem = items.length === 1; 
+                let dayRev = 0, dayCom = 0, dayBonus = 0;
+                items.forEach(item => {
+                    dayRev += item.rev; dayCom += item.com; dayBonus += item.bonus;
+                    const displayName = typeNameMap[item.type] || item.type; 
+                    let cellStyle = ''; let revColor = ''; let netColor = 'font-weight:bold; color: #000;';
+                    if (isSingleItem) { 
+                        cellStyle = 'background-color: #ecf0f1;'; 
+                        revColor = 'color: #000;'; 
+                        if (item.net >= 0) netColor = 'font-weight:bold; color: var(--danger-color);'; else netColor = 'font-weight:bold; color: var(--success-color);'; 
+                    }
+                    rowsHtml += `<tr><td style="text-align:left; font-size:14px; padding-left:15px;">${item.date} - <b style="color:#2c3e50">${displayName}</b></td><td style="${revColor} ${cellStyle}">${formatNumberHiddenK(item.rev)}</td><td style="${cellStyle}">${formatNumberHiddenK(item.com)}</td><td style="${cellStyle}">${item.bonus > 0 ? formatNumberHiddenK(item.bonus) : '-'}</td><td style="${netColor} ${cellStyle}">${formatNumberHiddenK(item.net)}</td></tr>`;
+                });
+                if (!isSingleItem) { 
+                    const dayNet = dayRev - dayCom - dayBonus; 
+                    const cellBgStyle = 'background-color: #ecf0f1;'; 
+                    const netColorTotal = dayNet >= 0 ? 'var(--danger-color)' : 'var(--success-color)'; 
+                    rowsHtml += `<tr style="font-weight: bold; border-bottom: 2px solid #bdc3c7;"><td style="text-align:right; font-style: italic;"></td> <td style="color: #000; ${cellBgStyle}">${formatNumberHiddenK(dayRev)}</td><td style="color: #000; ${cellBgStyle}">${formatNumberHiddenK(dayCom)}</td><td style="color: #000; ${cellBgStyle}">${formatNumberHiddenK(dayBonus)}</td><td style="color: ${netColorTotal}; ${cellBgStyle}">${formatNumberHiddenK(dayNet)}</td></tr>`; 
+                }
+            });
+
+            DOM.reportContainer.innerHTML = `
+            <table class="report-table" style="border: 1px solid var(--border-color);">
+                <colgroup><col style="width: 30%;"><col style="width: 20%;"><col style="width: 15%;"><col style="width: 15%;"><col style="width: 20%;"></colgroup>
+                <tbody>
+                    <tr><td class="header" style="font-weight:bold;">Đại Lý:</td><td colspan="4" class="so-so">${agentNameDisplay}</td></tr>
+                    <tr><td class="header" style="font-weight:bold;">Đợt:</td><td colspan="4" style="font-weight:500;">${reportDate}</td></tr>
+                    <tr style="background:#107c41; color:white;"><th>Ngày/Loại</th><th>Doanh Thu</th><th>Hoa hồng</th><th>Thưởng</th><th>Nộp/Lấy về</th></tr>
+                    ${rowsHtml}
+                    <tr id="tongCongRow" style="border-top: 2px solid #7f8c8d; background-color: #FEF9E7;">
+                        <td style="font-weight: bold; color: var(--header-bg);">Tổng</td>
+                        <td id="tongDT" style="font-weight:bold; color:var(--danger-color); font-size:1.1em;"></td>
+                        <td id="tongHH" style="font-weight:bold;"></td>
+                        <td style="font-weight:bold; color:var(--primary-dark)">${formatNumberHiddenK(state.baseThuong)}</td>
+                        <td></td>
+                    </tr>
+                    ${debtHtml}
+                    <tr id="finalResultRow"><td id="ketQuaLabel"></td><td colspan="4" id="ketQuaValue"></td></tr>
+                    <tr id="bangChuRow"><td class="header" style="font-size:13px;">Bằng chữ</td><td colspan="4" id="ketQuaBangChu" class="bang-chu-cell"></td></tr>
+                </tbody>
+            </table>`;
+        }
+    }
+
+    function createReport() {
+        const s = DOM.soSoInput.value.trim(); if(!s) return showNotification("Nhập số sổ!",'error');
+        const d = processDetailedReport(s); if(!d) return showNotification("Không có dữ liệu",'error');
+
+        renderDetailedReport(d, currentReportType); updateDetailedView();
+
+        DOM.actionButtonContainer.style.display = 'grid'; DOM.actionChoices.style.display = 'none';
+        DOM.toggleChoicesBtn.textContent = 'Thêm tiền Thưởng/Nợ cũ'; DOM.toggleChoicesBtn.className = 'secondary';
+        DOM.reportContainer.scrollIntoView({behavior:'smooth'});
+    }
+
+    DOM.btnLoadData.addEventListener('click', () => {
+        if(!excelData1.length && !excelData2.length) return showNotification("Chọn ít nhất 1 file Excel!",'error');
+        refreshAgentDropdown();
+        generateSummaryView(); DOM.homePage.style.display='none'; DOM.mainPage.style.display='block'; showSection('reportSection'); DOM.soSoInput.focus();
+    });
+
+    DOM.btnGoToSummary.onclick = () => { showSection('summarySection'); generateSummaryView(); };
+    DOM.btnGoToSell.onclick = () => { if(!state.currentSoSo) return showNotification('Hãy tra cứu báo cáo trước!', 'warning'); showSection('sellSection'); };
+    DOM.btnBackFromSummary.onclick = () => showSection('reportSection');
+    DOM.btnBackFromSell.onclick = () => showSection('reportSection');
+    
+    DOM.btnCreateDailyReport.onclick = () => { currentReportType = 'detailed'; createReport(); };
+    DOM.btnCreateSummaryReport.onclick = () => { currentReportType = 'summary'; createReport(); };
+
+    // HÀM IN BÁO CÁO CÓ KIỂM TRA PHẦN ĐANG HIỂN THỊ DÀNH CHO BẢNG TỔNG HỢP VÀ CHI TIẾT
+    function printReport() { if(DOM.summarySection.style.display !== 'none') { window.print(); } else { showNotification("Chưa có báo cáo để in!", "warning"); } }
+
+    // Hàm dựng Worksheet xuất Excel
+    function buildStyledSummarySheet(table) {
+        const ws = {};
+        const merges = [];
+        
+        const titleText = (DOM.summaryTitle ? DOM.summaryTitle.innerText : 'BẢNG TỔNG HỢP').trim();
+        const dateTextFull = (DOM.summaryDate ? DOM.summaryDate.innerText : '').trim();
+        const dateLines = dateTextFull.split('\n').map(s => s.trim()).filter(Boolean);
+        const dateLine1 = dateLines[0] || '';
+        const dateLine2 = dateLines[1] || '';
+
+        const thElements = Array.from(table.querySelectorAll('thead th'));
+        const colCount = thElements.length || 9;
+
+        const borderThin = {
+            top: { style: "thin", color: { rgb: "000000" } },
+            bottom: { style: "thin", color: { rgb: "000000" } },
+            left: { style: "thin", color: { rgb: "000000" } },
+            right: { style: "thin", color: { rgb: "000000" } }
+        };
+
+        const headerStyle = {
+            fill: { fgColor: { rgb: "107C41" } },
+            font: { name: "Arial", sz: 11, bold: true, color: { rgb: "FFFFFF" } },
+            alignment: { horizontal: "center", vertical: "center", wrapText: true },
+            border: borderThin
+        };
+
+        const totalRowStyle = {
+            fill: { fgColor: { rgb: "5D4037" } },
+            font: { name: "Arial", sz: 11, bold: true, color: { rgb: "FFFFFF" } },
+            alignment: { horizontal: "center", vertical: "center" },
+            border: borderThin
+        };
+
+        const dataRowStyleEven = {
+            fill: { fgColor: { rgb: "F8F9FA" } },
+            font: { name: "Arial", sz: 10, color: { rgb: "000000" } },
+            alignment: { horizontal: "center", vertical: "center" },
+            border: borderThin
+        };
+
+        const dataRowStyleOdd = {
+            fill: { fgColor: { rgb: "FFFFFF" } },
+            font: { name: "Arial", sz: 10, color: { rgb: "000000" } },
+            alignment: { horizontal: "center", vertical: "center" },
+            border: borderThin
+        };
+
+        let rowIndex = 0;
+
+        // Dòng 1: Tiêu đề Bảng
+        merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: colCount - 1 } });
+        ws[XLSX.utils.encode_cell({ r: 0, c: 0 })] = {
+            v: titleText,
+            t: 's',
+            s: {
+                font: { name: "Arial", sz: 14, bold: true, color: { rgb: "107C41" } },
+                alignment: { horizontal: "center", vertical: "center" }
+            }
+        };
+        rowIndex++;
+
+        // Dòng 2: Ngày tháng
+        if (dateLine1) {
+            merges.push({ s: { r: rowIndex, c: 0 }, e: { r: rowIndex, c: colCount - 1 } });
+            ws[XLSX.utils.encode_cell({ r: rowIndex, c: 0 })] = {
+                v: dateLine1,
+                t: 's',
+                s: {
+                    font: { name: "Arial", sz: 10, italic: true, color: { rgb: "555555" } },
+                    alignment: { horizontal: "center", vertical: "center" }
+                }
+            };
+            rowIndex++;
+        }
+
+        // Dòng 3: Doanh số & Thưởng
+        if (dateLine2) {
+            merges.push({ s: { r: rowIndex, c: 0 }, e: { r: rowIndex, c: colCount - 1 } });
+            ws[XLSX.utils.encode_cell({ r: rowIndex, c: 0 })] = {
+                v: dateLine2,
+                t: 's',
+                s: {
+                    font: { name: "Arial", sz: 10, bold: true, color: { rgb: "201F1E" } },
+                    alignment: { horizontal: "center", vertical: "center" }
+                }
+            };
+            rowIndex++;
+        }
+
+        // Dòng trống cách bảng
+        rowIndex++;
+
+        // Dòng Header Bảng
+        thElements.forEach((th, cIdx) => {
+            const cellRef = XLSX.utils.encode_cell({ r: rowIndex, c: cIdx });
+            ws[cellRef] = {
+                v: th.innerText.trim(),
+                t: 's',
+                s: headerStyle
+            };
+        });
+        rowIndex++;
+
+        // Dữ liệu trong Bảng
+        const trElements = Array.from(table.querySelectorAll('tbody tr'));
+        trElements.forEach((tr, trIdx) => {
+            const isTotalRow = tr.id === 'summaryTotalRow' || tr.classList.contains('group-total-row');
+            const tdElements = Array.from(tr.querySelectorAll('td, th'));
+
+            let colShift = 0;
+            tdElements.forEach((td, cIdx) => {
+                const text = td.innerText.trim();
+                const colspan = parseInt(td.getAttribute('colspan') || '1', 10);
+                const cReal = cIdx + colShift;
+
+                if (colspan > 1) {
+                    merges.push({
+                        s: { r: rowIndex, c: cReal },
+                        e: { r: rowIndex, c: cReal + colspan - 1 }
+                    });
+                }
+
+                let isNum = false;
+                let numVal = 0;
+                const cleanText = text.replace(/\./g, '').replace(/,/g, '.');
+                if (/^-?\d+(\.\d+)?$/.test(cleanText) && cReal >= 2) {
+                    isNum = true;
+                    numVal = parseFloat(cleanText);
+                }
+
+                let currentStyle;
+                if (isTotalRow) {
+                    currentStyle = JSON.parse(JSON.stringify(totalRowStyle));
+                    if (td.classList.contains('final-amount-negative')) {
+                        currentStyle.fill = { fgColor: { rgb: "107C41" } };
+                        currentStyle.font.color = { rgb: "FFFFFF" };
+                    } else if (td.classList.contains('final-amount-positive')) {
+                        currentStyle.fill = { fgColor: { rgb: "C42B1C" } };
+                        currentStyle.font.color = { rgb: "FFFFFF" };
+                    }
+                } else if (tr.classList.contains('group-member-row')) {
+                    currentStyle = {
+                        fill: { fgColor: { rgb: "FAFAFA" } },
+                        font: { name: "Arial", sz: 10, italic: true, color: { rgb: "555555" } },
+                        alignment: { horizontal: isNum ? "right" : "center", vertical: "center" },
+                        border: borderThin
+                    };
+                } else {
+                    currentStyle = trIdx % 2 === 0 ? JSON.parse(JSON.stringify(dataRowStyleOdd)) : JSON.parse(JSON.stringify(dataRowStyleEven));
+                    currentStyle.alignment.horizontal = isNum ? "right" : "center";
+                    if (td.classList.contains('code-cell-highlight')) {
+                        currentStyle.font.bold = true;
+                        currentStyle.font.color = { rgb: "0078D4" };
+                    }
+                    if (td.querySelector('.negative-value') || (isNum && numVal < 0)) {
+                        currentStyle.font.color = { rgb: "C42B1C" };
+                        currentStyle.font.bold = true;
+                    }
+                }
+
+                const cellRef = XLSX.utils.encode_cell({ r: rowIndex, c: cReal });
+                if (isNum) {
+                    ws[cellRef] = {
+                        v: numVal,
+                        t: 'n',
+                        z: '#,##0',
+                        s: currentStyle
+                    };
+                } else {
+                    ws[cellRef] = {
+                        v: text,
+                        t: 's',
+                        s: currentStyle
+                    };
+                }
+
+                if (colspan > 1) {
+                    colShift += (colspan - 1);
+                }
+            });
+            rowIndex++;
+        });
+
+        ws['!ref'] = XLSX.utils.encode_range({
+            s: { r: 0, c: 0 },
+            e: { r: rowIndex - 1, c: colCount - 1 }
+        });
+
+        if (merges.length > 0) ws['!merges'] = merges;
+
+        const colWidths = [];
+        for (let c = 0; c < colCount; c++) {
+            if (c === 0) colWidths.push({ wch: 8 });
+            else if (c === 1) colWidths.push({ wch: 14 });
+            else colWidths.push({ wch: 14 });
+        }
+        ws['!cols'] = colWidths;
+
+        return ws;
+    }
+
+    function buildStyledReportSheet(table) {
+        const ws = {};
+        const merges = [];
+        const borderThin = {
+            top: { style: "thin", color: { rgb: "000000" } },
+            bottom: { style: "thin", color: { rgb: "000000" } },
+            left: { style: "thin", color: { rgb: "000000" } },
+            right: { style: "thin", color: { rgb: "000000" } }
+        };
+
+        const trElements = Array.from(table.querySelectorAll('tr'));
+        let colCount = 3;
+        trElements.forEach(tr => {
+            const cells = Array.from(tr.querySelectorAll('td, th'));
+            let cnt = 0;
+            cells.forEach(c => cnt += parseInt(c.getAttribute('colspan') || '1', 10));
+            if (cnt > colCount) colCount = cnt;
+        });
+
+        let rowIndex = 0;
+
+        // Tiêu đề
+        merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: colCount - 1 } });
+        ws[XLSX.utils.encode_cell({ r: 0, c: 0 })] = {
+            v: "BÁO CÁO THU TIỀN XỔ SỐ",
+            t: 's',
+            s: {
+                font: { name: "Arial", sz: 14, bold: true, color: { rgb: "107C41" } },
+                alignment: { horizontal: "center", vertical: "center" }
+            }
+        };
+        rowIndex += 2;
+
+        trElements.forEach((tr) => {
+            const cells = Array.from(tr.querySelectorAll('td, th'));
+            const isTh = tr.querySelector('th') !== null;
+            const trId = tr.id;
+
+            let colShift = 0;
+            cells.forEach((cell, cIdx) => {
+                const text = cell.innerText.replace(/\n/g, ' ').trim();
+                const colspan = parseInt(cell.getAttribute('colspan') || '1', 10);
+                const cReal = cIdx + colShift;
+
+                if (colspan > 1) {
+                    merges.push({
+                        s: { r: rowIndex, c: cReal },
+                        e: { r: rowIndex, c: cReal + colspan - 1 }
+                    });
+                }
+
+                let isNum = false;
+                let numVal = 0;
+                const cleanText = text.replace(/\./g, '').replace(/,/g, '.');
+                if (/^-?\d+(\.\d+)?$/.test(cleanText) && text !== '0' && cReal >= 1 && !trId.includes('Row') && !cell.classList.contains('so-so')) {
+                    isNum = true;
+                    numVal = parseFloat(cleanText);
+                } else if (text === '0') {
+                    isNum = true;
+                    numVal = 0;
+                }
+
+                let style = {
+                    fill: { fgColor: { rgb: "FFFFFF" } },
+                    font: { name: "Arial", sz: 11, color: { rgb: "000000" } },
+                    alignment: { horizontal: isNum ? "right" : "center", vertical: "center" },
+                    border: borderThin
+                };
+
+                if (cell.classList.contains('so-so')) {
+                    style.font = { name: "Arial", sz: 16, bold: true, color: { rgb: "0078D4" } };
+                    style.alignment = { horizontal: "center", vertical: "center" };
+                } else if (isTh) {
+                    style.fill = { fgColor: { rgb: "107C41" } };
+                    style.font = { name: "Arial", sz: 11, bold: true, color: { rgb: "FFFFFF" } };
+                } else if (trId === 'tongCongRow') {
+                    style.fill = { fgColor: { rgb: "E5E5E5" } };
+                    style.font = { name: "Arial", sz: 11, bold: true, color: { rgb: "000000" } };
+                } else if (trId === 'mainBonusRow') {
+                    style.fill = { fgColor: { rgb: "107C41" } };
+                    style.font = { name: "Arial", sz: 11, bold: true, color: { rgb: "FFFFFF" } };
+                } else if (trId === 'finalResultRow') {
+                    if (tr.classList.contains('final-amount-positive')) {
+                        style.fill = { fgColor: { rgb: "C42B1C" } };
+                        style.font = { name: "Arial", sz: 14, bold: true, color: { rgb: "FFFFFF" } };
+                    } else {
+                        style.fill = { fgColor: { rgb: "107C41" } };
+                        style.font = { name: "Arial", sz: 14, bold: true, color: { rgb: "FFFFFF" } };
+                    }
+                } else if (trId === 'bangChuRow') {
+                    style.font = { name: "Arial", sz: 10, italic: true, color: { rgb: "555555" } };
+                    style.alignment = { horizontal: "center", vertical: "center" };
+                } else if (cell.classList.contains('header')) {
+                    style.fill = { fgColor: { rgb: "FAFAFA" } };
+                    style.font = { name: "Arial", sz: 11, bold: true, color: { rgb: "201F1E" } };
+                }
+
+                const cellRef = XLSX.utils.encode_cell({ r: rowIndex, c: cReal });
+                if (isNum) {
+                    ws[cellRef] = {
+                        v: numVal,
+                        t: 'n',
+                        z: '#,##0',
+                        s: style
+                    };
+                } else {
+                    ws[cellRef] = {
+                        v: text,
+                        t: 's',
+                        s: style
+                    };
+                }
+
+                if (colspan > 1) colShift += (colspan - 1);
+            });
+            rowIndex++;
+        });
+
+        ws['!ref'] = XLSX.utils.encode_range({
+            s: { r: 0, c: 0 },
+            e: { r: rowIndex - 1, c: colCount - 1 }
+        });
+
+        if (merges.length > 0) ws['!merges'] = merges;
+
+        const colWidths = [];
+        for (let c = 0; c < colCount; c++) {
+            colWidths.push({ wch: 22 });
+        }
+        ws['!cols'] = colWidths;
+
+        return ws;
+    }
+
+    DOM.btnExportExcel.onclick = function() {
+        const isSummaryVisible = DOM.summarySection && DOM.summarySection.style.display !== 'none';
+        const summaryTable = document.querySelector('#summaryTableContainer table');
+        const reportTable = document.querySelector('#reportContainer table');
+
+        if (!summaryTable && !reportTable) {
+            return showNotification('Chưa có bảng dữ liệu để xuất Excel!', 'warning');
+        }
+
+        try {
+            showLoading();
+            setTimeout(() => {
+                const wb = XLSX.utils.book_new();
+                let ws;
+
+                if (isSummaryVisible && summaryTable) {
+                    ws = buildStyledSummarySheet(summaryTable);
+                } else if (reportTable) {
+                    ws = buildStyledReportSheet(reportTable);
+                } else if (summaryTable) {
+                    ws = buildStyledSummarySheet(summaryTable);
+                }
+
+                if (ws) {
+                    XLSX.utils.book_append_sheet(wb, ws, "Báo Cáo");
+                    const fileName = getReportFileName() + '_BaoCao.xlsx';
+                    XLSX.writeFile(wb, fileName);
+                    showNotification('Đã xuất file Excel chuẩn định dạng thành công!', 'success');
+                }
+                hideLoading();
+            }, 100);
+        } catch (err) {
+            console.error("Lỗi xuất Excel:", err);
+            hideLoading();
+            showNotification('Lỗi khi xuất file Excel: ' + err.message, 'error');
+        }
+    };
+
+    // GÁN HÀM PRINTREPORT VÀO NÚT IN
+    DOM.btnPrintReport.onclick = printReport;
+
+    DOM.btnCopySummary.onclick = function() { copyElementAsImage('#summarySection', 'Đã copy ảnh bảng Tổng Hợp', this); };
+    DOM.btnCopyReport.onclick = function() { copyElementAsImage('#reportContainer', 'Đã copy ảnh Báo Cáo', this); };
+    DOM.closePreviewModalBtn.onclick = () => DOM.imagePreviewModal.style.display = 'none';
+
+    async function splitCanvasToCanvases(canvas, targetTable, rootElement) {
+        const canvases = []; const contentWidth = canvas.width; const totalHeight = canvas.height; const pageHeight = Math.floor(contentWidth * 1.414);
+        let theadH_inCanvas = 0; let theadY_inCanvas = 0;
+        if (targetTable && rootElement) {
+            const thead = targetTable.querySelector('thead');
+            if (thead) {
+                const rootRect = rootElement.getBoundingClientRect(); const theadRect = thead.getBoundingClientRect();
+                const relativeY = theadRect.top - rootRect.top; const scale = 2; const adjustment = 5;
+                theadY_inCanvas = Math.max(0, (relativeY - adjustment) * scale); theadH_inCanvas = (thead.offsetHeight + adjustment) * scale;
+            }
+        }
+        const repeatHeaderHeight = theadH_inCanvas; const repeatHeaderSourceY = theadY_inCanvas;
+        let currentY = 0; let pageIndex = 0; const scale = 2; let tableRows = [];
+        if (targetTable) {
+            const rows = targetTable.querySelectorAll('tbody tr'); const rootRect = rootElement.getBoundingClientRect();
+            rows.forEach(tr => { const rect = tr.getBoundingClientRect(); const top = (rect.top - rootRect.top) * scale; const bottom = (rect.bottom - rootRect.top) * scale; tableRows.push({ top, bottom }); });
+            const footRows = targetTable.querySelectorAll('tfoot tr');
+            footRows.forEach(tr => { const rect = tr.getBoundingClientRect(); const top = (rect.top - rootRect.top) * scale; const bottom = (rect.bottom - rootRect.top) * scale; tableRows.push({ top, bottom }); });
+        }
+        while (currentY < totalHeight) {
+            const isFirstPage = (pageIndex === 0); const availableContentHeight = isFirstPage ? pageHeight : (pageHeight - repeatHeaderHeight);
+            let splitPoint = Math.min(currentY + availableContentHeight, totalHeight);
+            if (splitPoint < totalHeight && tableRows.length > 0) { const splittingRow = tableRows.find(row => row.top < splitPoint && row.bottom > splitPoint); if (splittingRow && splittingRow.top > currentY) splitPoint = splittingRow.top; }
+            let sliceHeight = splitPoint - currentY;
+            const pageCanvas = document.createElement('canvas'); pageCanvas.width = contentWidth; pageCanvas.height = isFirstPage ? sliceHeight : (repeatHeaderHeight + sliceHeight);
+            const ctx = pageCanvas.getContext('2d'); ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+            if (!isFirstPage && repeatHeaderHeight > 0) ctx.drawImage(canvas, 0, repeatHeaderSourceY, contentWidth, repeatHeaderHeight, 0, 0, contentWidth, repeatHeaderHeight);
+            const destY = isFirstPage ? 0 : repeatHeaderHeight; ctx.drawImage(canvas, 0, currentY, contentWidth, sliceHeight, 0, destY, contentWidth, sliceHeight);
+            canvases.push(pageCanvas); currentY = splitPoint; pageIndex++;
+            if (currentY >= totalHeight) break;
+        }
+        return canvases;
+    }
+
+    function mergeCanvases(canvases) {
+        if (canvases.length === 0) return null; if (canvases.length === 1) return canvases[0];
+        const mergedCanvas = document.createElement('canvas');
+        mergedCanvas.width = canvases[0].width; mergedCanvas.height = canvases.reduce((sum, c) => sum + c.height, 0);
+        const ctx = mergedCanvas.getContext('2d'); ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, mergedCanvas.width, mergedCanvas.height);
+        let currentY = 0; canvases.forEach(c => { ctx.drawImage(c, 0, currentY); currentY += c.height; });
+        return mergedCanvas;
+    }
+
+    function getReportFileName() {
+        const soso = DOM.soSoInput.value.trim() || state.currentSoSo || 'baocao';
+        let dateStr = dateRangeText || '';
+        let clean = removeVietnameseTones(dateStr).toLowerCase();
+        const dateRegex = /(\d{1,2})[\/\-](\d{1,2})/g;
+        const matches = clean.match(dateRegex);
+        if (matches && matches.length >= 2) {
+            const start = matches[0].replace(/\//g, '-');
+            const end = matches[matches.length - 1].replace(/\//g, '-');
+            return `${soso} tu ${start} den ${end}`;
+        } else if (matches && matches.length === 1) {
+            const start = matches[0].replace(/\//g, '-');
+            return `${soso} tu ${start} den ${start}`;
+        }
+        let safeDate = removeVietnameseTones(dateStr).replace(/[\/]/g, "-").replace(/[:]/g, "").replace(/\s+/g, "_");
+        if (safeDate === "Chua_co_ngay" || !safeDate) safeDate = "Moi_nhat";
+        return `${soso}_${safeDate}`;
+    }
+
+    async function shareGeneratedImages() {
+        if (!currentGeneratedImages || currentGeneratedImages.length === 0) return;
+        showNotification('Đang chuẩn bị chia sẻ...', 'info');
+        const filenameBase = getReportFileName();
+        try {
+            const filesArray = [];
+            for (let index = 0; index < currentGeneratedImages.length; index++) {
+                const dataUrl = currentGeneratedImages[index];
+                const res = await fetch(dataUrl);
+                const blob = await res.blob();
+                const filename = currentGeneratedImages.length > 1 ? `${filenameBase}_Trang_${index + 1}.png` : `${filenameBase}.png`;
+                const file = new File([blob], filename, { type: 'image/png' });
+                filesArray.push(file);
+            }
+            if (navigator.canShare && navigator.canShare({ files: filesArray })) {
+                await navigator.share({
+                    files: filesArray,
+                    title: 'Báo cáo doanh thu',
+                    text: 'Gửi từ XSKT Nam Định Finance'
+                });
+                showNotification('Đã mở hộp thoại chia sẻ!', 'success');
+            } else {
+                showNotification('Trình duyệt không hỗ trợ chia sẻ tệp tin này.', 'warning');
+            }
+        } catch (error) {
+            console.error('Lỗi chia sẻ:', error);
+            showNotification('Không thể thực hiện chia sẻ.', 'error');
+        }
+    }
+
+    // CHỨC NĂNG COPY ẢNH CHUẨN ĐỒNG BỘ NỘI DUNG VÀ TỰ ĐỘNG TÁCH TRANG NẾU DÀI
+    async function copyElementAsImage(sel, msg, btn) {
+        const el = document.querySelector(sel); if(!el || !el.innerHTML.trim()) return showNotification("Chưa có nội dung!", 'info');
+        const oldTxt = btn ? btn.textContent : ''; if(btn) btn.textContent = 'Đang xử lý...';
+        if(sel === '#reportContainer') { el.classList.add('capturing-image'); await new Promise(r => setTimeout(r, 100)); }
+
+        const delBtns = el.querySelectorAll('.remove-ticket-btn');
+        delBtns.forEach(b => b.style.display = 'none');
+
+        const hiddenEls = [el.querySelector('.summary-actions'), el.querySelector('.controls-panel'), document.getElementById('actionButtonContainer'), document.getElementById('sellTicketControls'), el.querySelector('.nav-header'), document.querySelector('.home-menu-grid'), document.getElementById('scrollToTopBtn'), document.getElementById('scrollToBottomBtn')].filter(Boolean);
+        hiddenEls.forEach(e => e.style.display = 'none');
+
+        const footer = document.createElement('div'); footer.innerText = "© 2026 ZENG FINANCE";
+        footer.style.width = "100%"; footer.style.textAlign = "center"; footer.style.marginTop = "20px"; footer.style.padding = "10px 0"; footer.style.fontSize = "14px"; footer.style.fontWeight = "bold"; footer.style.color = "#7f8c8d"; footer.style.backgroundColor = "#ffffff";
+        el.appendChild(footer);
+
+        const inputsToFreeze = el.querySelectorAll('input.dynamic-input, textarea.dynamic-input'); const frozenState = [];
+        inputsToFreeze.forEach(input => {
+            const val = input.value || ''; const parent = input.parentNode;
+            if(parent) {
+                const replacement = document.createElement('div'); replacement.textContent = val;
+                const computedStyle = window.getComputedStyle(input);
+                replacement.style.cssText = `color:${computedStyle.color}; font-weight:bold; text-align:center; width:100%; font-size:inherit; display:flex; align-items:center; justify-content:center; padding:20px 0; white-space:pre-wrap; line-height:1.5;`;
+                frozenState.push({ input, replacement, parent, nextSibling: input.nextSibling }); parent.removeChild(input); parent.appendChild(replacement);
+            }
+        });
+
+        const tableContainer = document.getElementById('summaryTableContainer'); const reportContainer = document.getElementById('reportContainer'); let targetContainer = null; let targetTable = null; const originalStyles = { maxHeight: '', overflowX: '', overflowY: '', width: '' }; let stickyElements = [];
+        if (sel === '#summarySection' && tableContainer) targetContainer = tableContainer; else if (sel === '#reportContainer' && reportContainer) targetContainer = reportContainer;
+
+        if (targetContainer) {
+            originalStyles.maxHeight = targetContainer.style.maxHeight; originalStyles.overflowX = targetContainer.style.overflowX; originalStyles.overflowY = targetContainer.style.overflowY;
+            targetContainer.style.setProperty('max-height', 'none', 'important');
+            targetContainer.style.setProperty('overflow', 'visible', 'important');
+            targetTable = targetContainer.querySelector('table');
+            stickyElements = Array.from(targetContainer.querySelectorAll('th, #summaryTotalRow td'));
+            stickyElements.forEach(elem => { elem.dataset.originalPosition = elem.style.position; elem.style.position = 'static'; elem.style.borderTop = '1px solid #dfe6e9'; });
+            if (targetTable && targetTable.scrollWidth > window.innerWidth) { targetContainer.style.width = targetTable.scrollWidth + 'px'; el.style.width = targetTable.scrollWidth + 40 + 'px'; }
+        }
+
+        setTimeout(async()=>{
+            try {
+                window.scrollTo(0,0);
+                const canvas = await html2canvas(el, { backgroundColor: "#ffffff", scale: 2, useCORS: true, scrollY: 0, x: 0, y: 0, width: el.scrollWidth, height: el.scrollHeight });
+                if(sel === '#reportContainer') el.classList.remove('capturing-image');
+                frozenState.forEach(({ input, replacement, parent, nextSibling }) => { if(parent.contains(replacement)) parent.removeChild(replacement); if(nextSibling) parent.insertBefore(input, nextSibling); else parent.appendChild(input); });
+
+                const limitHeight = canvas.width * 2; const previewHolder = document.getElementById('imagePreviewHolder'); previewHolder.innerHTML = ''; currentGeneratedImages = [];
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                const instructText = isIOS ? 'Nhấn giữ ảnh dưới đây -> Chọn "Sao chép" để dán vào Zalo' : 'Click chuột phải / nhấn giữ để sao chép';
+
+                if (canvas.height > limitHeight && sel !== '#reportContainer') {
+                    const canvases = await splitCanvasToCanvases(canvas, targetTable, el);
+
+                    if (canvases.length <= 3) {
+                        const mergedCanvas = mergeCanvases(canvases);
+                        const imgSrc = mergedCanvas.toDataURL('image/png');
+                        currentGeneratedImages = [imgSrc];
+
+                        const showPreviewModal = () => {
+                            const div = document.createElement('div');
+                            div.className = 'preview-image-item';
+                            div.innerHTML = `<div class="page-number">Ảnh ghép từ ${canvases.length} trang (${instructText})</div><img src="${imgSrc}">`;
+                            previewHolder.appendChild(div);
+
+                            DOM.btnSaveAllImages.textContent = '💾 TẢI ẢNH VỀ MÁY';
+                            DOM.btnSaveAllImages.style.display = 'inline-block';
+                            if (navigator.share) { DOM.btnShareImage.style.display = 'inline-block'; } else { DOM.btnShareImage.style.display = 'none'; }
+                            DOM.imagePreviewModal.style.display = 'block';
+                        };
+
+                        if (navigator.clipboard && navigator.clipboard.write) {
+                            const copyPromise = new Promise((resolve, reject) => {
+                                try {
+                                    mergedCanvas.toBlob((blob) => {
+                                        if (blob) resolve(blob);
+                                        else reject(new Error("Không thể chuyển đổi ảnh"));
+                                    }, 'image/png');
+                                } catch (e) { reject(e); }
+                            });
+
+                            navigator.clipboard.write([
+                                new ClipboardItem({ 'image/png': copyPromise })
+                            ]).then(() => {
+                                showNotification('Đã ghép ' + canvases.length + ' trang thành 1 ảnh và sao chép vào Clipboard!', 'success');
+                                DOM.imagePreviewModal.style.display = 'none';
+                            }).catch((err) => {
+                                console.warn("Lỗi ghi clipboard:", err);
+                                showPreviewModal();
+                            });
+                        } else {
+                            showPreviewModal();
+                        }
+                    } else {
+                        const images = canvases.map(c => c.toDataURL('image/png'));
+                        currentGeneratedImages = images;
+                        images.forEach((imgSrc, index) => {
+                            const div = document.createElement('div');
+                            div.className = 'preview-image-item';
+                            div.innerHTML = `<div class="page-number">Trang ${index + 1}/${images.length} (${instructText})</div><img src="${imgSrc}">`;
+                            previewHolder.appendChild(div);
+                        });
+                        showNotification(`Đã chia thành ${images.length} trang`, 'info');
+                        DOM.btnSaveAllImages.textContent = '💾 TẢI TẤT CẢ ẢNH';
+                        DOM.btnSaveAllImages.style.display = 'inline-block';
+                        if (navigator.share) { DOM.btnShareImage.style.display = 'inline-block'; } else { DOM.btnShareImage.style.display = 'none'; }
+                        DOM.imagePreviewModal.style.display = 'block';
+                    }
+                } else {
+                    const imgSrc = canvas.toDataURL('image/png'); currentGeneratedImages = [imgSrc];
+                    const showPreviewModal = () => {
+                        const pageInfo = document.createElement('div');
+                        pageInfo.className = 'page-number';
+                        pageInfo.textContent = `Ảnh báo cáo (${instructText})`;
+                        const img = document.createElement('img'); img.src = imgSrc;
+                        previewHolder.appendChild(pageInfo);
+                        previewHolder.appendChild(img);
+                        DOM.btnSaveAllImages.textContent = '💾 TẢI ẢNH VỀ MÁY';
+                        DOM.btnSaveAllImages.style.display = 'inline-block';
+                        if (navigator.share) { DOM.btnShareImage.style.display = 'inline-block'; } else { DOM.btnShareImage.style.display = 'none'; }
+                        DOM.imagePreviewModal.style.display = 'block';
+                    };
+                    if (navigator.clipboard && navigator.clipboard.write) {
+                        const copyPromise = new Promise((resolve, reject) => {
+                            try {
+                                canvas.toBlob((blob) => {
+                                    if (blob) resolve(blob);
+                                    else reject(new Error("Không thể chuyển đổi ảnh"));
+                                }, 'image/png');
+                            } catch (e) { reject(e); }
+                        });
+
+                        navigator.clipboard.write([
+                            new ClipboardItem({ 'image/png': copyPromise })
+                        ]).then(() => {
+                            showNotification(msg, 'success');
+                            DOM.imagePreviewModal.style.display = 'none';
+                        }).catch((err) => {
+                            console.warn("Lỗi ghi clipboard:", err);
+                            showPreviewModal();
+                        });
+                    } else {
+                        showPreviewModal();
+                    }
+                }
+            } catch(e){
+                console.error(e); showNotification('Lỗi tạo ảnh', 'error'); if(sel === '#reportContainer') el.classList.remove('capturing-image');
+                frozenState.forEach(({ input, replacement, parent, nextSibling }) => { if(parent.contains(replacement)) parent.removeChild(replacement); if(nextSibling) parent.insertBefore(input, nextSibling); else parent.appendChild(input); });
+            }
+            finally {
+                delBtns.forEach(b => b.style.display = 'inline-block');
+                if(footer && footer.parentNode) footer.parentNode.removeChild(footer); hiddenEls.forEach(e => e.style.display = ''); if(btn) btn.textContent = oldTxt;
+                if (targetContainer) {
+                    targetContainer.style.removeProperty('max-height');
+                    targetContainer.style.removeProperty('overflow');
+                    targetContainer.style.overflowX = originalStyles.overflowX;
+                    targetContainer.style.overflowY = originalStyles.overflowY;
+                    targetContainer.style.width = ''; el.style.width = '';
+                    stickyElements.forEach(elem => { elem.style.position = elem.dataset.originalPosition || ''; elem.style.borderTop = ''; });
+                }
+            }
+        }, 100);
+    }
+
+    DOM.btnSaveAllImages.onclick = async () => {
+        if (!currentGeneratedImages || currentGeneratedImages.length === 0) return;
+        showNotification('Bắt đầu tải xuống...', 'info');
+        const filenameBase = getReportFileName();
+        for (let index = 0; index < currentGeneratedImages.length; index++) {
+            const imgSrc = currentGeneratedImages[index];
+            const link = document.createElement('a');
+            link.href = imgSrc;
+            link.download = currentGeneratedImages.length > 1 ? `${filenameBase}_Trang_${index + 1}.png` : `${filenameBase}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            // Wait 600ms between each download to bypass browser popup blocking
+            await new Promise(resolve => setTimeout(resolve, 600));
+        }
+        showNotification('Đã tải xuống tất cả ảnh!', 'success');
+    };
+
+    if (DOM.btnShareImage) {
+        DOM.btnShareImage.onclick = async () => {
+            await shareGeneratedImages();
+        };
+    }
+
+    DOM.toggleChoicesBtn.onclick = () => {
+        const show = DOM.toggleChoicesBtn.textContent.includes('Thêm'); DOM.actionChoices.style.display = show ? 'grid' : 'none';
+        DOM.toggleChoicesBtn.textContent = show ? 'Đóng / Xoá hết' : 'Thêm tiền Thưởng/Nợ cũ'; DOM.toggleChoicesBtn.className = show ? 'danger' : 'secondary';
+        if(!show) { document.getElementById('extraBonusRow')?.remove(); document.getElementById('extraDebtRow')?.remove(); state.extraBonus=0; state.extraDebt=0; updateDetailedView(); }
+        renderActionButtons();
+    };
+    function renderActionButtons() {
+        DOM.actionChoices.innerHTML = `${document.getElementById('extraBonusRow') ? `<button class="danger" onclick="window.removeRow('bonus')">Xoá Thưởng thêm</button>` : `<button onclick="window.addRow('bonus')">Thêm Thưởng</button>`}${document.getElementById('extraDebtRow') ? `<button class="danger" onclick="window.removeRow('debt')">Xoá Nợ cũ</button>` : `<button onclick="window.addRow('debt')">Thêm Nợ cũ</button>`}`;
+    }
+    window.addRow = (type) => {
+        const isB = type === 'bonus', rowId = isB ? 'extraBonusRow' : 'extraDebtRow';
+        const anchor = document.getElementById('extraBonusRow') || document.getElementById('mainBonusRow');
+        if(document.getElementById(rowId)) return;
+        const tr = document.createElement('tr'); tr.id = rowId;
+        tr.innerHTML = `<td>${isB ? `<textarea class="dynamic-input" style="color:var(--success-color)" placeholder="Tên thưởng..." rows="1" onkeydown="if(event.key==='Enter') { event.preventDefault(); this.blur(); }"></textarea>` : 'Nợ cũ'}</td><td colspan="${currentReportType === 'summary' ? 2 : 4}"><input class="dynamic-input" style="color:${isB ? 'var(--success-color)' : 'var(--danger-color)'}" oninput="window.handleDynInp(this,'${type}')" onkeydown="if(event.key==='Enter') { event.preventDefault(); this.blur(); }" inputmode="decimal" placeholder="0"></td>`;
+        anchor.after(tr); renderActionButtons(); const input = tr.querySelector('input'); if(input) input.focus();
+    };
+    window.removeRow = (type) => { document.getElementById(type === 'bonus' ? 'extraBonusRow' : 'extraDebtRow')?.remove(); if(type === 'bonus') state.extraBonus = 0; else state.extraDebt = 0; updateDetailedView(); renderActionButtons(); };
+    window.handleDynInp = (el, type) => { const v = parseInt(el.value.replace(/\D/g,'')) || 0; el.value = v.toLocaleString('vi-VN'); if(type === 'bonus') state.extraBonus = v * 1000; else state.extraDebt = v * 1000; updateDetailedView(); };
+    DOM.btnAddTicket.onclick = addTicket;
+
+    function addTicket() {
+        if(!state.currentSoSo) return showNotification("Chưa có báo cáo để thêm vé!",'error');
+        const q = parseInt(DOM.sellQuantityInput.value, 10); if(!q || q <= 0) return showNotification("Số lượng không hợp lệ!",'error');
+
+        let typeRad; try { typeRad = document.querySelector('input[name="sellTicketType"]:checked').value; } catch(e) { typeRad = 'xo-so'; }
+        let name = "";
+        if(typeRad === 'custom-name') { name = DOM.customTicketName.value.trim(); if(!name) return showNotification("Vui lòng nhập tên loại hình!", 'error'); }
+        else { name = typeRad === 've-boc' ? 'Vé bóc' : 'Xổ số'; }
+
+        let priceRad, price = 0; try { priceRad = document.querySelector('input[name="sellPrice"]:checked').value; } catch(e) { priceRad = '10000'; }
+        if(priceRad === 'custom-price') { price = parseFloat(DOM.customTicketPrice.value.replace(/\D/g, '')) || 0; if(price <= 0) return showNotification("Vui lòng nhập giá bán hợp lệ!", 'error'); }
+        else { price = parseFloat(priceRad); }
+
+        let rateRad, ratePercent = 0; try { rateRad = document.querySelector('input[name="sellRate"]:checked').value; } catch(e) { rateRad = '10'; }
+        if (rateRad === 'custom-rate') { ratePercent = parseFloat(DOM.customTicketRate.value); if (isNaN(ratePercent) || ratePercent < 0) return showNotification("Vui lòng nhập % hoa hồng hợp lệ!", 'error'); }
+        else { ratePercent = parseFloat(rateRad); }
+
+        const dt = q * price; const hh = dt * (ratePercent / 100);
+        const ticketId = Date.now();
+        state.addedTickets.push({id: ticketId, dt, hh});
+
+        const tr = document.createElement('tr'); tr.className = 'added-ticket-row'; tr.id = `ticket-${ticketId}`;
+        tr.innerHTML = `<td style="text-align: center; padding-left:15px;">${name} (${formatNumberHiddenK(price)}k) [${q} vé]<button class="remove-ticket-btn" onclick="window.removeTicket(${ticketId})" style="margin-left: 5px; margin-right: 0;">✕</button></td><td>${formatNumberHiddenK(dt)}</td><td>${formatCommissionCellHiddenK(dt, hh)}</td><td colspan="${currentReportType === 'summary' ? 0 : 2}"></td>`;
+        const anchor = document.getElementById('tongCongRow');
+        if(anchor) { anchor.parentNode.insertBefore(tr, anchor); updateDetailedView(); DOM.sellQuantityInput.value = ''; showNotification("Đã thêm vé thành công!", 'success'); showSection('reportSection'); }
+    }
+    window.removeTicket = (id) => { state.addedTickets = state.addedTickets.filter(t => t.id !== id); const el = document.getElementById(`ticket-${id}`); if(el) el.remove(); updateDetailedView(); showNotification("Đã xoá vé", "info"); };
+
+    function showSection(id) {
+        window.scrollTo(0, 0); document.documentElement.scrollTop = 0; document.body.scrollTop = 0;
+        const sections = ['summarySection','reportSection','sellSection','configSection'];
+        sections.forEach(s => { const el = document.getElementById(s); if (el) el.style.display = (s === id) ? 'block' : 'none'; });
+        const themeSwitcher = document.getElementById('themeSwitcher');
+        if (themeSwitcher) themeSwitcher.style.display = (id === 'homePage') ? 'flex' : 'none';
+
+        if (id === 'homePage') {
+            if (DOM.mainPage) DOM.mainPage.style.display = 'none';
+            if (DOM.homePage) DOM.homePage.style.display = 'block';
+        } else {
+            if (DOM.homePage) DOM.homePage.style.display = 'none';
+            if (DOM.mainPage) DOM.mainPage.style.display = 'block';
+        }
+    }
+    window.showSection = showSection;
+
+    document.querySelectorAll('input[name="sellTicketType"]').forEach(r => { r.addEventListener('change', function() { DOM.customTicketName.style.display = this.value === 'custom-name' ? 'block' : 'none'; }); });
+    document.querySelectorAll('input[name="sellPrice"]').forEach(r => { r.addEventListener('change', function() { DOM.customTicketPrice.style.display = this.value === 'custom-price' ? 'block' : 'none'; }); });
+    document.querySelectorAll('input[name="sellRate"]').forEach(r => { r.addEventListener('change', function() { DOM.customTicketRate.style.display = this.value === 'custom-rate' ? 'block' : 'none'; }); });
+
+    DOM.toggleAdvancedTools.onclick = () => { const isHidden = DOM.advancedToolsContainer.style.display === 'none'; DOM.advancedToolsContainer.style.display = isHidden ? 'block' : 'none'; DOM.toggleAdvancedTools.querySelector('button').textContent = isHidden ? '↑' : '↓'; };
+
+    // Config manager
+    let configData = [];
+    let currentFileSha = '';
+
+    function applyXemmaText(text) {
+        if (!text) return;
+        const lines = text.split(/\r?\n/);
+        branchModes = {
+            'all': { label: 'Xem Tất Cả', prefixes: [] }
+        };
+
+        lines.forEach(line => {
+            const trimmed = line.trim();
+            if (!trimmed) return;
+            const colonIdx = trimmed.indexOf(':');
+            if (colonIdx !== -1) {
+                const label = trimmed.substring(0, colonIdx).trim();
+                const valStr = trimmed.substring(colonIdx + 1).trim();
+                const prefixes = valStr.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+                
+                if (label) {
+                    const modeKey = 'mode_' + removeVietnameseTones(label).toLowerCase().replace(/[^a-z0-9]/g, '_');
+                    branchModes[modeKey] = {
+                        label: label,
+                        prefixes: prefixes
+                    };
+                }
+            }
+        });
+
+        localStorage.setItem('cached_xemma_txt', text);
+        populateBranchSelects();
+    }
+
+    function syncXemmaFromEditor() {
+        const selectedFile = document.getElementById('cfgFileSelect')?.value;
+        if (selectedFile === 'xemma.txt') {
+            const text = serializeConfig();
+            applyXemmaText(text);
+        }
+    }
+
+    window.saveGithubToken = function() {
+        const pat = document.getElementById('cfgGithubPat').value.trim();
+        localStorage.setItem('github_pat', pat);
+        showNotification("Đã lưu token GitHub", "success");
+    };
+
+    setTimeout(() => {
+        const patInput = document.getElementById('cfgGithubPat');
+        if (patInput) patInput.value = localStorage.getItem('github_pat') || '';
+    }, 100);
+
+    window.loadConfigFile = async function() {
+        const selectedFile = document.getElementById('cfgFileSelect').value;
+        const patInput = document.getElementById('cfgGithubPat');
+        const pat = patInput ? patInput.value.trim() : '';
+        if (pat) localStorage.setItem('github_pat', pat); 
+        
+        const listContainer = document.getElementById('cfgEditorList');
+        const titleEl = document.getElementById('cfgEditorTitle');
+        titleEl.textContent = `Đang tải ${selectedFile}...`;
+        listContainer.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-light);"><i class="fas fa-circle-notch fa-spin" style="margin-right: 8px;"></i> Đang tải dữ liệu...</div>`;
+        let loadedContent = null; currentFileSha = '';
+
+        if (pat) {
+            const repo = 'doducdungvn/doducdungvn.github.io';
+            const url = `https://api.github.com/repos/${repo}/contents/${selectedFile}`;
+            try {
+                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${pat}`, 'Accept': 'application/vnd.github+json' } });
+                if (res.ok) {
+                    const data = await res.json();
+                    currentFileSha = data.sha;
+                    loadedContent = decodeURIComponent(escape(atob(data.content.replace(/\s/g, ''))));
+                    showNotification(`Đã tải ${selectedFile} từ GitHub`, "success");
+                } else {
+                    showNotification(`Lỗi GitHub (${res.status}). Chuyển sang tải từ Local.`, "warning");
+                }
+            } catch (err) { showNotification(`Lỗi kết nối. Chuyển tải Local.`, "error"); }
+        }
+
+        if (loadedContent === null) {
+            try {
+                const res = await fetch(`${selectedFile}?t=${Date.now()}`);
+                if (res.ok) { loadedContent = await res.text(); showNotification(`Đã tải ${selectedFile} từ Local`, "info"); }
+            } catch (err) { console.error(err); }
+        }
+
+        if (loadedContent === null) {
+            listContainer.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--danger-color); font-weight: 600;">⚠️ Không thể tải cấu hình! Vui lòng kiểm tra lại token hoặc tệp tin cục bộ.</div>`;
+            titleEl.textContent = `Lỗi tải ${selectedFile}`; return;
+        }
+
+        configData = [];
+        const lines = loadedContent.split(/\r?\n/);
+        lines.forEach(line => {
+            const trimmed = line.trim(); if (!trimmed) return;
+            const colonIdx = trimmed.indexOf(':');
+            if (colonIdx !== -1) { configData.push({ key: trimmed.substring(0, colonIdx).trim(), value: trimmed.substring(colonIdx + 1).trim() }); } 
+            else { configData.push({ key: trimmed, value: '' }); }
+        });
+        titleEl.textContent = `Tệp: ${selectedFile} (${configData.length} mục)`;
+        renderConfigRows();
+        
+        if (selectedFile === 'xemma.txt') {
+            syncXemmaFromEditor();
+        }
+    };
+
+    function renderConfigRows() {
+        const listContainer = document.getElementById('cfgEditorList'); if (!listContainer) return;
+        listContainer.innerHTML = '';
+        if (configData.length === 0) { listContainer.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--text-light);">Danh sách trống. Nhấn "Thêm mới" để bắt đầu.</div>`; return; }
+
+        configData.forEach((item, idx) => {
+            const row = document.createElement('div');
+            row.style.cssText = "display: flex; gap: 10px; align-items: center; background: var(--container-bg); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px 12px; transition: 0.2s;";
+            row.innerHTML = `<div style="font-weight: bold; color: var(--text-light); font-size: 13px; width: 24px; text-align: center;">${idx + 1}</div>
+                <input type="text" value="${item.key.replace(/"/g, '&quot;')}" placeholder="Tên tổ/Chi nhánh..." style="flex: 1; max-width: 250px; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px;" oninput="updateConfigRowKey(${idx}, this.value)">
+                <input type="text" value="${item.value.replace(/"/g, '&quot;')}" placeholder="Danh sách đầu số..." style="flex: 2; padding: 6px 10px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 13px;" oninput="updateConfigRowValue(${idx}, this.value)">
+                <button onclick="deleteConfigRow(${idx})" class="btn danger" style="padding: 6px 10px; font-size: 12px; flex-shrink: 0; min-width: auto; width: auto; height: 32px;" title="Xóa hàng">✕</button>`;
+            listContainer.appendChild(row);
+        });
+    }
+
+    window.updateConfigRowKey = function(idx, val) { 
+        if (configData[idx]) configData[idx].key = val; 
+        syncXemmaFromEditor();
+    };
+    window.updateConfigRowValue = function(idx, val) { 
+        if (configData[idx]) configData[idx].value = val; 
+        syncXemmaFromEditor();
+    };
+    window.addNewConfigRow = function() { 
+        configData.push({ key: 'Mục mới', value: '' }); 
+        renderConfigRows(); 
+        syncXemmaFromEditor();
+        const listContainer = document.getElementById('cfgEditorList'); 
+        if (listContainer) listContainer.scrollTop = listContainer.scrollHeight; 
+    };
+    window.deleteConfigRow = function(idx) { 
+        configData.splice(idx, 1); 
+        renderConfigRows(); 
+        syncXemmaFromEditor();
+    };
+    function serializeConfig() { return configData.map(item => `${item.key}: ${item.value}`).join('\n') + '\n'; }
+
+    window.downloadConfigFile = function() {
+        const selectedFile = document.getElementById('cfgFileSelect').value; const text = serializeConfig();
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' }); const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob); link.download = selectedFile; document.body.appendChild(link);
+        link.click(); document.body.removeChild(link); showNotification(`Đã tạo liên kết tải về cho ${selectedFile}`, "success");
+    };
+
+    window.commitConfigFile = async function() {
+        const pat = localStorage.getItem('github_pat') || '';
+        if (!pat) { alert("Vui lòng nhập GitHub Personal Access Token (PAT) để commit trực tiếp lên GitHub!"); return; }
+        const selectedFile = document.getElementById('cfgFileSelect').value;
+        const commitMsg = document.getElementById('cfgCommitMsg').value.trim() || `Cập nhật ${selectedFile} qua Tiện ích`;
+        const contentText = serializeConfig();
+        const repo = 'doducdungvn/doducdungvn.github.io'; const url = `https://api.github.com/repos/${repo}/contents/${selectedFile}`;
+        showNotification("Đang chuẩn bị gửi cấu hình lên GitHub...", "info");
+
+        try {
+            const getRes = await fetch(url, { headers: { 'Authorization': `Bearer ${pat}` } });
+            let latestSha = currentFileSha;
+            if (getRes.ok) { const getJson = await getRes.json(); latestSha = getJson.sha; }
+            const base64Content = btoa(unescape(encodeURIComponent(contentText)));
+            const putRes = await fetch(url, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${pat}`, 'Accept': 'application/vnd.github+json', 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: commitMsg, content: base64Content, sha: latestSha, branch: 'main' })
+            });
+            if (putRes.ok) {
+                const putJson = await putRes.json(); currentFileSha = putJson.content.sha;
+                showNotification(`Đã commit thành công tệp ${selectedFile} lên GitHub!`, "success");
+                if (selectedFile === 'xemma.txt') {
+                    syncXemmaFromEditor();
+                }
+            } else {
+                const errJson = await putRes.json().catch(() => ({})); alert(`Lỗi commit: ${errJson.message || putRes.statusText}`);
+            }
+        } catch (err) { alert(`Lỗi kết nối mạng: ${err.message}`); }
+    };
+
+    async function loadRegionData() {
+        const REGION_DATA_URL = 'https://raw.githubusercontent.com/doducdungvn/doducdungvn.github.io/refs/heads/main/donvi.txt';
+        try {
+            const res = await fetch(REGION_DATA_URL + '?t=' + Date.now());
+            if (res.ok) {
+                const text = await res.text();
+                DOM.regionDefinitionsInput.value = text;
+                parseRegionDefinitions();
+                populateRegionSelect();
+            }
+        } catch (err) {
+            console.error('Không thể tự động tải cấu hình vùng từ GitHub:', err);
+        }
+    }
+    
+    function populateBranchSelects() {
+        const sel1 = document.getElementById('selBranchMode');
+        const sel2 = document.getElementById('selBranchMode_Detailed');
+        if (!sel1 || !sel2) return;
+
+        const val1 = sel1.value;
+        const val2 = sel2.value;
+
+        sel1.innerHTML = '';
+        sel2.innerHTML = '';
+
+        Object.keys(branchModes).forEach(modeKey => {
+            const mode = branchModes[modeKey];
+            const opt1 = document.createElement('option');
+            opt1.value = modeKey;
+            opt1.textContent = mode.label;
+            sel1.appendChild(opt1);
+
+            const opt2 = document.createElement('option');
+            opt2.value = modeKey;
+            opt2.textContent = mode.label;
+            sel2.appendChild(opt2);
+        });
+
+        if (branchModes[val1]) sel1.value = val1;
+        if (branchModes[val2]) sel2.value = val2;
+    }
+
+    async function loadBranchConfig() {
+        const cachedText = localStorage.getItem('cached_xemma_txt');
+        if (cachedText) {
+            applyXemmaText(cachedText);
+        }
+
+        const githubUrl = `https://raw.githubusercontent.com/doducdungvn/doducdungvn.github.io/main/xemma.txt?t=${Date.now()}`;
+        const localUrl = `xemma.txt?t=${Date.now()}`;
+
+        async function tryFetchAndParse(url) {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            const text = await res.text();
+            applyXemmaText(text);
+            return true;
+        }
+
+        try { await tryFetchAndParse(githubUrl); } 
+        catch (e) { try { await tryFetchAndParse(localUrl); } catch (err) { console.warn('Lỗi tải xemma.txt:', err); } }
+    }
+    loadBranchConfig();
+
+    // Hàm đọc cấu hình donvi.txt
+    function parseRegionDefinitions() {
+        regionDefinitions = {}; 
+        const text = DOM.regionDefinitionsInput.value;
+        const lines = text.split('\n');
+        
+        lines.forEach(line => {
+            const trimmed = line.trim();
+            if(!trimmed) return;
+            
+            const colonIdx = trimmed.indexOf(':'); 
+            if(colonIdx === -1) return;
+            
+            const regionName = trimmed.substring(0, colonIdx).trim(); 
+            const rulesStr = trimmed.substring(colonIdx + 1).trim(); 
+            
+            const items = rulesStr.split(/[+,]/);
+            const parsedRules = [];
+
+            items.forEach(rawItem => {
+                const item = rawItem.trim();
+                if (!item) return;
+
+                if (item.includes('_')) {
+                    const parts = item.split('_').map(s => parseInt(s.trim(), 10));
+                    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                        parsedRules.push({ min: Math.min(parts[0], parts[1]), max: Math.max(parts[0], parts[1]) });
+                    }
+                } else if (item.includes('-')) {
+                    const parts = item.split('-').map(s => parseInt(s.trim(), 10));
+                    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                        parsedRules.push({ min: Math.min(parts[0], parts[1]), max: Math.max(parts[0], parts[1]) });
+                    }
+                } else {
+                    const val = parseInt(item, 10);
+                    if (!isNaN(val)) {
+                        parsedRules.push({ min: val, max: val });
+                    }
+                }
+            });
+
+            if(parsedRules.length > 0) {
+                regionDefinitions[regionName] = parsedRules;
+            }
+        });
+    }
+
+    function populateRegionSelect() {
+        DOM.regionSelect.innerHTML = '<option value="all">--- Tất cả ---</option>';
+        for(let regionName in regionDefinitions) {
+            const option = document.createElement('option'); option.value = regionName; option.textContent = regionName;
+            DOM.regionSelect.appendChild(option);
+        }
+    }
+    
+    DOM.btnSaveRegions.onclick = () => { parseRegionDefinitions(); populateRegionSelect(); showNotification('Đã cập nhật cấu hình Tổ/Nhánh!', 'success'); };
+    DOM.regionSelect.addEventListener('change', generateSummaryView);
+    DOM.sortSelect.addEventListener('change', generateSummaryView);
+
+    function setupCurrencyInputFilter(inputElement) {
+        inputElement.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            if (value === '') { this.dataset.value = ''; this.value = ''; } 
+            else { this.dataset.value = value; this.value = parseInt(value, 10).toLocaleString('vi-VN'); }
+            generateSummaryView();
+        });
+    }
+    setupCurrencyInputFilter(DOM.minRevenueInput); setupCurrencyInputFilter(DOM.maxRevenueInput);
+
+    DOM.btnClearRevenueFilter.onclick = () => {
+        DOM.minRevenueInput.value = ''; DOM.minRevenueInput.dataset.value = '';
+        DOM.maxRevenueInput.value = ''; DOM.maxRevenueInput.dataset.value = '';
+        DOM.sortSelect.value = 'default'; DOM.regionSelect.value = 'all';
+        DOM.selBranchMode.value = 'all';
+        DOM.cbExcludeNumeric.checked = false; DOM.cbExcludeXSKT.checked = false; DOM.cbExcludeVeBoc.checked = false;
+        generateSummaryView(); showNotification('Đã xóa tất cả các bộ lọc!', 'info');
+    };
+
+    DOM.selBranchMode.addEventListener('change', generateSummaryView);
+    DOM.cbExcludeNumeric.addEventListener('change', generateSummaryView);
+    DOM.cbExcludeXSKT.addEventListener('change', generateSummaryView);
+    DOM.cbExcludeVeBoc.addEventListener('change', generateSummaryView);
+
+    window.addEventListener('scroll', () => {
+        if(document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) { DOM.scrollToTopBtn.style.display = "block"; DOM.scrollToBottomBtn.style.display = "block"; }
+        else { DOM.scrollToTopBtn.style.display = "none"; DOM.scrollToBottomBtn.style.display = "none"; }
+    });
+    DOM.scrollToTopBtn.onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
+    DOM.scrollToBottomBtn.onclick = () => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+
+    loadRegionData();
+})();
+</script>
+</body>
+</html>
