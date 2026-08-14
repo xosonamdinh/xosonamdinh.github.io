@@ -1,1 +1,163 @@
+import os
+import re
+import json
+import glob
+import xlrd
 
+# --- 1. CẤU HÌNH ĐƯỜNG DẪN THƯ MỤC CHỨA FILE ---
+DIR_B31 = r"Y:\Dung\thang8\31"
+DIR_B35 = r"Y:\Dung\thang8\35"
+OUTPUT_FILE = "data.json"
+
+
+def get_base_id(code: str) -> str:
+    """Lấy số cuối của mã đại lý (ví dụ: 'A919' -> '919')"""
+    match = re.search(r'\d+$', str(code).strip())
+    return match.group(0) if match else str(code).strip()
+
+
+def parse_all_bieu_31(folder_path: str):
+    """Quét và đọc toàn bộ file Biểu 31 (.xls) theo đúng logic Web Tool"""
+    all_records = []
+    files = glob.glob(os.path.join(folder_path, "*.xls")) + glob.glob(os.path.join(folder_path, "*.xlsx"))
+    print(f"-> Đang xử lý {len(files)} file Biểu 31...")
+
+    for fpath in sorted(files):
+        try:
+            wb = xlrd.open_workbook(fpath)
+            sheet = wb.sheet_by_index(0)
+
+            # 1. Dò tìm ngày trong 20 dòng đầu
+            found_date = "Khác"
+            date_regex = re.compile(r'(\d{1,2})[\/-](\d{1,2})(?:[\/-](\d{2,4}))?')
+            for r in range(min(20, sheet.nrows)):
+                for c in range(sheet.ncols):
+                    cell_val = str(sheet.cell_value(r, c)).strip()
+                    m = date_regex.search(cell_val)
+                    if m:
+                        parts = m.group(0).replace('-', '/').split('/')
+                        dd, mm = parts[0].zfill(2), parts[1].zfill(2)
+                        yy = parts[2][-2:] if len(parts) == 3 else "26"
+                        found_date = f"{dd}/{mm}/{yy}"
+                        break
+                if found_date != "Khác":
+                    break
+
+            # 2. Đọc dữ liệu đại lý
+            for r in range(sheet.nrows):
+                if sheet.ncols < 1:
+                    continue
+                code = str(sheet.cell_value(r, 0)).strip()
+                if not re.search(r'\d', code) or any(k in code.upper() for k in ["TỔNG", "CỘNG", "TOTAL"]):
+                    continue
+
+                def get_val(c_idx):
+                    if c_idx < sheet.ncols:
+                        val = sheet.cell_value(r, c_idx)
+                        try:
+                            return float(val) if val != "" else 0.0
+                        except (ValueError, TypeError):
+                            return 0.0
+                    return 0.0
+
+                # Khớp các cột tương ứng với code JS:
+                # Cột 0: Mã đại lý (__EMPTY)
+                # Cột 2: Lô ĐB (__EMPTY_2)
+                # Cột 6: Lô Cặp (__EMPTY_6)
+                # Cột 8: Lô 2/27 (__EMPTY_8)
+                # Cột 10: Lô 3/23 (__EMPTY_10)
+                # Cột 14: Thưởng (__EMPTY_14)
+                all_records.append({
+                    "__EMPTY": code,
+                    "__EMPTY_2": get_val(2),
+                    "__EMPTY_6": get_val(6),
+                    "__EMPTY_8": get_val(8),
+                    "__EMPTY_10": get_val(10),
+                    "__EMPTY_14": get_val(14),
+                    "_parsedDate": found_date
+                })
+
+        except Exception as e:
+            print(f"Lỗi đọc file {os.path.basename(fpath)}: {e}")
+
+    return all_records
+
+
+def parse_all_bieu_35(folder_path: str):
+    """Quét và đọc toàn bộ file Biểu 35 (.xls), gộp dữ liệu theo từng mã đại lý"""
+    merge_map = {}
+    files = glob.glob(os.path.join(folder_path, "*.xls")) + glob.glob(os.path.join(folder_path, "*.xlsx"))
+    print(f"-> Đang xử lý {len(files)} file Biểu 35...")
+
+    for fpath in sorted(files):
+        try:
+            wb = xlrd.open_workbook(fpath)
+            sheet = wb.sheet_by_index(0)
+            if sheet.nrows < 5:
+                continue
+
+            code_col_idx = -1
+            xskt_col_idx = -1
+            header_row_idx = -1
+
+            # Dò tìm vị trí cột Mã và cột XSKT
+            for r_idx in range(min(sheet.nrows, 15)):
+                for c_idx in range(sheet.ncols):
+                    cell_txt = str(sheet.cell_value(r_idx, c_idx)).upper().replace(" ", "").replace(".", "")
+                    if cell_txt in ["MADL", "MADAILY", "MADONVI"]:
+                        code_col_idx = c_idx
+                    if "XSKT" in cell_txt:
+                        xskt_col_idx = c_idx
+                        header_row_idx = r_idx
+
+            if xskt_col_idx == -1:
+                xskt_col_idx, header_row_idx = 8, 4
+            if code_col_idx == -1:
+                code_col_idx = 1
+
+            for r_idx in range(header_row_idx + 1, sheet.nrows):
+                if code_col_idx >= sheet.ncols:
+                    continue
+                code = str(sheet.cell_value(r_idx, code_col_idx)).strip()
+                if not code or not re.search(r'\d', code):
+                    continue
+                if any(k in code.upper() for k in ["TỔNG", "CỘNG", "TOTAL"]):
+                    continue
+
+                try:
+                    val = float(sheet.cell_value(r_idx, xskt_col_idx)) if sheet.cell_value(r_idx, xskt_col_idx) != "" else 0.0
+                except (ValueError, TypeError):
+                    val = 0.0
+
+                key = code.upper()
+                if key in merge_map:
+                    merge_map[key]["xskt"] += val
+                else:
+                    merge_map[key] = {"code": code, "xskt": val}
+
+        except Exception as e:
+            print(f"Lỗi đọc file {os.path.basename(fpath)}: {e}")
+
+    return list(merge_map.values())
+
+
+def main():
+    print("=== BẮT ĐẦU XỬ LÝ DỮ LIỆU EXCEL ===")
+    data1 = parse_all_bieu_31(DIR_B31)
+    data2 = parse_all_bieu_35(DIR_B35)
+
+    output_data = {
+        "excelData1": data1,
+        "excelData2": data2
+    }
+
+    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+        json.dump(output_data, f, ensure_ascii=False, indent=2)
+
+    print(f"\n Xuất thành công file '{OUTPUT_FILE}'!")
+    print(f"- Tổng số bản ghi Biểu 31: {len(data1)}")
+    print(f"- Tổng số đại lý Biểu 35: {len(data2)}")
+
+
+if __name__ == "__main__":
+    main()
