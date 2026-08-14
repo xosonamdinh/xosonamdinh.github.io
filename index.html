@@ -11,7 +11,7 @@
     <link rel="stylesheet" type="text/css" href="https://www.minhngoc.net.vn/style/bangketqua_mini.css"/>
     <script src="https://www.minhngoc.net.vn/jquery/jquery-1.7.2.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
 
         :root {
             --primary-color: #107c41;
@@ -95,7 +95,6 @@
         .single-agent-row td { font-weight: 700; }
         .group-member-row td { font-style: italic; font-weight: 400; color: #555; }
         
-        /* STT luôn thẳng đứng và in đậm */
         td.stt-col { font-style: normal !important; font-weight: 800 !important; color: var(--text-color) !important; }
 
         .code-cell-highlight { color: var(--primary-color) !important; font-weight: 800 !important; }
@@ -108,17 +107,14 @@
         .final-amount-negative { background-color: var(--success-color) !important; color: #ffffff !important; }
         tr.final-amount-positive td, tr.final-amount-negative td { font-size: 20px !important; font-weight: 700; padding: 12px 6px !important; }
 
-        /* Report Table Chi tiết */
         .report-table { width: 100%; max-width: 100%; table-layout: auto; }
         .report-table th, .report-table td { padding: 8px 4px; font-size: 13.5px; }
 
-        /* Dynamic Inputs & Choices */
         .dynamic-input { width: 100%; border: none !important; background: transparent !important; font-family: inherit; font-size: inherit; font-weight: bold; text-align: center; padding: 5px; outline: none !important; color: inherit; box-shadow: none !important; }
         #actionButtonContainer { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         #actionChoices { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; grid-column: 1 / -1; }
         .bang-chu-cell { text-align: center !important; font-style: italic; padding: 8px 12px !important; font-size: 13px; color: var(--text-light); background: #fff !important; white-space: normal !important; }
 
-        /* Bán thêm vé */
         .sell-row-container { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
         .sell-row-container > label { min-width: 80px; margin: 0; }
         .ticket-type-selector { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -126,7 +122,6 @@
         .input-group-row { display: flex; gap: 8px; width: 100%; align-items: center; }
         .remove-ticket-btn { background: #fff5f5; border: 1px solid #ffcccc; cursor: pointer; color: var(--danger-color); font-weight: bold; font-size: 12px; margin-left: 5px; padding: 2px 6px; border-radius: 4px; display: inline-block; vertical-align: middle; }
 
-        /* 3 Nút cuối trang */
         .summary-actions-bottom {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -143,99 +138,6 @@
             height: 44px;
             border: 1px solid rgba(0,0,0,0.1);
         }
-
-        /* --- CHỤP ẢNH BÁO CÁO GỐC --- */
-        #reportContainer.capturing-image {
-            aspect-ratio: 1 / 1.414;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            font-size: 22px !important;
-            padding: 30px !important;
-            background-color: white;
-            box-shadow: none;
-            overflow: visible !important;
-        }
-        #reportContainer.capturing-image table { height: 100%; width: 100%; }
-        #reportContainer.capturing-image h2 { font-size: 3em; }
-        #reportContainer.capturing-image .total-amount { font-size: 4em; }
-        #reportContainer.capturing-image .so-so { font-size: 4.5em !important; font-weight: 900; color: var(--logo-color); }
-        #reportContainer.capturing-image tr.final-amount-positive td, #reportContainer.capturing-image tr.final-amount-negative td { font-size: 4.5em !important; padding: 25px 10px !important; }
-        #reportContainer.capturing-image table th, #reportContainer.capturing-image table td { padding: 10px 10px; font-size: 1.1em; }
-        #reportContainer.capturing-image .report-table tr:not(#finalResultRow):not(#bangChuRow) td, #reportContainer.capturing-image .report-table th { font-size: 2.4em !important; padding: 20px 10px !important; font-weight: 600; }
-        #reportContainer.capturing-image #tongCongRow td { font-size: 2.4em !important; }
-        #reportContainer.capturing-image #bangChuRow td { font-size: 1.3em !important; font-style: italic; padding: 10px !important; font-weight: normal; }
-
-        /* --- GIAO DIỆN LỊCH WINDOWS --- */
-        .win-calendar-box {
-            background: #202020;
-            color: #ffffff;
-            border-radius: 6px;
-            padding: 12px;
-            margin-top: 8px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
-            max-width: 350px;
-        }
-        .win-calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 700;
-            font-size: 14px;
-            margin-bottom: 10px;
-            color: #ffffff;
-            padding: 0 4px;
-        }
-        .win-cal-nav-btn {
-            background: #333333;
-            color: #fff;
-            border: 1px solid #555;
-            padding: 3px 9px;
-            font-size: 13px;
-            cursor: pointer;
-            border-radius: 3px;
-            transition: all 0.15s;
-        }
-        .win-cal-nav-btn:hover { background: #0078d4; border-color: #0078d4; }
-        .win-calendar-weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            font-size: 12.5px;
-            font-weight: 700;
-            color: #888888;
-            margin-bottom: 6px;
-        }
-        .win-calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-        .win-cal-cell {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13.5px;
-            font-weight: 600;
-            border-radius: 3px;
-            cursor: default;
-            border: 1px solid transparent;
-            user-select: none;
-            color: #555555;
-            background: transparent;
-        }
-        .win-cal-cell.has-data { 
-            color: #ffffff !important; 
-            background: #383838 !important;
-            font-weight: 700;
-            cursor: pointer;
-            border: 1px solid #4a4a4a;
-        }
-        .win-cal-cell.has-data:hover { background: #4f4f4f !important; border-color: #777; }
-        .win-cal-cell.active { 
-            background-color: #0078d4 !important; 
-            color: #ffffff !important; 
-            border: 1px solid #60cdff !important; 
-            font-weight: 800; 
-        }
-        .win-cal-cell.dimmed { color: #555555; }
 
         /* Responsive Mobile */
         @media (max-width: 768px) {
@@ -297,78 +199,9 @@
 
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
+        <!-- SỬ DỤNG FILE LOGO.GIF TRÊN GITHUB -->
         <div class="simple-animated-logo" onclick="window.location.href = window.location.pathname; return false;">
-            <div style="width: 75px; height: 75px;">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
-                <defs>
-                  <clipPath id="inner-circle-clip-home">
-                    <circle cx="250" cy="250" r="162" />
-                  </clipPath>
-                  <path id="text-arc-path-home" d="M 52,250 A 198,198 0 0,0 448,250" fill="none" />
-                </defs>
-                <circle cx="250" cy="250" r="245" fill="#E31A1A" stroke="#0B3C85" stroke-width="7" />
-                <circle cx="250" cy="250" r="162" fill="#FFFFFF" stroke="#0B3C85" stroke-width="6" />
-                <polygon points="250,32 258,58 284,58 263,73 271,98 250,83 229,98 237,73 216,58 242,58" fill="#FFEB3B" />
-                <text font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-weight="800" font-size="28" fill="#FFEE00" letter-spacing="2">
-                  <textPath href="#text-arc-path-home" startOffset="50%" text-anchor="middle">
-                    XỔ SỐ KIẾN THIẾT NAM ĐỊNH
-                  </textPath>
-                </text>
-                <g clip-path="url(#inner-circle-clip-home)">
-                  <path d="M 125,120 L 195,120 L 375,380 L 305,380 Z" fill="#0C4DA2" />
-                  <path d="M 260,172 Q 315,142 375,142" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
-                  <path d="M 260,192 Q 315,162 375,162" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
-                  <path d="M 260,212 Q 315,182 375,182" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
-                  <path d="M 240,328 Q 185,358 125,358" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
-                  <path d="M 240,308 Q 185,338 125,338" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
-                  <path d="M 240,288 Q 185,318 125,318" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
-                  <g>
-                    <polygon points="175,380 325,380 318,368 182,368" fill="#E0692A" />
-                    <rect x="180" y="362" width="140" height="6" fill="#F8A060" />
-                    <polygon points="185,362 315,362 310,352 190,352" fill="#E0692A" />
-                    <rect x="188" y="347" width="124" height="5" fill="#F8A060" />
-                    <rect x="195" y="328" width="110" height="19" fill="#E0692A" />
-                    <rect x="192" y="325" width="116" height="3" fill="#F8A060" />
-                    <path d="M 235,347 A 15,15 0 0,1 265,347 V 347 H 235 Z" fill="#0C4DA2" />
-                    <rect x="201" y="308" width="98" height="17" fill="#E0692A" />
-                    <rect x="198" y="305" width="104" height="3" fill="#F8A060" />
-                    <path d="M 237,325 A 13,13 0 0,1 263,325 V 325 H 237 Z" fill="#0C4DA2" />
-                    <rect x="207" y="290" width="86" height="15" fill="#E0692A" />
-                    <rect x="204" y="287" width="92" height="3" fill="#F8A060" />
-                    <path d="M 239,305 A 11,11 0 0,1 261,305 V 239 Z" fill="#0C4DA2" />
-                    <rect x="212" y="274" width="76" height="13" fill="#E0692A" />
-                    <rect x="209" y="271" width="82" height="3" fill="#F8A060" />
-                    <path d="M 241,287 A 9,9 0 0,1 259,287 V 287 H 241 Z" fill="#0C4DA2" />
-                    <rect x="216" y="259" width="68" height="12" fill="#E0692A" />
-                    <rect x="214" y="256" width="72" height="3" fill="#F8A060" />
-                    <path d="M 242,271 A 8,8 0 0,1 258,271 V 271 H 242 Z" fill="#0C4DA2" />
-                    <rect x="220" y="245" width="60" height="11" fill="#E0692A" />
-                    <rect x="218" y="242" width="64" height="3" fill="#F8A060" />
-                    <path d="M 243,256 A 7,7 0 0,1 257,256 V 256 H 243 Z" fill="#0C4DA2" />
-                    <rect x="224" y="232" width="52" height="10" fill="#E0692A" />
-                    <rect x="222" y="229" width="56" height="3" fill="#F8A060" />
-                    <path d="M 244,242 A 6,6 0 0,1 256,242 V 242 H 244 Z" fill="#0C4DA2" />
-                    <rect x="228" y="220" width="44" height="9" fill="#E0692A" />
-                    <rect x="226" y="217" width="48" height="3" fill="#F8A060" />
-                    <path d="M 245,229 A 5,5 0 0,1 255,229 V 229 H 245 Z" fill="#0C4DA2" />
-                    <rect x="231" y="209" width="38" height="8" fill="#E0692A" />
-                    <rect x="229" y="206" width="42" height="3" fill="#F8A060" />
-                    <path d="M 246,217 A 4,4 0 0,1 254,217 V 217 H 246 Z" fill="#0C4DA2" />
-                    <rect x="234" y="199" width="32" height="7" fill="#E0692A" />
-                    <rect x="232" y="196" width="36" height="3" fill="#F8A060" />
-                    <path d="M 247,206 A 3,3 0 0,1 253,206 V 206 H 247 Z" fill="#0C4DA2" />
-                    <rect x="237" y="190" width="26" height="6" fill="#E0692A" />
-                    <rect x="235" y="187" width="30" height="3" fill="#F8A060" />
-                    <rect x="240" y="182" width="20" height="5" fill="#E0692A" />
-                    <rect x="238" y="179" width="24" height="3" fill="#F8A060" />
-                    <rect x="242" y="174" width="16" height="5" fill="#E0692A" />
-                    <rect x="240" y="171" width="20" height="3" fill="#F8A060" />
-                    <polygon points="250,128 255,145 257,171 243,171 245,145" fill="#E0692A" />
-                    <circle cx="250" cy="132" r="5" fill="#F8A060" />
-                  </g>
-                </g>
-              </svg>
-            </div>
+            <img src="logoXSND.gif" alt="Logo XSKT Nam Định" style="width: 100px; height: 100px; object-fit: contain;">
         </div>
         <h2>Báo cáo Thu Tiền</h2>
 
@@ -394,78 +227,9 @@
     <!-- MAIN PAGE -->
     <div id="mainPage" class="page" style="display: none;">
         
+        <!-- SỬ DỤNG FILE LOGO.GIF TRÊN GITHUB -->
         <div class="simple-animated-logo main-page-logo" onclick="window.location.href = window.location.pathname; return false;">
-            <div style="width: 55px; height: 55px;">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
-                <defs>
-                  <clipPath id="inner-circle-clip-main">
-                    <circle cx="250" cy="250" r="162" />
-                  </clipPath>
-                  <path id="text-arc-path-main" d="M 52,250 A 198,198 0 0,0 448,250" fill="none" />
-                </defs>
-                <circle cx="250" cy="250" r="245" fill="#E31A1A" stroke="#0B3C85" stroke-width="7" />
-                <circle cx="250" cy="250" r="162" fill="#FFFFFF" stroke="#0B3C85" stroke-width="6" />
-                <polygon points="250,32 258,58 284,58 263,73 271,98 250,83 229,98 237,73 216,58 242,58" fill="#FFEB3B" />
-                <text font-family="'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif" font-weight="800" font-size="28" fill="#FFEE00" letter-spacing="2">
-                  <textPath href="#text-arc-path-main" startOffset="50%" text-anchor="middle">
-                    XỔ SỐ KIẾN THIẾT NAM ĐỊNH
-                  </textPath>
-                </text>
-                <g clip-path="url(#inner-circle-clip-main)">
-                  <path d="M 125,120 L 195,120 L 375,380 L 305,380 Z" fill="#0C4DA2" />
-                  <path d="M 260,172 Q 315,142 375,142" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
-                  <path d="M 260,192 Q 315,162 375,162" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
-                  <path d="M 260,212 Q 315,182 375,182" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
-                  <path d="M 240,328 Q 185,358 125,358" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
-                  <path d="M 240,308 Q 185,338 125,338" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
-                  <path d="M 240,288 Q 185,318 125,318" stroke="#E31A1A" stroke-width="10" fill="none" stroke-linecap="square" />
-                  <g>
-                    <polygon points="175,380 325,380 318,368 182,368" fill="#E0692A" />
-                    <rect x="180" y="362" width="140" height="6" fill="#F8A060" />
-                    <polygon points="185,362 315,362 310,352 190,352" fill="#E0692A" />
-                    <rect x="188" y="347" width="124" height="5" fill="#F8A060" />
-                    <rect x="195" y="328" width="110" height="19" fill="#E0692A" />
-                    <rect x="192" y="325" width="116" height="3" fill="#F8A060" />
-                    <path d="M 235,347 A 15,15 0 0,1 265,347 V 347 H 235 Z" fill="#0C4DA2" />
-                    <rect x="201" y="308" width="98" height="17" fill="#E0692A" />
-                    <rect x="198" y="305" width="104" height="3" fill="#F8A060" />
-                    <path d="M 237,325 A 13,13 0 0,1 263,325 V 325 H 237 Z" fill="#0C4DA2" />
-                    <rect x="207" y="290" width="86" height="15" fill="#E0692A" />
-                    <rect x="204" y="287" width="92" height="3" fill="#F8A060" />
-                    <path d="M 239,305 A 11,11 0 0,1 261,305 V 239 Z" fill="#0C4DA2" />
-                    <rect x="212" y="274" width="76" height="13" fill="#E0692A" />
-                    <rect x="209" y="271" width="82" height="3" fill="#F8A060" />
-                    <path d="M 241,287 A 9,9 0 0,1 259,287 V 287 H 241 Z" fill="#0C4DA2" />
-                    <rect x="216" y="259" width="68" height="12" fill="#E0692A" />
-                    <rect x="214" y="256" width="72" height="3" fill="#F8A060" />
-                    <path d="M 242,271 A 8,8 0 0,1 258,271 V 271 H 242 Z" fill="#0C4DA2" />
-                    <rect x="220" y="245" width="60" height="11" fill="#E0692A" />
-                    <rect x="218" y="242" width="64" height="3" fill="#F8A060" />
-                    <path d="M 243,256 A 7,7 0 0,1 257,256 V 256 H 243 Z" fill="#0C4DA2" />
-                    <rect x="224" y="232" width="52" height="10" fill="#E0692A" />
-                    <rect x="222" y="229" width="56" height="3" fill="#F8A060" />
-                    <path d="M 244,242 A 6,6 0 0,1 256,242 V 242 H 244 Z" fill="#0C4DA2" />
-                    <rect x="228" y="220" width="44" height="9" fill="#E0692A" />
-                    <rect x="226" y="217" width="48" height="3" fill="#F8A060" />
-                    <path d="M 245,229 A 5,5 0 0,1 255,229 V 229 H 245 Z" fill="#0C4DA2" />
-                    <rect x="231" y="209" width="38" height="8" fill="#E0692A" />
-                    <rect x="229" y="206" width="42" height="3" fill="#F8A060" />
-                    <path d="M 246,217 A 4,4 0 0,1 254,217 V 217 H 246 Z" fill="#0C4DA2" />
-                    <rect x="234" y="199" width="32" height="7" fill="#E0692A" />
-                    <rect x="232" y="196" width="36" height="3" fill="#F8A060" />
-                    <path d="M 247,206 A 3,3 0 0,1 253,206 V 206 H 247 Z" fill="#0C4DA2" />
-                    <rect x="237" y="190" width="26" height="6" fill="#E0692A" />
-                    <rect x="235" y="187" width="30" height="3" fill="#F8A060" />
-                    <rect x="240" y="182" width="20" height="5" fill="#E0692A" />
-                    <rect x="238" y="179" width="24" height="3" fill="#F8A060" />
-                    <rect x="242" y="174" width="16" height="5" fill="#E0692A" />
-                    <rect x="240" y="171" width="20" height="3" fill="#F8A060" />
-                    <polygon points="250,128 255,145 257,171 243,171 245,145" fill="#E0692A" />
-                    <circle cx="250" cy="132" r="5" fill="#F8A060" />
-                  </g>
-                </g>
-              </svg>
-            </div>
+            <img src="logoXSND.gif" alt="Logo XSKT Nam Định" style="width: 65px; height: 65px; object-fit: contain;">
         </div>
 
         <!-- 1. PHÂN HỆ TỔNG HỢP -->
@@ -1625,22 +1389,92 @@
         DOM.toggleChoicesBtn.className = 'secondary';
     }
 
+    function focusNextSellInput(current) {
+        if (current === 'type') {
+            const priceRad = document.querySelector('input[name="sellPrice"]:checked')?.value;
+            if (priceRad === 'custom-price') DOM.customTicketPrice.focus();
+            else {
+                const rateRad = document.querySelector('input[name="sellRate"]:checked')?.value;
+                if (rateRad === 'custom-rate') DOM.customTicketRate.focus();
+                else DOM.sellQuantityInput.focus();
+            }
+        } else if (current === 'price') {
+            const rateRad = document.querySelector('input[name="sellRate"]:checked')?.value;
+            if (rateRad === 'custom-rate') DOM.customTicketRate.focus();
+            else DOM.sellQuantityInput.focus();
+        } else if (current === 'rate') {
+            DOM.sellQuantityInput.focus();
+        }
+    }
+
     document.querySelectorAll('input[name="sellTicketType"]').forEach(r => {
         r.addEventListener('change', function() {
-            DOM.customTicketName.style.display = this.value === 'custom-name' ? 'block' : 'none';
+            const isCustom = this.value === 'custom-name';
+            DOM.customTicketName.style.display = isCustom ? 'block' : 'none';
+            if (isCustom) DOM.customTicketName.focus();
         });
+        r.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                focusNextSellInput('type');
+            }
+        });
+    });
+
+    DOM.customTicketName.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            focusNextSellInput('type');
+        }
     });
 
     document.querySelectorAll('input[name="sellPrice"]').forEach(r => {
         r.addEventListener('change', function() {
-            DOM.customTicketPrice.style.display = this.value === 'custom-price' ? 'block' : 'none';
+            const isCustom = this.value === 'custom-price';
+            DOM.customTicketPrice.style.display = isCustom ? 'block' : 'none';
+            if (isCustom) DOM.customTicketPrice.focus();
         });
+        r.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                focusNextSellInput('price');
+            }
+        });
+    });
+
+    DOM.customTicketPrice.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            focusNextSellInput('price');
+        }
     });
 
     document.querySelectorAll('input[name="sellRate"]').forEach(r => {
         r.addEventListener('change', function() {
-            DOM.customTicketRate.style.display = this.value === 'custom-rate' ? 'block' : 'none';
+            const isCustom = this.value === 'custom-rate';
+            DOM.customTicketRate.style.display = isCustom ? 'block' : 'none';
+            if (isCustom) DOM.customTicketRate.focus();
         });
+        r.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                focusNextSellInput('rate');
+            }
+        });
+    });
+
+    DOM.customTicketRate.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            DOM.sellQuantityInput.focus();
+        }
+    });
+
+    DOM.sellQuantityInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            DOM.btnAddTicket.click();
+        }
     });
 
     DOM.btnAddTicket.onclick = function() {
@@ -1752,7 +1586,15 @@
     };
 
     DOM.btnGoToSummary.onclick = () => { showSection('summarySection'); generateSummaryView(); };
-    DOM.btnGoToSell.onclick = () => { if(!state.currentSoSo) return showNotification('Hãy tra cứu báo cáo trước!', 'warning'); showSection('sellSection'); };
+    DOM.btnGoToSell.onclick = () => { 
+        if(!state.currentSoSo) return showNotification('Hãy tra cứu báo cáo trước!', 'warning'); 
+        showSection('sellSection'); 
+        setTimeout(() => {
+            const typeRad = document.querySelector('input[name="sellTicketType"]:checked')?.value;
+            if (typeRad === 'custom-name') DOM.customTicketName.focus();
+            else DOM.sellQuantityInput.focus();
+        }, 100);
+    };
     DOM.btnBackFromSummary.onclick = () => showSection('reportSection');
     DOM.btnBackFromSell.onclick = () => showSection('reportSection');
 
