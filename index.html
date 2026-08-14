@@ -140,7 +140,7 @@
             border: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* --- GIAO DIỆN LỊCH WINDOWS STYLE CHUẨN 7 CỘT KHÔNG BỊ VỠ --- */
+        /* --- GIAO DIỆN LỊCH WINDOWS STYLE CHUẨN --- */
         .win-calendar-box {
             background: #202020 !important;
             color: #ffffff !important;
@@ -261,7 +261,7 @@
         .preview-image-item img { width: 100%; display: block; border-radius: 4px; -webkit-touch-callout: default !important; user-select: auto !important; -webkit-user-select: auto !important; }
         .page-number { text-align: center; font-weight: bold; color: #7f8c8d; margin-bottom: 5px; font-size: 12px; }
 
-        /* Print Styles */
+        /* Print Styles - SỬA LỖI DÒNG TỔNG NHẢY LÊN TRÊN KHI IN */
         @media print {
             @page { size: A4; margin: 10mm; }
             body { padding: 0 !important; margin: 0 !important; background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-size: 11pt; }
@@ -2171,7 +2171,7 @@
     }
 
     DOM.btnCopySummary.onclick = function() { copyElementAsImage('#summaryPrintContainer', 'Đã copy ảnh bảng Tổng Hợp!', this); };
-    DOM.btnCopyReport.onclick = function() { copyElementAsImage('#reportContainer', 'Đã copy ảnh Báo cáo Công nợ!', this); };
+    DOM.btnCopyReport.onclick = function() { copyElementAsImage('#reportContainer', 'Đã copy ảnh Báo Cáo chi tiết!', this); };
     DOM.closePreviewModalBtn.onclick = () => DOM.imagePreviewModal.style.display = 'none';
 
     DOM.imagePreviewModal.addEventListener('click', function(e) {
@@ -2503,6 +2503,45 @@
 
     localStorage.removeItem('cached_xemma_txt');
 
+    // TỰ ĐỘNG TẢI FILE DATA.JSON TỪ GITHUB
+    async function loadAutoDataFromGithub() {
+        try {
+            const res = await fetch(`data.json?t=${Date.now()}`);
+            if (res.ok) {
+                const data = await res.json();
+                excelData1 = data.excelData1 || [];
+                excelData2 = data.excelData2 || [];
+                
+                if (excelData1.length > 0 || excelData2.length > 0) {
+                    let allParsedDates = new Set();
+                    excelData1.forEach(r => {
+                        if (r._parsedDate && r._parsedDate !== 'Khác') allParsedDates.add(r._parsedDate);
+                    });
+
+                    if (allParsedDates.size > 0) {
+                        globalAllDates = Array.from(allParsedDates).sort();
+                        globalSelectedDates = [...globalAllDates];
+                        dateRangeText = getFormattedDateRange(globalSelectedDates);
+
+                        const lastDate = globalAllDates[globalAllDates.length - 1];
+                        const p = lastDate.split('/');
+                        summaryCalView.month = parseInt(p[1], 10);
+                        summaryCalView.year = p.length === 3 ? (parseInt(p[2], 10) < 100 ? parseInt(p[2], 10) + 2000 : parseInt(p[2], 10)) : 2026;
+                        
+                        renderWinCalendarGrid();
+                    }
+
+                    generateSummaryView();
+                    DOM.homePage.style.display = 'none'; 
+                    DOM.mainPage.style.display = 'block';
+                    showSection('summarySection');
+                }
+            }
+        } catch (e) {
+            console.log("Chưa có data.json tự động, dùng nạp thủ công.");
+        }
+    }
+
     async function initConfig() {
         try {
             const donviUrl = `${GITHUB_RAW_BASE}/donvi.txt?t=${Date.now()}`;
@@ -2536,6 +2575,8 @@
         if (token && document.getElementById('cfgGithubPat')) {
             document.getElementById('cfgGithubPat').value = token;
         }
+
+        loadAutoDataFromGithub();
     }
 
     initConfig();
