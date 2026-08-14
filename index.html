@@ -90,6 +90,7 @@
         table { border-collapse: separate; border-spacing: 0; width: 100%; background: white; margin: 0 auto; }
         th, td { border-right: 1px solid #dcdde1; border-bottom: 1px solid #dcdde1; padding: 8px 6px; text-align: center; vertical-align: middle; font-size: 13.5px; white-space: nowrap; }
         th { background: #107c41; color: #ffffff; font-weight: 700; position: sticky; top: 0; z-index: 20; border-top: none; }
+        
         #summaryTotalRow td { background-color: #5d4037 !important; color: #ffffff !important; font-weight: 700; position: sticky; bottom: 0; z-index: 20; }
         .group-total-row td { background-color: #fafafa; font-weight: bold; }
         .single-agent-row td { font-weight: 700; }
@@ -139,6 +140,89 @@
             border: 1px solid rgba(0,0,0,0.1);
         }
 
+        /* --- GIAO DIỆN LỊCH WINDOWS STYLE CHUẨN 7 CỘT KHÔNG BỊ VỠ --- */
+        .win-calendar-box {
+            background: #202020 !important;
+            color: #ffffff !important;
+            border-radius: 6px !important;
+            padding: 12px !important;
+            margin-top: 8px !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35) !important;
+            max-width: 340px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        .win-calendar-header {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            font-weight: 700 !important;
+            font-size: 14px !important;
+            margin-bottom: 10px !important;
+            color: #ffffff !important;
+            padding: 0 4px !important;
+        }
+        .win-cal-nav-btn {
+            background: #333333 !important;
+            color: #ffffff !important;
+            border: 1px solid #555555 !important;
+            padding: 3px 10px !important;
+            font-size: 13px !important;
+            cursor: pointer !important;
+            border-radius: 3px !important;
+        }
+        .win-cal-nav-btn:hover { background: #0078d4 !important; border-color: #0078d4 !important; }
+        
+        .win-calendar-weekdays {
+            display: grid !important;
+            grid-template-columns: repeat(7, 1fr) !important;
+            text-align: center !important;
+            font-size: 12.5px !important;
+            font-weight: 700 !important;
+            color: #aaaaaa !important;
+            margin-bottom: 6px !important;
+        }
+        .win-calendar-weekdays div {
+            padding: 4px 0 !important;
+        }
+
+        .win-calendar-grid {
+            display: grid !important;
+            grid-template-columns: repeat(7, 1fr) !important;
+            gap: 4px !important;
+        }
+        .win-cal-cell {
+            aspect-ratio: 1 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 13.5px !important;
+            font-weight: 600 !important;
+            border-radius: 3px !important;
+            cursor: default !important;
+            border: 1px solid transparent !important;
+            user-select: none !important;
+            color: #555555 !important;
+            background: transparent !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .win-cal-cell.has-data { 
+            color: #ffffff !important; 
+            background: #383838 !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            border: 1px solid #4a4a4a !important;
+        }
+        .win-cal-cell.has-data:hover { background: #4f4f4f !important; border-color: #777777 !important; }
+        .win-cal-cell.active { 
+            background-color: #0078d4 !important; 
+            color: #ffffff !important; 
+            border: 1px solid #60cdff !important; 
+            font-weight: 800 !important; 
+        }
+        .win-cal-cell.dimmed { color: #555555 !important; }
+
         /* Responsive Mobile */
         @media (max-width: 768px) {
             body { padding: 0 !important; background-color: #ffffff; }
@@ -180,14 +264,48 @@
         /* Print Styles */
         @media print {
             @page { size: A4; margin: 10mm; }
-            body { padding: 0; background: white; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-size: 11pt; }
+            body { padding: 0 !important; margin: 0 !important; background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-size: 11pt; }
             body > * { display: none !important; }
-            #mainPage, #summarySection, #summaryTableContainer { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; position: static !important; visibility: visible !important; overflow: visible !important; max-height: none !important; border: none !important; }
-            table { width: 100% !important; border-collapse: collapse !important; }
-            th, td { border: 1px solid #000 !important; }
+            
+            #mainPage, #summarySection, #summaryPrintContainer, #summaryTableContainer { 
+                display: block !important; 
+                width: 100% !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                position: static !important; 
+                visibility: visible !important; 
+                overflow: visible !important; 
+                max-height: none !important; 
+                border: none !important; 
+            }
+
+            table { 
+                width: 100% !important; 
+                border-collapse: collapse !important; 
+                page-break-after: auto;
+            }
+            tr { page-break-inside: avoid !important; page-break-after: auto; }
+            thead { display: table-header-group !important; }
+            tfoot { display: table-footer-group !important; }
+            tbody { display: table-row-group !important; }
+            
+            th, td { 
+                border: 1px solid #000 !important; 
+                position: static !important;
+            }
             th { background: #107c41 !important; color: white !important; }
-            #summaryTotalRow td { background-color: #5d4037 !important; color: white !important; font-weight: bold !important; border: 1px solid #000 !important; }
-            .controls-panel, .summary-actions-bottom, .home-menu-grid, .nav-header, .simple-animated-logo, #notification-area, #actionButtonContainer { display: none !important; }
+            
+            #summaryTotalRow td { 
+                background-color: #5d4037 !important; 
+                color: white !important; 
+                font-weight: bold !important; 
+                border: 1px solid #000 !important; 
+                position: static !important; 
+            }
+            
+            .controls-panel, .summary-actions-bottom, .home-menu-grid, .nav-header, .simple-animated-logo, #notification-area, #actionButtonContainer { 
+                display: none !important; 
+            }
             #summaryTitle, #summaryDate { text-align: center !important; display: block !important; }
         }
     </style>
@@ -199,7 +317,6 @@
 
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
-        <!-- SỬ DỤNG FILE LOGO.GIF TRÊN GITHUB -->
         <div class="simple-animated-logo" onclick="window.location.href = window.location.pathname; return false;">
             <img src="logoXSND.gif" alt="Logo XSKT Nam Định" style="width: 100px; height: 100px; object-fit: contain;">
         </div>
@@ -227,9 +344,8 @@
     <!-- MAIN PAGE -->
     <div id="mainPage" class="page" style="display: none;">
         
-        <!-- SỬ DỤNG FILE LOGO.GIF TRÊN GITHUB -->
         <div class="simple-animated-logo main-page-logo" onclick="window.location.href = window.location.pathname; return false;">
-            <img src="logoXSND.gif" alt="Logo XSKT Nam Định" style="width: 65px; height: 65px; object-fit: contain;">
+            <img src="logoXSND.gif" alt="Logo XSKT Nam Định" style="width: 100px; height: 100px; object-fit: contain;">
         </div>
 
         <!-- 1. PHÂN HỆ TỔNG HỢP -->
@@ -251,7 +367,7 @@
                         <div class="win-calendar-header">
                             <div style="display: flex; align-items: center; gap: 6px;">
                                 <button class="win-cal-nav-btn" onclick="navWinCalendar('prev', 'summary')">❮</button>
-                                <span id="winCalMonthYear">Tháng Tám 2026</span>
+                                <span id="winCalMonthYear" style="color:#ffffff; font-weight:bold;">Tháng Tám 2026</span>
                                 <button class="win-cal-nav-btn" onclick="navWinCalendar('next', 'summary')">❯</button>
                             </div>
                             <div style="display:flex; gap: 4px;">
@@ -344,6 +460,7 @@
                     <button id="btnCreateSummaryReport" class="danger" style="flex: 1; padding: 10px 4px;">Công nợ</button>
                 </div>
 
+                <!-- LỊCH TRA CỨU ĐẠI LÝ -->
                 <div id="detailedDatePickerContainer" style="display: none; border-top: 1px dashed #dcdde1; padding-top: 8px; margin-top: 6px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <label style="font-size: 12.5px; color: #0078d4; margin: 0; font-weight: bold; cursor: pointer;" onclick="toggleWinCalendar('detailedWinCalBox')">
@@ -352,11 +469,11 @@
                         <button class="secondary" style="padding: 2px 8px; font-size: 11.5px; height: 24px;" onclick="toggleWinCalendar('detailedWinCalBox')">Đổi ngày</button>
                     </div>
 
-                    <div id="detailedWinCalBox" class="win-calendar-box" style="display: none; margin: 8px auto 0 auto; width: 100%; max-width: 320px;">
+                    <div id="detailedWinCalBox" class="win-calendar-box" style="display: none; margin: 8px auto 0 auto;">
                         <div class="win-calendar-header">
                             <div style="display: flex; align-items: center; gap: 6px;">
                                 <button class="win-cal-nav-btn" onclick="navWinCalendar('prev', 'detailed')">❮</button>
-                                <span id="detailedWinCalMonthYear">Tháng Tám 2026</span>
+                                <span id="detailedWinCalMonthYear" style="color:#ffffff; font-weight:bold;">Tháng Tám 2026</span>
                                 <button class="win-cal-nav-btn" onclick="navWinCalendar('next', 'detailed')">❯</button>
                             </div>
                             <div style="display:flex; gap: 4px;">
@@ -1091,7 +1208,8 @@
         const {groups, totals} = processSummaryData(rules);
 
         const hasXSKT = excelData2.length > 0;
-        let html = `<thead><tr><th>STT</th><th>ĐL</th><th>LTô</th><th>LCặp</th><th>Lô 3/23</th><th>Lô 2/27</th>${hasXSKT?'<th>XSKT</th>':''}<th>Dsố</th><th>Thưởng</th><th>Tiền nộp</th></tr></thead><tbody>`;
+        let htmlHead = `<thead><tr><th>STT</th><th>ĐL</th><th>LTô</th><th>LCặp</th><th>Lô 3/23</th><th>Lô 2/27</th>${hasXSKT?'<th>XSKT</th>':''}<th>Dsố</th><th>Thưởng</th><th>Tiền nộp</th></tr></thead>`;
+        let htmlBody = `<tbody>`;
 
         let stt = 1;
         let sortedGroups = [...groups.entries()];
@@ -1104,7 +1222,7 @@
             const isGroup = g.agents.length > 1;
             g.agents.forEach((ag, idx) => {
                 const d = ag.data, final = (d.totRev-d.totCom-d.thuong)+d.debt;
-                html += `<tr class="${isGroup?'group-member-row':'single-agent-row'}">
+                htmlBody += `<tr class="${isGroup?'group-member-row':'single-agent-row'}">
                     <td class="stt-col">${idx===0?stt:''}</td>
                     <td class="code-cell-highlight clickable-agent-code" onclick="window.viewAgentDetail('${ag.code}')">${ag.code}</td>
                     <td>${formatNumberHiddenK(d.lotoDB)}</td>
@@ -1118,7 +1236,7 @@
                 </tr>`;
             });
             if(isGroup) {
-                html += `<tr class="group-total-row">
+                htmlBody += `<tr class="group-total-row">
                     <td class="stt-col"></td>
                     <td class="code-cell-highlight clickable-agent-code" onclick="window.viewAgentDetail('${gk}')">${String(gk).padStart(3, '0')}</td>
                     <td>${formatNumberHiddenK(g.gdb)}</td>
@@ -1134,7 +1252,9 @@
             stt++;
         });
 
-        html += `<tr id="summaryTotalRow">
+        htmlBody += `</tbody>`;
+
+        let htmlFoot = `<tfoot><tr id="summaryTotalRow">
             <td colspan="2">TỔNG</td>
             <td>${formatNumberHiddenK(totals.lotoDB)}</td>
             <td>${formatNumberHiddenK(totals.lotoCap)}</td>
@@ -1144,9 +1264,9 @@
             <td>${formatNumberHiddenK(totals.rev)}</td>
             <td>${formatNumberHiddenK(totals.th)}</td>
             <td class="${totals.final>=0?'final-amount-positive':'final-amount-negative'}">${formatNumberHiddenK(totals.final)}</td>
-        </tr></tbody>`;
+        </tr></tfoot>`;
 
-        DOM.summaryTableContainer.innerHTML = `<table>${html}</table>`;
+        DOM.summaryTableContainer.innerHTML = `<table>${htmlHead}${htmlBody}${htmlFoot}</table>`;
         DOM.summaryTitle.innerHTML = `Bảng Tổng Hợp: <span style="color:var(--primary-color)">${regVal==='all'?'Tất Cả':regVal}</span>`;
         let percent = totals.rev > 0 ? (totals.th / totals.rev * 100).toFixed(1) : 0;
         
@@ -1648,7 +1768,7 @@
         });
         rowIndex++;
 
-        const trElements = Array.from(table.querySelectorAll('tbody tr'));
+        const trElements = Array.from(table.querySelectorAll('tbody tr, tfoot tr'));
         trElements.forEach(tr => {
             const isTotal = tr.id === 'summaryTotalRow' || tr.classList.contains('group-total-row');
             const cells = Array.from(tr.querySelectorAll('td'));
