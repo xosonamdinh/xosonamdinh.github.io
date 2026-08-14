@@ -140,7 +140,7 @@
             border: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* --- GIAO DIỆN LỊCH WINDOWS STYLE CHUẨN 7 CỘT KHÔNG BỊ VỠ --- */
+        /* --- GIAO DIỆN LỊCH WINDOWS STYLE CHUẨN --- */
         .win-calendar-box {
             background: #202020 !important;
             color: #ffffff !important;
@@ -324,19 +324,32 @@
 
         <div class="controls-panel">
             <div style="display: flex; gap: 4px; background: #eee; padding: 2px; border-radius: 4px;">
-                <button class="tab-btn active" style="flex:1;">Nhập Excel</button>
+                <button class="tab-btn active" style="flex:1;">Tự Động GitHub</button>
                 <button class="tab-btn secondary" style="flex:1;" onclick="showSection('configSection')">⚙️ Cấu hình</button>
             </div>
 
             <div style="margin-top: 10px;">
-                <label for="excelFile1">Chọn Biểu 31 (Lô tô) [Có thể chọn nhiều]:</label>
-                <input type="file" id="excelFile1" accept=".xls,.xlsx" multiple>
-                <div style="height: 10px;"></div>
-                <label for="excelFile2">Chọn Biểu 35 (XSKT) [Có thể chọn nhiều file]:</label>
-                <input type="file" id="excelFile2" accept=".xls,.xlsx" multiple>
+                <label for="selMonthHome">Chọn Tháng Đồng Bộ:</label>
+                <div style="display: flex; gap: 8px;">
+                    <select id="selMonthHome" style="flex: 1; font-weight: bold; border: 1.5px solid var(--primary-color);">
+                        <option value="Thang8" selected>Tháng 08/2026</option>
+                        <option value="Thang7">Tháng 07/2026</option>
+                        <option value="Thang6">Tháng 06/2026</option>
+                        <option value="Thang9">Tháng 09/2026</option>
+                    </select>
+                    <button id="btnAutoFetchHome" class="success" style="padding: 10px 16px;">🔄 Tải Dữ Liệu</button>
+                </div>
             </div>
 
-            <button id="btnLoadData" class="success" style="width: 100%; margin-top: 10px; padding: 12px;">Nạp dữ liệu & Xem báo cáo</button>
+            <div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 12px;">
+                <label style="color: #666; font-size: 12px; margin-bottom: 8px;">Hoặc nạp file thủ công từ máy:</label>
+                <label for="excelFile1" style="font-size: 12px;">Biểu 31 (Lô tô):</label>
+                <input type="file" id="excelFile1" accept=".xls,.xlsx" multiple>
+                <div style="height: 6px;"></div>
+                <label for="excelFile2" style="font-size: 12px;">Biểu 35 (XSKT):</label>
+                <input type="file" id="excelFile2" accept=".xls,.xlsx" multiple>
+                <button id="btnLoadData" class="secondary" style="width: 100%; margin-top: 8px; padding: 8px;">Nạp File Thủ Công</button>
+            </div>
         </div>
         <div style="text-align: center; font-size: 11px; color: #888; font-weight: 600;">© 2026 ZENG FINANCE</div>
     </div>
@@ -350,8 +363,17 @@
 
         <!-- 1. PHÂN HỆ TỔNG HỢP -->
         <div id="summarySection" class="main-section" style="display: none;">
-            <div class="nav-header">
+            <div class="nav-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <button class="back-btn" id="btnBackFromSummary">⬅ Quay lại Tra cứu</button>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span style="font-size: 12px; font-weight: bold; color: #555;">Tháng:</span>
+                    <select id="selMonthMain" style="padding: 4px 8px; font-size: 12.5px; font-weight: bold; border-radius: 4px; border: 1px solid var(--primary-color); width: auto;">
+                        <option value="Thang8" selected>Tháng 08</option>
+                        <option value="Thang7">Tháng 07</option>
+                        <option value="Thang6">Tháng 06</option>
+                        <option value="Thang9">Tháng 09</option>
+                    </select>
+                </div>
             </div>
 
             <div class="controls-panel">
@@ -668,7 +690,8 @@
         selBranchMode: document.getElementById('selBranchMode'), selBranchMode_Detailed: document.getElementById('selBranchMode_Detailed'),
         cbExcludeNumeric: document.getElementById('cbExcludeNumeric'), cbExcludeXSKT: document.getElementById('cbExcludeXSKT'),
         cbSortDesc: document.getElementById('cbSortDesc'),
-        cbExcludeNumeric_Detailed: document.getElementById('cbExcludeNumeric_Detailed'), cbExcludeXSKT_Detailed: document.getElementById('cbExcludeXSKT_Detailed')
+        cbExcludeNumeric_Detailed: document.getElementById('cbExcludeNumeric_Detailed'), cbExcludeXSKT_Detailed: document.getElementById('cbExcludeXSKT_Detailed'),
+        selMonthHome: document.getElementById('selMonthHome'), selMonthMain: document.getElementById('selMonthMain'), btnAutoFetchHome: document.getElementById('btnAutoFetchHome')
     };
 
     function showNotification(msg, type = 'info') {
@@ -986,11 +1009,27 @@
         });
     }
 
+    function processParsed31(jsonList) {
+        let allParsedDates = new Set();
+        jsonList.forEach(r => {
+            if (r._parsedDate && r._parsedDate !== 'Khác') allParsedDates.add(r._parsedDate);
+        });
+        if (allParsedDates.size > 0) {
+            globalAllDates = Array.from(allParsedDates).sort();
+            globalSelectedDates = [...globalAllDates];
+            dateRangeText = getFormattedDateRange(globalSelectedDates);
+
+            const lastDate = globalAllDates[globalAllDates.length - 1];
+            const p = lastDate.split('/');
+            summaryCalView.month = parseInt(p[1], 10);
+            summaryCalView.year = p.length === 3 ? (parseInt(p[2], 10) < 100 ? parseInt(p[2], 10) + 2000 : parseInt(p[2], 10)) : 2026;
+            renderWinCalendarGrid();
+        }
+    }
+
     DOM.excelFile1.addEventListener('change', async function(e) {
         const files = e.target.files; if (!files.length) return;
         showLoading(); excelData1 = [];
-        let allParsedDates = new Set();
-
         for (let i = 0; i < files.length; i++) {
             try {
                 const { json } = await readExcelFileAsync(files[i]);
@@ -1008,26 +1047,11 @@
                     }
                     if(foundDate) break;
                 }
-                if (foundDate) {
-                    allParsedDates.add(foundDate);
-                    json.forEach(r => r._parsedDate = foundDate);
-                }
+                json.forEach(r => r._parsedDate = foundDate || 'Khác');
                 excelData1 = excelData1.concat(json);
             } catch(err) { console.error(err); }
         }
-
-        if (allParsedDates.size > 0) {
-            globalAllDates = Array.from(allParsedDates).sort();
-            globalSelectedDates = [...globalAllDates];
-            dateRangeText = getFormattedDateRange(globalSelectedDates);
-
-            const lastDate = globalAllDates[globalAllDates.length - 1];
-            const p = lastDate.split('/');
-            summaryCalView.month = parseInt(p[1], 10);
-            summaryCalView.year = p.length === 3 ? (parseInt(p[2], 10) < 100 ? parseInt(p[2], 10) + 2000 : parseInt(p[2], 10)) : 2026;
-            
-            renderWinCalendarGrid();
-        }
+        processParsed31(excelData1);
         hideLoading();
         showNotification(`Đã nạp ${files.length} file Biểu 31!`, 'success');
     });
@@ -1127,17 +1151,141 @@
             excelData2 = Array.from(mergeMap.values());
 
             DOM.excelFile2.classList.add('loaded');
-            if (files.length > 1) {
-                showNotification(`Đã nạp và gộp ${files.length} file Biểu 35! (${excelData2.length} đại lý)`, 'success');
-            } else {
-                showNotification(`Đã nạp file Biểu 35! (${excelData2.length} đại lý)`, 'success');
-            }
+            showNotification(`Đã nạp ${files.length} file Biểu 35! (${excelData2.length} đại lý)`, 'success');
         } catch(err) { 
             showNotification('Lỗi đọc file Biểu 35: ' + err.message, 'error'); 
         } finally { 
             hideLoading(); 
         }
     });
+
+    // --- TỰ ĐỘNG QUÉT & NẠP DỮ LIỆU TỪ GITHUB THEO PHÂN CẤP THÁNG ---
+    async function fetchFilesFromFolder(folderPath) {
+        const pat = localStorage.getItem('github_pat') || '';
+        const headers = pat ? { 'Authorization': `Bearer ${pat}` } : {};
+        
+        let fileList = [];
+        try {
+            const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/${folderPath}?t=${Date.now()}`;
+            const res = await fetch(apiUrl, { headers });
+            if (res.ok) {
+                const json = await res.json();
+                fileList = json.filter(f => f.type === 'file' && (f.name.endsWith('.xls') || f.name.endsWith('.xlsx'))).map(f => f.download_url || `${GITHUB_RAW_BASE}/${folderPath}/${f.name}`);
+            }
+        } catch (e) {
+            console.warn("GitHub API Limit, fallback sang quét trực tiếp:", e);
+        }
+
+        // Fallback dò file từ 01.xls đến 31.xls nếu API rate limit
+        if (fileList.length === 0) {
+            for (let i = 1; i <= 31; i++) {
+                const dayStr = String(i).padStart(2, '0');
+                fileList.push(`${GITHUB_RAW_BASE}/${folderPath}/${dayStr}.xls`);
+            }
+        }
+        return fileList;
+    }
+
+    async function autoFetchDataByMonth(monthFolder) {
+        showLoading();
+        showNotification(`Đang tải dữ liệu ${monthFolder} từ GitHub...`, 'info');
+        excelData1 = [];
+        excelData2 = [];
+
+        try {
+            // 1. Quét nạp Biểu 31 (Lô tô)
+            const list31 = await fetchFilesFromFolder(`31/${monthFolder}`);
+            for (const url of list31) {
+                try {
+                    const res = await fetch(url + `?t=${Date.now()}`);
+                    if (!res.ok) continue;
+                    const buf = await res.arrayBuffer();
+                    const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
+                    const ws = wb.Sheets[wb.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(ws, { defval: "" });
+
+                    let foundDate = null;
+                    for (let j = 0; j < Math.min(json.length, 20); j++) {
+                        for (let v of Object.values(json[j])) {
+                            if (typeof v === "string") {
+                                let match = v.match(/\d{1,2}\/\d{1,2}(?:\/\d{2,4})?/g);
+                                if (match) {
+                                    let parts = match[0].split('/');
+                                    foundDate = parts.length === 3 && parts[2].length === 4 ? `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2].substring(2)}` : match[0];
+                                    break;
+                                }
+                            }
+                        }
+                        if (foundDate) break;
+                    }
+                    json.forEach(r => r._parsedDate = foundDate || 'Khác');
+                    excelData1 = excelData1.concat(json);
+                } catch (err) {}
+            }
+            processParsed31(excelData1);
+
+            // 2. Quét nạp Biểu 35 (XSKT)
+            const list35 = await fetchFilesFromFolder(`35/${monthFolder}`);
+            const allResults35 = [];
+            const allBieu35Dates = new Set();
+            for (const url of list35) {
+                try {
+                    const res = await fetch(url + `?t=${Date.now()}`);
+                    if (!res.ok) continue;
+                    const buf = await res.arrayBuffer();
+                    const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
+                    const ws = wb.Sheets[wb.SheetNames[0]];
+                    const { data: parsed, parsedDates } = parseBieu35(ws);
+                    allResults35.push(...parsed);
+                    parsedDates.forEach(d => allBieu35Dates.add(d));
+                } catch (err) {}
+            }
+
+            if (allBieu35Dates.size > 0) {
+                bieu35DateRange = getFormattedDateRange(Array.from(allBieu35Dates));
+            } else {
+                bieu35DateRange = '';
+            }
+
+            const mergeMap = new Map();
+            for (const item of allResults35) {
+                const key = item.code.toUpperCase().trim();
+                if (mergeMap.has(key)) {
+                    mergeMap.get(key).xskt += item.xskt;
+                } else {
+                    mergeMap.set(key, { code: item.code, xskt: item.xskt });
+                }
+            }
+            excelData2 = Array.from(mergeMap.values());
+
+            if (excelData1.length > 0 || excelData2.length > 0) {
+                generateSummaryView();
+                DOM.homePage.style.display = 'none'; 
+                DOM.mainPage.style.display = 'block';
+                showSection('summarySection');
+                showNotification(`Đã tự động nạp thành công ${monthFolder}!`, 'success');
+            } else {
+                showNotification(`Chưa tìm thấy file trong thư mục 31/${monthFolder} hoặc 35/${monthFolder}`, 'warning');
+            }
+        } catch (e) {
+            console.error(e);
+            showNotification('Lỗi nạp tự động: ' + e.message, 'error');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    DOM.btnAutoFetchHome.onclick = () => {
+        const m = DOM.selMonthHome.value;
+        if (DOM.selMonthMain) DOM.selMonthMain.value = m;
+        autoFetchDataByMonth(m);
+    };
+
+    DOM.selMonthMain.onchange = function() {
+        const m = this.value;
+        if (DOM.selMonthHome) DOM.selMonthHome.value = m;
+        autoFetchDataByMonth(m);
+    };
 
     function processSummaryData(regionRules) {
         let groups = new Map();
@@ -2536,6 +2684,9 @@
         if (token && document.getElementById('cfgGithubPat')) {
             document.getElementById('cfgGithubPat').value = token;
         }
+
+        // Tự động tải tháng mặc định (Thang8) khi vừa mở trang
+        autoFetchDataByMonth('Thang8');
     }
 
     initConfig();
