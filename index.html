@@ -343,8 +343,16 @@
                             <option value="">Đang tải...</option>
                         </select>
                     </div>
-                    <button id="btnAutoFetchHome" class="success" style="padding: 9px 15px; width: 100%; margin-top: 4px;">🔄 Tải Dữ Liệu</button>
                 </div>
+
+                <!-- Ô CHỌN CÓ LẤY BIỂU 35 HAY KHÔNG -->
+                <div style="margin-top: 8px;">
+                    <label style="font-size: 13.5px; cursor: pointer; color: #0078d4; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; margin: 0;">
+                        <input type="checkbox" id="cbFetchBieu35Home" checked> Lấy cả Biểu 35 (XSKT)
+                    </label>
+                </div>
+
+                <button id="btnAutoFetchHome" class="success" style="padding: 10px 15px; width: 100%; margin-top: 8px;">🔄 Tải Dữ Liệu</button>
             </div>
 
             <div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 12px;">
@@ -371,8 +379,8 @@
         <div id="summarySection" class="main-section" style="display: none;">
             <div class="nav-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                 <button class="back-btn" id="btnBackFromSummary">⬅ Quay lại Tra cứu</button>
-                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                    <span style="font-size: 12.5px; font-weight: bold; color: #2c3e50;">Từ tháng:</span>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <span style="font-size: 12.5px; font-weight: bold; color: #2c3e50;">Từ:</span>
                     <select id="selFromMonthMain" style="padding: 3px 6px; font-size: 12px; font-weight: bold; border-radius: 4px; border: 1.5px solid var(--primary-color); width: auto;">
                         <option value="">Đang tải...</option>
                     </select>
@@ -380,6 +388,9 @@
                     <select id="selToMonthMain" style="padding: 3px 6px; font-size: 12px; font-weight: bold; border-radius: 4px; border: 1.5px solid var(--primary-color); width: auto;">
                         <option value="">Đang tải...</option>
                     </select>
+                    <label style="font-size: 12px; cursor: pointer; color: #0078d4; font-weight: bold; display: inline-flex; align-items: center; gap: 4px; margin: 0; white-space: nowrap;">
+                        <input type="checkbox" id="cbFetchBieu35Main" checked> Lấy XSKT
+                    </label>
                 </div>
             </div>
 
@@ -702,6 +713,7 @@
         cbExcludeNumeric_Detailed: document.getElementById('cbExcludeNumeric_Detailed'), cbExcludeXSKT_Detailed: document.getElementById('cbExcludeXSKT_Detailed'),
         selFromMonthHome: document.getElementById('selFromMonthHome'), selToMonthHome: document.getElementById('selToMonthHome'),
         selFromMonthMain: document.getElementById('selFromMonthMain'), selToMonthMain: document.getElementById('selToMonthMain'),
+        cbFetchBieu35Home: document.getElementById('cbFetchBieu35Home'), cbFetchBieu35Main: document.getElementById('cbFetchBieu35Main'),
         btnAutoFetchHome: document.getElementById('btnAutoFetchHome')
     };
 
@@ -1198,6 +1210,15 @@
         }
     });
 
+    // Đồng bộ checkbox Lấy Biểu 35 giữa 2 màn hình
+    DOM.cbFetchBieu35Home.onchange = function() {
+        if (DOM.cbFetchBieu35Main) DOM.cbFetchBieu35Main.checked = this.checked;
+    };
+    DOM.cbFetchBieu35Main.onchange = function() {
+        if (DOM.cbFetchBieu35Home) DOM.cbFetchBieu35Home.checked = this.checked;
+        handleMainMonthChange();
+    };
+
     // --- 1. TỰ ĐỘNG QUÉT DANH MỤC THÁNG THỰC TẾ TỪ GITHUB & SẮP XẾP ---
     async function autoDetectMonthsFromRepo() {
         const pat = localStorage.getItem('github_pat') || '';
@@ -1294,17 +1315,18 @@
         }
 
         const selectedMonths = availableRepoMonths.slice(startIndex, endIndex + 1);
+        const shouldFetchBieu35 = DOM.cbFetchBieu35Home ? DOM.cbFetchBieu35Home.checked : true;
         const rangeLabel = selectedMonths.length > 1 ? `Từ [${fromMonth}] đến [${toMonth}]` : `[${fromMonth}]`;
 
         showLoading();
-        showNotification(`Đang tải dữ liệu ${rangeLabel} (${selectedMonths.length} tháng)...`, 'info');
+        showNotification(`Đang tải dữ liệu ${rangeLabel} (${selectedMonths.length} tháng, ${shouldFetchBieu35 ? 'có Biểu 35' : 'bỏ qua Biểu 35'})...`, 'info');
         excelData1 = [];
         excelData2 = [];
         const allBieu35Dates = new Set();
 
         try {
             for (const monthFolder of selectedMonths) {
-                // Quét nạp Biểu 31 (Lô tô)
+                // 1. Quét nạp Biểu 31 (Lô tô)
                 const list31 = await fetchFilesFromFolder(`31/${monthFolder}`);
                 for (const url of list31) {
                     try {
@@ -1328,23 +1350,25 @@
                     } catch (err) {}
                 }
 
-                // Quét nạp Biểu 35 (XSKT)
-                const list35 = await fetchFilesFromFolder(`35/${monthFolder}`);
-                for (const url of list35) {
-                    try {
-                        const res = await fetch(url + `?t=${Date.now()}`);
-                        if (!res.ok) continue;
-                        const buf = await res.arrayBuffer();
-                        const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
-                        const ws = wb.Sheets[wb.SheetNames[0]];
-                        const { data: parsed, parsedDates } = parseBieu35(ws);
-                        excelData2.push(...parsed);
-                        parsedDates.forEach(d => allBieu35Dates.add(d));
-                    } catch (err) {}
+                // 2. Quét nạp Biểu 35 (XSKT) - CHỈ TẢI NẾU ĐƯỢC CHỌN
+                if (shouldFetchBieu35) {
+                    const list35 = await fetchFilesFromFolder(`35/${monthFolder}`);
+                    for (const url of list35) {
+                        try {
+                            const res = await fetch(url + `?t=${Date.now()}`);
+                            if (!res.ok) continue;
+                            const buf = await res.arrayBuffer();
+                            const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
+                            const ws = wb.Sheets[wb.SheetNames[0]];
+                            const { data: parsed, parsedDates } = parseBieu35(ws);
+                            excelData2.push(...parsed);
+                            parsedDates.forEach(d => allBieu35Dates.add(d));
+                        } catch (err) {}
+                    }
                 }
             }
 
-            if (allBieu35Dates.size > 0) {
+            if (shouldFetchBieu35 && allBieu35Dates.size > 0) {
                 bieu35DateRange = getFormattedDateRange(Array.from(allBieu35Dates));
             } else {
                 bieu35DateRange = '';
@@ -1681,6 +1705,7 @@
             const c = String(item.code||'').trim();
             if (parseInt(getBaseId(c), 10) !== targetNum) return false;
             if (selectedBranch !== 'all' && !branchPrefixes.some(pref => item.code.toUpperCase().startsWith(pref))) return false;
+            if (isExcludeNumeric && /^\d+$/.test(c)) return false;
             
             let isDateValid = false;
             if (currentSearchSelectedDates.length === 0) {
@@ -1702,7 +1727,12 @@
         const t = {lotoDB: 0, loCap: 0, c227: 0, c323: 0, thuong: 0, xskt: 0};
 
         f1.forEach(r => {
-            const name = String(r.__EMPTY).trim(); if(name) state.accountCodes.add(name);
+            const name = String(r.__EMPTY).trim(); 
+            if(name) {
+                if (!(isExcludeNumeric && /^\d+$/.test(name))) {
+                    state.accountCodes.add(name);
+                }
+            }
             let displayDate = 'Khác';
             let sortTime = 0;
             if (Array.isArray(r._parsedDate)) {
@@ -1731,7 +1761,10 @@
         });
 
         f2.forEach(item => {
-            const x = item.xskt * 1000; t.xskt += x; state.accountCodes.add(item.code);
+            const x = item.xskt * 1000; 
+            if (!(isExcludeNumeric && /^\d+$/.test(item.code))) {
+                state.accountCodes.add(item.code);
+            }
             let displayDate = 'Khác';
             let sortTime = 0;
             if (Array.isArray(item._parsedDate)) {
