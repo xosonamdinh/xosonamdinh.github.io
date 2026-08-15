@@ -329,13 +329,10 @@
             </div>
 
             <div style="margin-top: 10px;">
-                <label for="selMonthHome">Chọn Tháng Đồng Bộ:</label>
+                <label for="selMonthHome">Chọn Thư Mục Tháng Trên GitHub:</label>
                 <div style="display: flex; gap: 8px;">
                     <select id="selMonthHome" style="flex: 1; font-weight: bold; border: 1.5px solid var(--primary-color);">
-                        <option value="Thang8" selected>Tháng 08/2026</option>
-                        <option value="Thang7">Tháng 07/2026</option>
-                        <option value="Thang6">Tháng 06/2026</option>
-                        <option value="Thang9">Tháng 09/2026</option>
+                        <option value="">Đang tải danh mục tháng...</option>
                     </select>
                     <button id="btnAutoFetchHome" class="success" style="padding: 10px 16px;">🔄 Tải Dữ Liệu</button>
                 </div>
@@ -368,10 +365,7 @@
                 <div style="display: flex; align-items: center; gap: 6px;">
                     <span style="font-size: 12px; font-weight: bold; color: #555;">Tháng:</span>
                     <select id="selMonthMain" style="padding: 4px 8px; font-size: 12.5px; font-weight: bold; border-radius: 4px; border: 1px solid var(--primary-color); width: auto;">
-                        <option value="Thang8" selected>Tháng 08</option>
-                        <option value="Thang7">Tháng 07</option>
-                        <option value="Thang6">Tháng 06</option>
-                        <option value="Thang9">Tháng 09</option>
+                        <option value="">Đang tải...</option>
                     </select>
                 </div>
             </div>
@@ -1159,7 +1153,53 @@
         }
     });
 
-    // --- TỰ ĐỘNG QUÉT & NẠP DỮ LIỆU TỪ GITHUB THEO PHÂN CẤP THÁNG ---
+    // --- 1. TỰ ĐỘNG QUÉT DANH MỤC THÁNG THỰC TẾ TỪ GITHUB (KHÔNG HARD-CODE) ---
+    async function autoDetectMonthsFromRepo() {
+        const pat = localStorage.getItem('github_pat') || '';
+        const headers = pat ? { 'Authorization': `Bearer ${pat}` } : {};
+
+        try {
+            const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/31?t=${Date.now()}`;
+            const res = await fetch(apiUrl, { headers });
+            let folderList = [];
+
+            if (res.ok) {
+                const items = await res.json();
+                folderList = items.filter(it => it.type === 'dir').map(it => it.name);
+            }
+
+            // Fallback danh sách nếu bị giới hạn lượt gọi GitHub API
+            if (folderList.length === 0) {
+                folderList = ['Thang8', 'Thang7', 'Thang6', '08', '07', '06'];
+            }
+
+            const sel1 = DOM.selMonthHome;
+            const sel2 = DOM.selMonthMain;
+            if (sel1) sel1.innerHTML = '';
+            if (sel2) sel2.innerHTML = '';
+
+            folderList.forEach((name, idx) => {
+                const opt1 = document.createElement('option');
+                opt1.value = name;
+                opt1.textContent = `Tháng: ${name}`;
+                if (idx === 0) opt1.selected = true;
+                if (sel1) sel1.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = name;
+                opt2.textContent = name;
+                if (idx === 0) opt2.selected = true;
+                if (sel2) sel2.appendChild(opt2);
+            });
+
+        } catch (e) {
+            console.warn("Không lấy được danh mục tháng qua GitHub API:", e);
+            if (DOM.selMonthHome) DOM.selMonthHome.innerHTML = '<option value="Thang8">Tháng: Thang8</option>';
+            if (DOM.selMonthMain) DOM.selMonthMain.innerHTML = '<option value="Thang8">Thang8</option>';
+        }
+    }
+
+    // --- 2. QUÉT FILE & TẢI DỮ LIỆU TỪ THƯ MỤC THÁNG ĐƯỢC CHỌN ---
     async function fetchFilesFromFolder(folderPath) {
         const pat = localStorage.getItem('github_pat') || '';
         const headers = pat ? { 'Authorization': `Bearer ${pat}` } : {};
@@ -1173,10 +1213,10 @@
                 fileList = json.filter(f => f.type === 'file' && (f.name.endsWith('.xls') || f.name.endsWith('.xlsx'))).map(f => f.download_url || `${GITHUB_RAW_BASE}/${folderPath}/${f.name}`);
             }
         } catch (e) {
-            console.warn("GitHub API Limit, fallback sang quét trực tiếp:", e);
+            console.warn("GitHub API Limit, fallback quét trực tiếp:", e);
         }
 
-        // Fallback dò file từ 01.xls đến 31.xls nếu API rate limit
+        // Fallback dò file từ 01.xls đến 31.xls
         if (fileList.length === 0) {
             for (let i = 1; i <= 31; i++) {
                 const dayStr = String(i).padStart(2, '0');
@@ -1187,13 +1227,14 @@
     }
 
     async function autoFetchDataByMonth(monthFolder) {
+        if (!monthFolder) return;
         showLoading();
-        showNotification(`Đang tải dữ liệu ${monthFolder} từ GitHub...`, 'info');
+        showNotification(`Đang tải dữ liệu thư mục [${monthFolder}] từ GitHub...`, 'info');
         excelData1 = [];
         excelData2 = [];
 
         try {
-            // 1. Quét nạp Biểu 31 (Lô tô)
+            // Quét nạp Biểu 31 (Lô tô)
             const list31 = await fetchFilesFromFolder(`31/${monthFolder}`);
             for (const url of list31) {
                 try {
@@ -1224,7 +1265,7 @@
             }
             processParsed31(excelData1);
 
-            // 2. Quét nạp Biểu 35 (XSKT)
+            // Quét nạp Biểu 35 (XSKT)
             const list35 = await fetchFilesFromFolder(`35/${monthFolder}`);
             const allResults35 = [];
             const allBieu35Dates = new Set();
@@ -1263,9 +1304,9 @@
                 DOM.homePage.style.display = 'none'; 
                 DOM.mainPage.style.display = 'block';
                 showSection('summarySection');
-                showNotification(`Đã tự động nạp thành công ${monthFolder}!`, 'success');
+                showNotification(`Đã tải thành công dữ liệu ${monthFolder}!`, 'success');
             } else {
-                showNotification(`Chưa tìm thấy file trong thư mục 31/${monthFolder} hoặc 35/${monthFolder}`, 'warning');
+                showNotification(`Không tìm thấy file Excel trong 31/${monthFolder} hoặc 35/${monthFolder}`, 'warning');
             }
         } catch (e) {
             console.error(e);
@@ -1275,8 +1316,10 @@
         }
     }
 
+    // CHỈ TẢI DỮ LIỆU KHI NGƯỜI DÙNG BẤM NÚT "TẢI DỮ LIỆU" HOẶC ĐỔI THÁNG TRONG BÁO CÁO
     DOM.btnAutoFetchHome.onclick = () => {
         const m = DOM.selMonthHome.value;
+        if (!m) return showNotification("Vui lòng chọn thư mục tháng!", "warning");
         if (DOM.selMonthMain) DOM.selMonthMain.value = m;
         autoFetchDataByMonth(m);
     };
@@ -1823,7 +1866,7 @@
         const anchor = document.getElementById('extraBonusRow') || document.getElementById('mainBonusRow') || document.getElementById('tongCongRow');
         if(document.getElementById(rowId)) return;
         const tr = document.createElement('tr'); tr.id = rowId;
-        tr.innerHTML = `<td>${isB ? `<textarea class="dynamic-input" style="color:var(--success-color)" placeholder="Tên thưởng..." rows="1" onkeydown="if(event.key==='Enter') { event.preventDefault(); this.blur(); }"></textarea>` : 'Nợ cũ'}</td><td colspan="${currentReportType === 'summary' ? 2 : 4}"><input class="dynamic-input" style="color:${isB ? 'var(--success-color)' : 'var(--danger-color)'}" oninput="window.handleDynInp(this,'${type}')" onkeydown="if(event.key==='Enter') { event.preventDefault(); this.blur(); }" inputmode="decimal" placeholder="0"></td>`;
+        tr.innerHTML = `<td>${isB ? `<textarea class="dynamic-input" style="color:var(--success-color)" placeholder="Tên thưởng..." rows="1" onkeydown="if(event.key==='Enter') { event.preventDefault(); this.blur(); }" style="resize:none;"></textarea>` : 'Nợ cũ'}</td><td colspan="${currentReportType === 'summary' ? 2 : 4}"><input class="dynamic-input" style="color:${isB ? 'var(--success-color)' : 'var(--danger-color)'}" oninput="window.handleDynInp(this,'${type}')" onkeydown="if(event.key==='Enter') { event.preventDefault(); this.blur(); }" inputmode="decimal" placeholder="0"></td>`;
         if(anchor) anchor.after(tr); 
         renderActionButtons(); 
         const input = tr.querySelector('input'); 
@@ -2685,8 +2728,8 @@
             document.getElementById('cfgGithubPat').value = token;
         }
 
-        // Tự động tải tháng mặc định (Thang8) khi vừa mở trang
-        autoFetchDataByMonth('Thang8');
+        // Tự động quét danh mục thư mục tháng thực tế có trong kho GitHub (Không nạp dữ liệu cho đến khi ấn nút)
+        autoDetectMonthsFromRepo();
     }
 
     initConfig();
