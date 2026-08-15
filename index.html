@@ -48,7 +48,7 @@
             margin: 0 auto;
         }
 
-        #homePage { max-width: 500px !important; margin: 20px auto; padding: 25px 20px; }
+        #homePage { max-width: 520px !important; margin: 20px auto; padding: 25px 20px; }
         #mainPage { max-width: 1200px; margin: 0 auto; padding: 15px; border: 1px solid #e0e0e0; }
 
         h2 { font-size: 22px; font-weight: 800; text-align: center; color: var(--text-color); margin-bottom: 15px; }
@@ -329,12 +329,21 @@
             </div>
 
             <div style="margin-top: 10px;">
-                <label for="selMonthHome">Chọn Thư Mục Tháng Trên GitHub:</label>
-                <div style="display: flex; gap: 8px;">
-                    <select id="selMonthHome" style="flex: 1; font-weight: bold; border: 1.5px solid var(--primary-color);">
-                        <option value="">Đang tải danh mục tháng...</option>
-                    </select>
-                    <button id="btnAutoFetchHome" class="success" style="padding: 10px 16px;">🔄 Tải Dữ Liệu</button>
+                <label>Chọn Khoảng Tháng Trên GitHub:</label>
+                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 4px; flex: 1; min-width: 140px;">
+                        <span style="font-size: 13px; font-weight: bold; color: #2c3e50; white-space: nowrap;">Từ:</span>
+                        <select id="selFromMonthHome" style="font-weight: bold; border: 1.5px solid var(--primary-color);">
+                            <option value="">Đang tải...</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 4px; flex: 1; min-width: 140px;">
+                        <span style="font-size: 13px; font-weight: bold; color: #2c3e50; white-space: nowrap;">Đến:</span>
+                        <select id="selToMonthHome" style="font-weight: bold; border: 1.5px solid var(--primary-color);">
+                            <option value="">Đang tải...</option>
+                        </select>
+                    </div>
+                    <button id="btnAutoFetchHome" class="success" style="padding: 9px 15px; width: 100%; margin-top: 4px;">🔄 Tải Dữ Liệu</button>
                 </div>
             </div>
 
@@ -360,11 +369,15 @@
 
         <!-- 1. PHÂN HỆ TỔNG HỢP -->
         <div id="summarySection" class="main-section" style="display: none;">
-            <div class="nav-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="nav-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                 <button class="back-btn" id="btnBackFromSummary">⬅ Quay lại Tra cứu</button>
-                <div style="display: flex; align-items: center; gap: 6px;">
-                    <span style="font-size: 12px; font-weight: bold; color: #555;">Tháng:</span>
-                    <select id="selMonthMain" style="padding: 4px 8px; font-size: 12.5px; font-weight: bold; border-radius: 4px; border: 1px solid var(--primary-color); width: auto;">
+                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                    <span style="font-size: 12.5px; font-weight: bold; color: #2c3e50;">Từ tháng:</span>
+                    <select id="selFromMonthMain" style="padding: 3px 6px; font-size: 12px; font-weight: bold; border-radius: 4px; border: 1.5px solid var(--primary-color); width: auto;">
+                        <option value="">Đang tải...</option>
+                    </select>
+                    <span style="font-size: 12.5px; font-weight: bold; color: #2c3e50;">Đến:</span>
+                    <select id="selToMonthMain" style="padding: 3px 6px; font-size: 12px; font-weight: bold; border-radius: 4px; border: 1.5px solid var(--primary-color); width: auto;">
                         <option value="">Đang tải...</option>
                     </select>
                 </div>
@@ -644,6 +657,8 @@
     let currentGeneratedImages = [];
     let bieu35DateRange = '';
 
+    let availableRepoMonths = [];
+
     let branchModes = { 'all': { label: 'Xem Tất Cả', prefixes: [] } };
     let globalAllDates = [];
     let globalSelectedDates = [];
@@ -685,7 +700,9 @@
         cbExcludeNumeric: document.getElementById('cbExcludeNumeric'), cbExcludeXSKT: document.getElementById('cbExcludeXSKT'),
         cbSortDesc: document.getElementById('cbSortDesc'),
         cbExcludeNumeric_Detailed: document.getElementById('cbExcludeNumeric_Detailed'), cbExcludeXSKT_Detailed: document.getElementById('cbExcludeXSKT_Detailed'),
-        selMonthHome: document.getElementById('selMonthHome'), selMonthMain: document.getElementById('selMonthMain'), btnAutoFetchHome: document.getElementById('btnAutoFetchHome')
+        selFromMonthHome: document.getElementById('selFromMonthHome'), selToMonthHome: document.getElementById('selToMonthHome'),
+        selFromMonthMain: document.getElementById('selFromMonthMain'), selToMonthMain: document.getElementById('selToMonthMain'),
+        btnAutoFetchHome: document.getElementById('btnAutoFetchHome')
     };
 
     function showNotification(msg, type = 'info') {
@@ -771,6 +788,48 @@
         }
     }
 
+    function isPeriodData() {
+        return excelData1.some(r => Array.isArray(r._parsedDate) && r._parsedDate.length > 1) ||
+               excelData2.some(r => Array.isArray(r._parsedDate) && r._parsedDate.length > 1);
+    }
+
+    function extractDatesFromCell(cellText) {
+        if (typeof cellText !== 'string') return [];
+        const matches = cellText.match(/\d{1,2}[\/-]\d{1,2}(?:[\/-]\d{2,4})?/g);
+        if (!matches) return [];
+
+        const parsePart = (str) => {
+            const p = str.split(/[\/-]/);
+            const d = parseInt(p[0], 10);
+            const m = parseInt(p[1], 10);
+            let y = p.length === 3 ? parseInt(p[2], 10) : 2026;
+            if (y < 100) y += 2000;
+            return { d, m, y, date: new Date(y, m - 1, d) };
+        };
+
+        if (matches.length >= 2) {
+            const start = parsePart(matches[0]);
+            const end = parsePart(matches[matches.length - 1]);
+            const allDates = [];
+
+            let cur = new Date(start.date.getTime());
+            while (cur <= end.date) {
+                const dd = String(cur.getDate()).padStart(2, '0');
+                const mm = String(cur.getMonth() + 1).padStart(2, '0');
+                const yy = String(cur.getFullYear()).slice(-2);
+                allDates.push(`${dd}/${mm}/${yy}`);
+                cur.setDate(cur.getDate() + 1);
+            }
+            return allDates;
+        } else {
+            const single = parsePart(matches[0]);
+            const dd = String(single.d).padStart(2, '0');
+            const mm = String(single.m).padStart(2, '0');
+            const yy = String(single.y).slice(-2);
+            return [`${dd}/${mm}/${yy}`];
+        }
+    }
+
     window.toggleWinCalendar = function(boxId) {
         const box = document.getElementById(boxId);
         if (box) box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
@@ -796,6 +855,10 @@
     }
 
     window.selectAllDates = function(isSelectAll) {
+        if (isPeriodData()) {
+            showNotification("Dữ liệu là tổng hợp cả kỳ, không thể tách lọc ngày!", "warning");
+            return;
+        }
         globalSelectedDates = isSelectAll ? [...globalAllDates] : [];
         renderWinCalendarGrid();
         generateSummaryView();
@@ -823,6 +886,19 @@
         const prevM = month === 1 ? 12 : month - 1;
         const prevY = month === 1 ? year - 1 : year;
 
+        const handleCellClick = (matchedDate, cell) => {
+            if (isPeriodData()) {
+                showNotification(`Dữ liệu là tổng hợp trọn kỳ (${dateRangeText}), không thể tách xem ngày lẻ!`, "warning");
+                return;
+            }
+            const idx = globalSelectedDates.indexOf(matchedDate);
+            if (idx > -1) globalSelectedDates.splice(idx, 1);
+            else globalSelectedDates.push(matchedDate);
+            cell.classList.toggle('active');
+            countTxt.textContent = globalSelectedDates.length === globalAllDates.length ? "Tất cả" : `${globalSelectedDates.length} ngày`;
+            generateSummaryView();
+        };
+
         for (let i = startOffset - 1; i >= 0; i--) {
             const dayNum = prevMonthTotalDays - i;
             const cell = document.createElement('div'); 
@@ -833,14 +909,7 @@
             if (matchedDate) {
                 cell.classList.add('has-data');
                 if (globalSelectedDates.includes(matchedDate)) cell.classList.add('active');
-                cell.onclick = () => {
-                    const idx = globalSelectedDates.indexOf(matchedDate);
-                    if (idx > -1) globalSelectedDates.splice(idx, 1);
-                    else globalSelectedDates.push(matchedDate);
-                    cell.classList.toggle('active');
-                    countTxt.textContent = globalSelectedDates.length === globalAllDates.length ? "Tất cả" : `${globalSelectedDates.length} ngày`;
-                    generateSummaryView();
-                };
+                cell.onclick = () => handleCellClick(matchedDate, cell);
             }
             grid.appendChild(cell);
         }
@@ -854,14 +923,7 @@
             if (matchedDate) {
                 cell.classList.add('has-data');
                 if (globalSelectedDates.includes(matchedDate)) cell.classList.add('active');
-                cell.onclick = () => {
-                    const idx = globalSelectedDates.indexOf(matchedDate);
-                    if (idx > -1) globalSelectedDates.splice(idx, 1);
-                    else globalSelectedDates.push(matchedDate);
-                    cell.classList.toggle('active');
-                    countTxt.textContent = globalSelectedDates.length === globalAllDates.length ? "Tất cả" : `${globalSelectedDates.length} ngày`;
-                    generateSummaryView();
-                };
+                cell.onclick = () => handleCellClick(matchedDate, cell);
             }
             grid.appendChild(cell);
         }
@@ -879,20 +941,17 @@
             if (matchedDate) {
                 cell.classList.add('has-data');
                 if (globalSelectedDates.includes(matchedDate)) cell.classList.add('active');
-                cell.onclick = () => {
-                    const idx = globalSelectedDates.indexOf(matchedDate);
-                    if (idx > -1) globalSelectedDates.splice(idx, 1);
-                    else globalSelectedDates.push(matchedDate);
-                    cell.classList.toggle('active');
-                    countTxt.textContent = globalSelectedDates.length === globalAllDates.length ? "Tất cả" : `${globalSelectedDates.length} ngày`;
-                    generateSummaryView();
-                };
+                cell.onclick = () => handleCellClick(matchedDate, cell);
             }
             grid.appendChild(cell);
         }
     }
 
     window.selectDetailedAllDates = function(isSelectAll) {
+        if (isPeriodData()) {
+            showNotification("Dữ liệu là tổng hợp cả kỳ, không thể tách lọc ngày!", "warning");
+            return;
+        }
         currentSearchSelectedDates = isSelectAll ? [...currentSearchAllDates] : [];
         renderDetailedWinCalendar();
         if (DOM.reportContainer.innerHTML !== '') createReport();
@@ -920,6 +979,19 @@
         const prevM = month === 1 ? 12 : month - 1;
         const prevY = month === 1 ? year - 1 : year;
 
+        const handleDetailClick = (matchedDate, cell) => {
+            if (isPeriodData()) {
+                showNotification(`Dữ liệu là tổng hợp trọn kỳ (${dateRangeText}), không thể tách xem ngày lẻ!`, "warning");
+                return;
+            }
+            const idx = currentSearchSelectedDates.indexOf(matchedDate);
+            if (idx > -1) currentSearchSelectedDates.splice(idx, 1);
+            else currentSearchSelectedDates.push(matchedDate);
+            cell.classList.toggle('active');
+            countTxt.textContent = currentSearchSelectedDates.length === currentSearchAllDates.length ? "Tất cả" : `${currentSearchSelectedDates.length} ngày`;
+            if (DOM.reportContainer.innerHTML !== '') createReport();
+        };
+
         for (let i = startOffset - 1; i >= 0; i--) {
             const dayNum = prevMonthTotalDays - i;
             const cell = document.createElement('div'); 
@@ -930,14 +1002,7 @@
             if (matchedDate) {
                 cell.classList.add('has-data');
                 if (currentSearchSelectedDates.includes(matchedDate)) cell.classList.add('active');
-                cell.onclick = () => {
-                    const idx = currentSearchSelectedDates.indexOf(matchedDate);
-                    if (idx > -1) currentSearchSelectedDates.splice(idx, 1);
-                    else currentSearchSelectedDates.push(matchedDate);
-                    cell.classList.toggle('active');
-                    countTxt.textContent = currentSearchSelectedDates.length === currentSearchAllDates.length ? "Tất cả" : `${currentSearchSelectedDates.length} ngày`;
-                    if (DOM.reportContainer.innerHTML !== '') createReport();
-                };
+                cell.onclick = () => handleDetailClick(matchedDate, cell);
             }
             grid.appendChild(cell);
         }
@@ -951,14 +1016,7 @@
             if (matchedDate) {
                 cell.classList.add('has-data');
                 if (currentSearchSelectedDates.includes(matchedDate)) cell.classList.add('active');
-                cell.onclick = () => {
-                    const idx = currentSearchSelectedDates.indexOf(matchedDate);
-                    if (idx > -1) currentSearchSelectedDates.splice(idx, 1);
-                    else currentSearchSelectedDates.push(matchedDate);
-                    cell.classList.toggle('active');
-                    countTxt.textContent = currentSearchSelectedDates.length === currentSearchAllDates.length ? "Tất cả" : `${currentSearchSelectedDates.length} ngày`;
-                    if (DOM.reportContainer.innerHTML !== '') createReport();
-                };
+                cell.onclick = () => handleDetailClick(matchedDate, cell);
             }
             grid.appendChild(cell);
         }
@@ -976,14 +1034,7 @@
             if (matchedDate) {
                 cell.classList.add('has-data');
                 if (currentSearchSelectedDates.includes(matchedDate)) cell.classList.add('active');
-                cell.onclick = () => {
-                    const idx = currentSearchSelectedDates.indexOf(matchedDate);
-                    if (idx > -1) currentSearchSelectedDates.splice(idx, 1);
-                    else currentSearchSelectedDates.push(matchedDate);
-                    cell.classList.toggle('active');
-                    countTxt.textContent = currentSearchSelectedDates.length === currentSearchAllDates.length ? "Tất cả" : `${currentSearchSelectedDates.length} ngày`;
-                    if (DOM.reportContainer.innerHTML !== '') createReport();
-                };
+                cell.onclick = () => handleDetailClick(matchedDate, cell);
             }
             grid.appendChild(cell);
         }
@@ -1003,11 +1054,23 @@
         });
     }
 
-    function processParsed31(jsonList) {
+    function processParsedDates() {
         let allParsedDates = new Set();
-        jsonList.forEach(r => {
-            if (r._parsedDate && r._parsedDate !== 'Khác') allParsedDates.add(r._parsedDate);
+        excelData1.forEach(r => {
+            if (r._parsedDate && Array.isArray(r._parsedDate)) {
+                r._parsedDate.forEach(d => allParsedDates.add(d));
+            } else if (r._parsedDate && r._parsedDate !== 'Khác') {
+                allParsedDates.add(r._parsedDate);
+            }
         });
+        excelData2.forEach(r => {
+            if (r._parsedDate && Array.isArray(r._parsedDate)) {
+                r._parsedDate.forEach(d => allParsedDates.add(d));
+            } else if (r._parsedDate && r._parsedDate !== 'Khác') {
+                allParsedDates.add(r._parsedDate);
+            }
+        });
+        
         if (allParsedDates.size > 0) {
             globalAllDates = Array.from(allParsedDates).sort();
             globalSelectedDates = [...globalAllDates];
@@ -1027,25 +1090,22 @@
         for (let i = 0; i < files.length; i++) {
             try {
                 const { json } = await readExcelFileAsync(files[i]);
-                let foundDate = null;
+                let foundDates = [];
                 for(let j = 0; j < Math.min(json.length, 20); j++) {
                     for(let v of Object.values(json[j])) {
-                        if(typeof v === "string") {
-                            let match = v.match(/\d{1,2}\/\d{1,2}(?:\/\d{2,4})?/g);
-                            if(match) {
-                                let parts = match[0].split('/');
-                                foundDate = parts.length === 3 && parts[2].length === 4 ? `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2].substring(2)}` : match[0];
-                                break;
-                            }
-                        }
+                        foundDates = extractDatesFromCell(v);
+                        if(foundDates.length > 0) break;
                     }
-                    if(foundDate) break;
+                    if(foundDates.length > 0) break;
                 }
-                json.forEach(r => r._parsedDate = foundDate || 'Khác');
+                
+                json.forEach(r => {
+                    r._parsedDate = foundDates.length > 0 ? foundDates : ['Khác'];
+                });
                 excelData1 = excelData1.concat(json);
             } catch(err) { console.error(err); }
         }
-        processParsed31(excelData1);
+        processParsedDates();
         hideLoading();
         showNotification(`Đã nạp ${files.length} file Biểu 31!`, 'success');
     });
@@ -1073,26 +1133,16 @@
         if (xsktColIndex === -1) { xsktColIndex = 8; headerRowIndex = 4; }
         if (codeColIndex === -1) { codeColIndex = 1; }
 
-        let parsedDates = [];
-        const datePattern = /(\d{1,2})[\/-](\d{1,2})(?:[\/-](\d{2,4}))?/g;
+        let parsedDates = new Set();
         for (let rIdx = 0; rIdx < Math.min(rows.length, headerRowIndex + 1 || 10); rIdx++) {
             for (const cell of rows[rIdx]) {
-                const cellStr = String(cell || '').trim();
-                if (!cellStr) continue;
-                const dates = cellStr.match(datePattern);
-                if (dates && dates.length > 0) {
-                    dates.forEach(d => {
-                        let parts = d.split(/[\/-]/);
-                        let dd = parts[0].padStart(2, '0');
-                        let mm = parts[1].padStart(2, '0');
-                        let yy = parts.length === 3 ? (parts[2].length === 4 ? parts[2].substring(2) : parts[2]) : '26';
-                        parsedDates.push(`${dd}/${mm}/${yy}`);
-                    });
-                }
+                const extracted = extractDatesFromCell(cell);
+                extracted.forEach(d => parsedDates.add(d));
             }
-            if (parsedDates.length > 0) break;
+            if (parsedDates.size > 0) break;
         }
 
+        const dateArray = Array.from(parsedDates);
         const dataList = [];
         for (let i = headerRowIndex + 1; i < rows.length; i++) {
             const row = rows[i];
@@ -1101,9 +1151,15 @@
             if (!code || !/\d/.test(code)) continue;
             const upper = code.toUpperCase();
             if (upper.includes("TỔNG") || upper.includes("CỘNG") || upper.includes("CÔNG") || upper.includes("TOTAL")) continue;
-            dataList.push({ code: code, xskt: parseFloat(row[xsktColIndex]) || 0 });
+            
+            const xsktVal = parseFloat(row[xsktColIndex]) || 0;
+            dataList.push({ 
+                code: code, 
+                xskt: xsktVal, 
+                _parsedDate: dateArray.length > 0 ? dateArray : ['Khác'] 
+            });
         }
-        return { data: dataList, parsedDates };
+        return { data: dataList, parsedDates: dateArray };
     }
 
     DOM.excelFile2.addEventListener('change', async function(e) {
@@ -1111,19 +1167,18 @@
         if (!files.length) return;
         showLoading();
         try {
-            const allResults = [];
+            excelData2 = [];
             const allBieu35Dates = new Set();
             for (const file of files) {
                 const data = await new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onload = ev => resolve(new Uint8Array(ev.target.result));
-                    reader.onerror = () => reject(new Error('Không đọc được file: ' + file.name));
                     reader.readAsArrayBuffer(file);
                 });
                 const wb = XLSX.read(data, { type: 'array' });
                 const ws = wb.Sheets[wb.SheetNames[0]];
                 const { data: parsed, parsedDates } = parseBieu35(ws);
-                allResults.push(...parsed);
+                excelData2.push(...parsed);
                 parsedDates.forEach(d => allBieu35Dates.add(d));
             }
 
@@ -1133,19 +1188,9 @@
                 bieu35DateRange = '';
             }
 
-            const mergeMap = new Map();
-            for (const item of allResults) {
-                const key = item.code.toUpperCase().trim();
-                if (mergeMap.has(key)) {
-                    mergeMap.get(key).xskt += item.xskt;
-                } else {
-                    mergeMap.set(key, { code: item.code, xskt: item.xskt });
-                }
-            }
-            excelData2 = Array.from(mergeMap.values());
-
+            processParsedDates();
             DOM.excelFile2.classList.add('loaded');
-            showNotification(`Đã nạp ${files.length} file Biểu 35! (${excelData2.length} đại lý)`, 'success');
+            showNotification(`Đã nạp ${files.length} file Biểu 35! (${excelData2.length} bản ghi)`, 'success');
         } catch(err) { 
             showNotification('Lỗi đọc file Biểu 35: ' + err.message, 'error'); 
         } finally { 
@@ -1153,7 +1198,7 @@
         }
     });
 
-    // --- 1. TỰ ĐỘNG QUÉT DANH MỤC THÁNG THỰC TẾ TỪ GITHUB (KHÔNG HARD-CODE) ---
+    // --- 1. TỰ ĐỘNG QUÉT DANH MỤC THÁNG THỰC TẾ TỪ GITHUB & SẮP XẾP ---
     async function autoDetectMonthsFromRepo() {
         const pat = localStorage.getItem('github_pat') || '';
         const headers = pat ? { 'Authorization': `Bearer ${pat}` } : {};
@@ -1168,38 +1213,45 @@
                 folderList = items.filter(it => it.type === 'dir').map(it => it.name);
             }
 
-            // Fallback danh sách nếu bị giới hạn lượt gọi GitHub API
             if (folderList.length === 0) {
-                folderList = ['Thang8', 'Thang7', 'Thang6', '08', '07', '06'];
+                folderList = ['Thang1', 'Thang2', 'Thang3', 'Thang4', 'Thang5', 'Thang6', 'Thang7', 'Thang8', 'Thang9', 'Thang10', 'Thang11', 'Thang12'];
             }
 
-            const sel1 = DOM.selMonthHome;
-            const sel2 = DOM.selMonthMain;
-            if (sel1) sel1.innerHTML = '';
-            if (sel2) sel2.innerHTML = '';
-
-            folderList.forEach((name, idx) => {
-                const opt1 = document.createElement('option');
-                opt1.value = name;
-                opt1.textContent = `Tháng: ${name}`;
-                if (idx === 0) opt1.selected = true;
-                if (sel1) sel1.appendChild(opt1);
-
-                const opt2 = document.createElement('option');
-                opt2.value = name;
-                opt2.textContent = name;
-                if (idx === 0) opt2.selected = true;
-                if (sel2) sel2.appendChild(opt2);
+            folderList.sort((a, b) => {
+                const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
+                const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
+                return numA - numB;
             });
+
+            availableRepoMonths = folderList;
+
+            const populateSelect = (selectEl, defaultVal) => {
+                if (!selectEl) return;
+                selectEl.innerHTML = '';
+                folderList.forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.textContent = name;
+                    selectEl.appendChild(opt);
+                });
+                if (defaultVal && folderList.includes(defaultVal)) {
+                    selectEl.value = defaultVal;
+                } else if (folderList.length > 0) {
+                    selectEl.value = folderList[folderList.length - 1];
+                }
+            };
+
+            const latest = folderList[folderList.length - 1];
+            populateSelect(DOM.selFromMonthHome, latest);
+            populateSelect(DOM.selToMonthHome, latest);
+            populateSelect(DOM.selFromMonthMain, latest);
+            populateSelect(DOM.selToMonthMain, latest);
 
         } catch (e) {
             console.warn("Không lấy được danh mục tháng qua GitHub API:", e);
-            if (DOM.selMonthHome) DOM.selMonthHome.innerHTML = '<option value="Thang8">Tháng: Thang8</option>';
-            if (DOM.selMonthMain) DOM.selMonthMain.innerHTML = '<option value="Thang8">Thang8</option>';
         }
     }
 
-    // --- 2. QUÉT FILE & TẢI DỮ LIỆU TỪ THƯ MỤC THÁNG ĐƯỢC CHỌN ---
     async function fetchFilesFromFolder(folderPath) {
         const pat = localStorage.getItem('github_pat') || '';
         const headers = pat ? { 'Authorization': `Bearer ${pat}` } : {};
@@ -1216,7 +1268,6 @@
             console.warn("GitHub API Limit, fallback quét trực tiếp:", e);
         }
 
-        // Fallback dò file từ 01.xls đến 31.xls
         if (fileList.length === 0) {
             for (let i = 1; i <= 31; i++) {
                 const dayStr = String(i).padStart(2, '0');
@@ -1226,60 +1277,71 @@
         return fileList;
     }
 
-    async function autoFetchDataByMonth(monthFolder) {
-        if (!monthFolder) return;
+    // --- 2. QUÉT & TẢI GỘP NHIỀU THÁNG TỪ "FROM_MONTH" ĐẾN "TO_MONTH" ---
+    async function autoFetchDataRange(fromMonth, toMonth) {
+        if (!fromMonth || !toMonth) return;
+
+        let startIndex = availableRepoMonths.indexOf(fromMonth);
+        let endIndex = availableRepoMonths.indexOf(toMonth);
+
+        if (startIndex === -1 || endIndex === -1) {
+            startIndex = 0;
+            endIndex = availableRepoMonths.length - 1;
+        }
+
+        if (startIndex > endIndex) {
+            const tmp = startIndex; startIndex = endIndex; endIndex = tmp;
+        }
+
+        const selectedMonths = availableRepoMonths.slice(startIndex, endIndex + 1);
+        const rangeLabel = selectedMonths.length > 1 ? `Từ [${fromMonth}] đến [${toMonth}]` : `[${fromMonth}]`;
+
         showLoading();
-        showNotification(`Đang tải dữ liệu thư mục [${monthFolder}] từ GitHub...`, 'info');
+        showNotification(`Đang tải dữ liệu ${rangeLabel} (${selectedMonths.length} tháng)...`, 'info');
         excelData1 = [];
         excelData2 = [];
+        const allBieu35Dates = new Set();
 
         try {
-            // Quét nạp Biểu 31 (Lô tô)
-            const list31 = await fetchFilesFromFolder(`31/${monthFolder}`);
-            for (const url of list31) {
-                try {
-                    const res = await fetch(url + `?t=${Date.now()}`);
-                    if (!res.ok) continue;
-                    const buf = await res.arrayBuffer();
-                    const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
-                    const ws = wb.Sheets[wb.SheetNames[0]];
-                    const json = XLSX.utils.sheet_to_json(ws, { defval: "" });
+            for (const monthFolder of selectedMonths) {
+                // Quét nạp Biểu 31 (Lô tô)
+                const list31 = await fetchFilesFromFolder(`31/${monthFolder}`);
+                for (const url of list31) {
+                    try {
+                        const res = await fetch(url + `?t=${Date.now()}`);
+                        if (!res.ok) continue;
+                        const buf = await res.arrayBuffer();
+                        const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
+                        const ws = wb.Sheets[wb.SheetNames[0]];
+                        const json = XLSX.utils.sheet_to_json(ws, { defval: "" });
 
-                    let foundDate = null;
-                    for (let j = 0; j < Math.min(json.length, 20); j++) {
-                        for (let v of Object.values(json[j])) {
-                            if (typeof v === "string") {
-                                let match = v.match(/\d{1,2}\/\d{1,2}(?:\/\d{2,4})?/g);
-                                if (match) {
-                                    let parts = match[0].split('/');
-                                    foundDate = parts.length === 3 && parts[2].length === 4 ? `${parts[0].padStart(2,'0')}/${parts[1].padStart(2,'0')}/${parts[2].substring(2)}` : match[0];
-                                    break;
-                                }
+                        let foundDates = [];
+                        for (let j = 0; j < Math.min(json.length, 20); j++) {
+                            for (let v of Object.values(json[j])) {
+                                foundDates = extractDatesFromCell(v);
+                                if(foundDates.length > 0) break;
                             }
+                            if (foundDates.length > 0) break;
                         }
-                        if (foundDate) break;
-                    }
-                    json.forEach(r => r._parsedDate = foundDate || 'Khác');
-                    excelData1 = excelData1.concat(json);
-                } catch (err) {}
-            }
-            processParsed31(excelData1);
+                        json.forEach(r => r._parsedDate = foundDates.length > 0 ? foundDates : ['Khác']);
+                        excelData1 = excelData1.concat(json);
+                    } catch (err) {}
+                }
 
-            // Quét nạp Biểu 35 (XSKT)
-            const list35 = await fetchFilesFromFolder(`35/${monthFolder}`);
-            const allResults35 = [];
-            const allBieu35Dates = new Set();
-            for (const url of list35) {
-                try {
-                    const res = await fetch(url + `?t=${Date.now()}`);
-                    if (!res.ok) continue;
-                    const buf = await res.arrayBuffer();
-                    const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
-                    const ws = wb.Sheets[wb.SheetNames[0]];
-                    const { data: parsed, parsedDates } = parseBieu35(ws);
-                    allResults35.push(...parsed);
-                    parsedDates.forEach(d => allBieu35Dates.add(d));
-                } catch (err) {}
+                // Quét nạp Biểu 35 (XSKT)
+                const list35 = await fetchFilesFromFolder(`35/${monthFolder}`);
+                for (const url of list35) {
+                    try {
+                        const res = await fetch(url + `?t=${Date.now()}`);
+                        if (!res.ok) continue;
+                        const buf = await res.arrayBuffer();
+                        const wb = XLSX.read(new Uint8Array(buf), { type: 'array' });
+                        const ws = wb.Sheets[wb.SheetNames[0]];
+                        const { data: parsed, parsedDates } = parseBieu35(ws);
+                        excelData2.push(...parsed);
+                        parsedDates.forEach(d => allBieu35Dates.add(d));
+                    } catch (err) {}
+                }
             }
 
             if (allBieu35Dates.size > 0) {
@@ -1288,25 +1350,16 @@
                 bieu35DateRange = '';
             }
 
-            const mergeMap = new Map();
-            for (const item of allResults35) {
-                const key = item.code.toUpperCase().trim();
-                if (mergeMap.has(key)) {
-                    mergeMap.get(key).xskt += item.xskt;
-                } else {
-                    mergeMap.set(key, { code: item.code, xskt: item.xskt });
-                }
-            }
-            excelData2 = Array.from(mergeMap.values());
+            processParsedDates();
 
             if (excelData1.length > 0 || excelData2.length > 0) {
                 generateSummaryView();
                 DOM.homePage.style.display = 'none'; 
                 DOM.mainPage.style.display = 'block';
                 showSection('summarySection');
-                showNotification(`Đã tải thành công dữ liệu ${monthFolder}!`, 'success');
+                showNotification(`Đã tải thành công dữ liệu ${rangeLabel}!`, 'success');
             } else {
-                showNotification(`Không tìm thấy file Excel trong 31/${monthFolder} hoặc 35/${monthFolder}`, 'warning');
+                showNotification(`Không tìm thấy file Excel trong khoảng ${rangeLabel}`, 'warning');
             }
         } catch (e) {
             console.error(e);
@@ -1316,19 +1369,25 @@
         }
     }
 
-    // CHỈ TẢI DỮ LIỆU KHI NGƯỜI DÙNG BẤM NÚT "TẢI DỮ LIỆU" HOẶC ĐỔI THÁNG TRONG BÁO CÁO
     DOM.btnAutoFetchHome.onclick = () => {
-        const m = DOM.selMonthHome.value;
-        if (!m) return showNotification("Vui lòng chọn thư mục tháng!", "warning");
-        if (DOM.selMonthMain) DOM.selMonthMain.value = m;
-        autoFetchDataByMonth(m);
+        const fromM = DOM.selFromMonthHome.value;
+        const toM = DOM.selToMonthHome.value;
+        if (!fromM || !toM) return showNotification("Vui lòng chọn khoảng tháng!", "warning");
+        if (DOM.selFromMonthMain) DOM.selFromMonthMain.value = fromM;
+        if (DOM.selToMonthMain) DOM.selToMonthMain.value = toM;
+        autoFetchDataRange(fromM, toM);
     };
 
-    DOM.selMonthMain.onchange = function() {
-        const m = this.value;
-        if (DOM.selMonthHome) DOM.selMonthHome.value = m;
-        autoFetchDataByMonth(m);
-    };
+    function handleMainMonthChange() {
+        const fromM = DOM.selFromMonthMain.value;
+        const toM = DOM.selToMonthMain.value;
+        if (DOM.selFromMonthHome) DOM.selFromMonthHome.value = fromM;
+        if (DOM.selToMonthHome) DOM.selToMonthHome.value = toM;
+        autoFetchDataRange(fromM, toM);
+    }
+
+    DOM.selFromMonthMain.onchange = handleMainMonthChange;
+    DOM.selToMonthMain.onchange = handleMainMonthChange;
 
     function processSummaryData(regionRules) {
         let groups = new Map();
@@ -1338,7 +1397,16 @@
 
         excelData1.forEach(r => {
             const c = String(r.__EMPTY||'').trim(); if(!c || !/\d/.test(c)) return;
-            if (r._parsedDate && globalSelectedDates.length > 0 && !globalSelectedDates.includes(r._parsedDate)) return;
+            
+            let isDateValid = false;
+            if (globalSelectedDates.length === 0) {
+                isDateValid = true;
+            } else if (Array.isArray(r._parsedDate)) {
+                isDateValid = r._parsedDate.some(d => globalSelectedDates.includes(d));
+            } else if (r._parsedDate && globalSelectedDates.includes(r._parsedDate)) {
+                isDateValid = true;
+            }
+            if (!isDateValid) return;
 
             init(c); const d = map.get(c);
             const ldb = parseFloat(r.__EMPTY_2)||0, lc = parseFloat(r.__EMPTY_6)||0, c2 = parseFloat(r.__EMPTY_8)||0, c3 = parseFloat(r.__EMPTY_10)||0, th = parseFloat(r.__EMPTY_14)||0;
@@ -1347,7 +1415,19 @@
         });
 
         excelData2.forEach(item => {
-            init(item.code); const d = map.get(item.code);
+            const c = String(item.code||'').trim(); if(!c || !/\d/.test(c)) return;
+            
+            let isDateValid = false;
+            if (globalSelectedDates.length === 0) {
+                isDateValid = true;
+            } else if (Array.isArray(item._parsedDate)) {
+                isDateValid = item._parsedDate.some(d => globalSelectedDates.includes(d));
+            } else if (item._parsedDate && globalSelectedDates.includes(item._parsedDate)) {
+                isDateValid = true;
+            }
+            if (!isDateValid) return;
+
+            init(c); const d = map.get(c);
             const x = item.xskt * 1000;
             d.xskt += x; d.xsktCom += x*0.1; d.totRev += x; d.totCom += x*0.1;
         });
@@ -1463,7 +1543,10 @@
         
         let globalDateDisplay = getFormattedDateRange(globalSelectedDates);
         let xsktDateLine = '';
-        if (hasXSKT && bieu35DateRange && bieu35DateRange !== globalDateDisplay) {
+
+        // Chỉ hiển thị dòng XSKT khi file Biểu 35 là dạng báo cáo gộp cố định cả kỳ
+        const isB35Period = excelData2.some(r => Array.isArray(r._parsedDate) && r._parsedDate.length > 1);
+        if (hasXSKT && isB35Period && bieu35DateRange && bieu35DateRange !== globalDateDisplay) {
             xsktDateLine = `<br><span style="font-size:12.5px; color:#e67e22; font-weight:700;">📅 XSKT: ${bieu35DateRange}</span>`;
         }
 
@@ -1497,7 +1580,23 @@
                 const keyBase = getBaseId(c);
                 if (c.toUpperCase() === searchCode || keyBase === inputNum) {
                     baseId = keyBase;
-                    if (r._parsedDate) availableDates.add(r._parsedDate);
+                    if (Array.isArray(r._parsedDate)) {
+                        r._parsedDate.forEach(d => availableDates.add(d));
+                    } else if (r._parsedDate) {
+                        availableDates.add(r._parsedDate);
+                    }
+                }
+            });
+            excelData2.forEach(r => {
+                const c = String(r.code||'').trim(); 
+                const keyBase = getBaseId(c);
+                if (c.toUpperCase() === searchCode || keyBase === inputNum) {
+                    baseId = keyBase;
+                    if (Array.isArray(r._parsedDate)) {
+                        r._parsedDate.forEach(d => availableDates.add(d));
+                    } else if (r._parsedDate) {
+                        availableDates.add(r._parsedDate);
+                    }
                 }
             });
         }
@@ -1537,20 +1636,25 @@
         }
     });
 
+    // LẮNG NGHE THAY ĐỔI CỦA BỘ LỌC CHI TIẾT
     DOM.selBranchMode_Detailed.addEventListener('change', function() {
         if (!DOM.soSoInput.value.trim()) return;
-        if (globalAllDates.length <= 1) {
-            currentReportType = 'summary';
-        } else {
-            currentReportType = 'detailed';
-        }
-        createReport();
+        if (state.currentSoSo) createReport();
+    });
+    DOM.cbExcludeNumeric_Detailed.addEventListener('change', function() {
+        if (!DOM.soSoInput.value.trim()) return;
+        if (state.currentSoSo) createReport();
+    });
+    DOM.cbExcludeXSKT_Detailed.addEventListener('change', function() {
+        if (!DOM.soSoInput.value.trim()) return;
+        if (state.currentSoSo) createReport();
     });
 
     function processDetailedReport(soSo) {
         const targetNum = parseInt(soSo, 10); if (isNaN(targetNum)) return null;
         let detailedItems = [];
-        const isExclude = DOM.cbExcludeNumeric_Detailed.checked;
+        const isExcludeNumeric = DOM.cbExcludeNumeric_Detailed.checked;
+        const isExcludeXSKT = DOM.cbExcludeXSKT_Detailed.checked;
         const selectedBranch = DOM.selBranchMode_Detailed.value;
         const branchPrefixes = branchModes[selectedBranch]?.prefixes || [];
 
@@ -1558,13 +1662,36 @@
             const c = String(r.__EMPTY||'').trim();
             if (parseInt(getBaseId(c), 10) !== targetNum) return false;
             if (selectedBranch !== 'all' && !branchPrefixes.some(pref => c.toUpperCase().startsWith(pref))) return false;
-            if (isExclude && /^\d+$/.test(c)) return false;
-            if (r._parsedDate && currentSearchSelectedDates.length > 0 && !currentSearchSelectedDates.includes(r._parsedDate)) return false;
+            if (isExcludeNumeric && /^\d+$/.test(c)) return false;
+            
+            let isDateValid = false;
+            if (currentSearchSelectedDates.length === 0) {
+                isDateValid = true;
+            } else if (Array.isArray(r._parsedDate)) {
+                isDateValid = r._parsedDate.some(d => currentSearchSelectedDates.includes(d));
+            } else if (r._parsedDate && currentSearchSelectedDates.includes(r._parsedDate)) {
+                isDateValid = true;
+            }
+            if (!isDateValid) return false;
+            
             return true;
         });
-        const f2 = excelData2.filter(item => {
-            if (parseInt(getBaseId(item.code), 10) !== targetNum) return false;
+
+        const f2 = isExcludeXSKT ? [] : excelData2.filter(item => {
+            const c = String(item.code||'').trim();
+            if (parseInt(getBaseId(c), 10) !== targetNum) return false;
             if (selectedBranch !== 'all' && !branchPrefixes.some(pref => item.code.toUpperCase().startsWith(pref))) return false;
+            
+            let isDateValid = false;
+            if (currentSearchSelectedDates.length === 0) {
+                isDateValid = true;
+            } else if (Array.isArray(item._parsedDate)) {
+                isDateValid = item._parsedDate.some(d => currentSearchSelectedDates.includes(d));
+            } else if (item._parsedDate && currentSearchSelectedDates.includes(item._parsedDate)) {
+                isDateValid = true;
+            }
+            if (!isDateValid) return false;
+
             return true;
         });
 
@@ -1576,21 +1703,58 @@
 
         f1.forEach(r => {
             const name = String(r.__EMPTY).trim(); if(name) state.accountCodes.add(name);
-            const date = r._parsedDate || 'Khác';
+            let displayDate = 'Khác';
+            let sortTime = 0;
+            if (Array.isArray(r._parsedDate)) {
+                const datesInFilter = r._parsedDate.filter(d => currentSearchSelectedDates.includes(d));
+                if (datesInFilter.length > 0) {
+                    sortTime = parseDateToTime(datesInFilter[0]);
+                    if (datesInFilter.length > 1) {
+                        const first = datesInFilter[0].split('/').slice(0,2).join('/');
+                        const last = datesInFilter[datesInFilter.length - 1].split('/').slice(0,2).join('/');
+                        displayDate = `Từ ${first} đến ${last}`;
+                    } else {
+                        displayDate = datesInFilter[0].split('/').slice(0,2).join('/');
+                    }
+                }
+            } else if (r._parsedDate) {
+                displayDate = r._parsedDate.split('/').slice(0,2).join('/');
+                sortTime = parseDateToTime(r._parsedDate);
+            }
+
             const ldb = parseFloat(r.__EMPTY_2)||0, lc = parseFloat(r.__EMPTY_6)||0, c2 = parseFloat(r.__EMPTY_8)||0, c3 = parseFloat(r.__EMPTY_10)||0, th = parseFloat(r.__EMPTY_14)||0;
             t.lotoDB += ldb; t.loCap += lc; t.c227 += c2; t.c323 += c3; t.thuong += th;
-            if(ldb || th) detailedItems.push({date, type: 'Ltô ĐB', rev: ldb, com: ldb*0.08, bonus: th, net: ldb - ldb*0.08 - th});
-            if(lc) detailedItems.push({date, type: 'LCặp', rev: lc, com: lc*0.1, bonus: 0, net: lc - lc*0.1});
-            if(c2) detailedItems.push({date, type: 'Lô 2/27', rev: c2, com: c2*0.1, bonus: 0, net: c2 - c2*0.1});
-            if(c3) detailedItems.push({date, type: 'Lô 3/23', rev: c3, com: c3*0.1, bonus: 0, net: c3 - c3*0.1});
+            if(ldb || th) detailedItems.push({date: displayDate, sortTime, type: 'Ltô ĐB', rev: ldb, com: ldb*0.08, bonus: th, net: ldb - ldb*0.08 - th});
+            if(lc) detailedItems.push({date: displayDate, sortTime, type: 'LCặp', rev: lc, com: lc*0.1, bonus: 0, net: lc - lc*0.1});
+            if(c2) detailedItems.push({date: displayDate, sortTime, type: 'Lô 2/27', rev: c2, com: c2*0.1, bonus: 0, net: c2 - c2*0.1});
+            if(c3) detailedItems.push({date: displayDate, sortTime, type: 'Lô 3/23', rev: c3, com: c3*0.1, bonus: 0, net: c3 - c3*0.1});
         });
 
         f2.forEach(item => {
             const x = item.xskt * 1000; t.xskt += x; state.accountCodes.add(item.code);
-            if(x > 0) detailedItems.push({date: 'Khác', type: 'XSKT', rev: x, com: x*0.1, bonus: 0, net: x - x*0.1});
+            let displayDate = 'Khác';
+            let sortTime = 0;
+            if (Array.isArray(item._parsedDate)) {
+                const datesInFilter = item._parsedDate.filter(d => currentSearchSelectedDates.includes(d));
+                if (datesInFilter.length > 0) {
+                    sortTime = parseDateToTime(datesInFilter[0]);
+                    if (datesInFilter.length > 1) {
+                        const first = datesInFilter[0].split('/').slice(0,2).join('/');
+                        const last = datesInFilter[datesInFilter.length - 1].split('/').slice(0,2).join('/');
+                        displayDate = `Từ ${first} đến ${last}`;
+                    } else {
+                        displayDate = datesInFilter[0].split('/').slice(0,2).join('/');
+                    }
+                }
+            } else if (item._parsedDate) {
+                displayDate = item._parsedDate.split('/').slice(0,2).join('/');
+                sortTime = parseDateToTime(item._parsedDate);
+            }
+
+            if(x > 0) detailedItems.push({date: displayDate, sortTime, type: 'XSKT', rev: x, com: x*0.1, bonus: 0, net: x - x*0.1});
         });
 
-        detailedItems.sort((a, b) => parseDateToTime(a.date) - parseDateToTime(b.date));
+        detailedItems.sort((a, b) => a.sortTime - b.sortTime);
 
         const c = { ldb: t.lotoDB * 0.08, lc: t.loCap * 0.1, c2: t.c227 * 0.1, c3: t.c323 * 0.1, x: t.xskt * 0.1 };
         state.baseTongDT = t.lotoDB + t.loCap + t.c227 + t.c323 + t.xskt;
@@ -1667,9 +1831,8 @@
         } else {
             let rowsHtml = '';
             d.detailedItems.forEach(it => {
-                const shortDate = it.date.replace(/\/20(\d{2})/, '/$1');
                 rowsHtml += `<tr>
-                    <td style="text-align:left; padding-left:6px; white-space: normal;">${shortDate} - <b>${it.type}</b></td>
+                    <td style="text-align:left; padding-left:6px; white-space: normal;">${it.date} - <b>${it.type}</b></td>
                     <td>${formatNumberHiddenK(it.rev)}</td>
                     <td>${formatNumberHiddenK(it.com)}</td>
                     <td>${it.bonus > 0 ? formatNumberHiddenK(it.bonus) : '-'}</td>
@@ -2406,6 +2569,16 @@
     DOM.cbSortDesc.onchange = generateSummaryView;
 
     DOM.btnClearRevenueFilter.onclick = () => {
+        if (isPeriodData()) {
+            DOM.regionSelect.value = 'all';
+            DOM.selBranchMode.value = 'all';
+            DOM.cbExcludeNumeric.checked = false;
+            DOM.cbExcludeXSKT.checked = false;
+            DOM.cbSortDesc.checked = false;
+            generateSummaryView();
+            showNotification('Đã xóa tất cả bộ lọc!', 'info');
+            return;
+        }
         DOM.regionSelect.value = 'all';
         DOM.selBranchMode.value = 'all';
         DOM.cbExcludeNumeric.checked = false;
@@ -2728,7 +2901,6 @@
             document.getElementById('cfgGithubPat').value = token;
         }
 
-        // Tự động quét danh mục thư mục tháng thực tế có trong kho GitHub (Không nạp dữ liệu cho đến khi ấn nút)
         autoDetectMonthsFromRepo();
     }
 
