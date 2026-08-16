@@ -23,7 +23,7 @@
             --container-bg: #ffffff;
             --text-color: #201f1e;
             --text-light: #605e5c;
-            --border-color: #e0e0e0;
+            --border-color: #dcdde1;
             --success-color: #107c41;
             --danger-color: #c42b1c;
             --warning-color: #d83b01;
@@ -56,18 +56,15 @@
         h4 { margin-top: 0; text-align: center; color: var(--text-color); font-weight: 600;}
         .report-date { text-align:center; font-weight: 600; margin-top: -5px; margin-bottom: 15px; color: var(--text-light); font-size: 13.5px; }
 
-        /* Logo */
         .simple-animated-logo { text-align: center; margin-bottom: 12px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .main-page-logo { margin-bottom: 15px; margin-top: 5px; }
 
-        /* Panels & Controls */
         .controls-panel { display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; padding: 14px; background: #fafafa; border-radius: 6px; border: 1px solid #dcdde1; }
         label { font-weight: 700; color: var(--text-color); font-size: 13.5px; margin-bottom: 4px; display: block; }
         input[type="text"], input[type="number"], input[type="password"], select, textarea { padding: 9px 12px; border-radius: 4px; border: 1px solid #bbb; width: 100%; font-size: 14px; background: #ffffff; color: var(--text-color); }
         input:focus, textarea:focus, select:focus { border-color: var(--primary-color); outline: none; }
         input[type="file"] { padding: 8px; background: #ffffff; border: 1px dashed #ababab; border-radius: 4px; width: 100%; font-size: 13px; }
 
-        /* Buttons */
         button { cursor: pointer; background: var(--primary-color); color: white; border: none; font-weight: 700; padding: 9px 16px; border-radius: 4px; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         button:hover { background-color: var(--primary-dark); }
         button.secondary { background-color: #ffffff; color: var(--text-color); border: 1px solid #ccc; }
@@ -77,16 +74,16 @@
         button.warning { background-color: var(--warning-color); }
         button.info { background-color: #0078d4; }
 
-        /* Menus & Nav Header */
         .home-menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; margin-bottom: 18px; }
         .home-menu-btn { padding: 12px 10px; font-size: 14px; font-weight: 700; text-align: center; background-color: #ffffff; color: #2c3e50; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .home-menu-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
         .nav-header { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 12px; }
         .back-btn { background-color: var(--primary-color) !important; color: #ffffff !important; padding: 7px 14px !important; font-size: 13px !important; border-radius: 4px !important; }
 
-        /* Table Design */
         #summaryTableContainer { width: 100%; max-height: calc(100vh - 310px); min-height: 350px; overflow: auto; border: 1px solid #ccc; background: #fff; }
-        #reportContainer { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        
+        #reportContainer { width: 100%; max-width: 750px; margin: 0 auto; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        
         table { border-collapse: separate; border-spacing: 0; width: 100%; background: white; margin: 0 auto; }
         th, td { border-right: 1px solid #dcdde1; border-bottom: 1px solid #dcdde1; padding: 8px 6px; text-align: center; vertical-align: middle; font-size: 13.5px; white-space: nowrap; }
         th { background: #107c41; color: #ffffff; font-weight: 700; position: sticky; top: 0; z-index: 20; border-top: none; }
@@ -101,20 +98,23 @@
         .code-cell-highlight { color: var(--primary-color) !important; font-weight: 800 !important; }
         .clickable-agent-code { cursor: pointer !important; }
         .clickable-agent-code:hover { text-decoration: underline !important; }
-        .so-so { font-size: 22px !important; font-weight: 800; color: var(--primary-color); text-align: center; }
-        #tongCongRow { background-color: #eaeaea; color: var(--text-color); font-weight: 700 !important; }
+        
+        .so-so { font-size: 28px !important; font-weight: 900 !important; color: var(--primary-color); text-align: center; letter-spacing: 0.5px; padding: 8px 4px !important; }
+        
+        #tongCongRow { background-color: #eaeaea; color: var(--text-color); font-weight: 800 !important; font-size: 15px !important; }
         .negative-value { color: var(--danger-color); }
         .final-amount-positive { background-color: var(--danger-color) !important; color: #ffffff !important; }
         .final-amount-negative { background-color: var(--success-color) !important; color: #ffffff !important; }
-        tr.final-amount-positive td, tr.final-amount-negative td { font-size: 20px !important; font-weight: 700; padding: 12px 6px !important; }
+        tr.final-amount-positive td, tr.final-amount-negative td { font-size: 26px !important; font-weight: 900; padding: 10px 4px !important; }
 
         .report-table { width: 100%; max-width: 100%; table-layout: auto; }
-        .report-table th, .report-table td { padding: 8px 4px; font-size: 13.5px; }
+        .report-table th { padding: 9px 4px; font-size: 14px; font-weight: 800; }
+        .report-table td { padding: 7.5px 4px; font-size: 14px; font-weight: 600; }
 
         .dynamic-input { width: 100%; border: none !important; background: transparent !important; font-family: inherit; font-size: inherit; font-weight: bold; text-align: center; padding: 5px; outline: none !important; color: inherit; box-shadow: none !important; }
-        #actionButtonContainer { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        #actionButtonContainer { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; max-width: 750px; margin-left: auto; margin-right: auto; }
         #actionChoices { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; grid-column: 1 / -1; }
-        .bang-chu-cell { text-align: center !important; font-style: italic; padding: 8px 12px !important; font-size: 13px; color: var(--text-light); background: #fff !important; white-space: normal !important; }
+        .bang-chu-cell { text-align: center !important; font-style: italic; padding: 8px 6px !important; font-size: 13.5px !important; color: #444; background: #fff !important; white-space: normal !important; line-height: 1.35; }
 
         .sell-row-container { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
         .sell-row-container > label { min-width: 80px; margin: 0; }
@@ -140,7 +140,6 @@
             border: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* --- GIAO DIỆN LỊCH WINDOWS STYLE CHUẨN --- */
         .win-calendar-box {
             background: #202020 !important;
             color: #ffffff !important;
@@ -182,9 +181,7 @@
             color: #aaaaaa !important;
             margin-bottom: 6px !important;
         }
-        .win-calendar-weekdays div {
-            padding: 4px 0 !important;
-        }
+        .win-calendar-weekdays div { padding: 4px 0 !important; }
 
         .win-calendar-grid {
             display: grid !important;
@@ -223,7 +220,6 @@
         }
         .win-cal-cell.dimmed { color: #555555 !important; }
 
-        /* Responsive Mobile */
         @media (max-width: 768px) {
             body { padding: 0 !important; background-color: #ffffff; }
             #mainPage, #homePage { border: none !important; border-radius: 0 !important; box-shadow: none !important; padding: 10px 8px !important; width: 100% !important; max-width: 100% !important; }
@@ -231,19 +227,18 @@
             .home-menu-grid { margin-top: 10px; margin-bottom: 14px; gap: 8px; }
             .home-menu-btn { padding: 10px 6px; font-size: 13px; }
             #summaryTableContainer { max-height: calc(100vh - 270px); border-left: none; border-right: none; }
+            #reportContainer { max-width: 100% !important; }
             th, td { padding: 8px 3px !important; font-size: 13px !important; }
-            .report-table th, .report-table td { padding: 7px 2px !important; font-size: 12.5px !important; }
+            .report-table th, .report-table td { padding: 7px 2px !important; font-size: 13.5px !important; }
             .summary-actions-bottom { margin-top: 12px; gap: 6px; }
             .summary-actions-bottom button { font-size: 13.5px; padding: 10px 2px; }
         }
 
-        /* Config Card UI */
         .cfg-card { background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
         .cfg-field { margin-bottom: 12px; }
         .cfg-field label { font-size: 13px; color: #555; margin-bottom: 4px; }
         .cfg-item-row { display: flex; gap: 8px; align-items: center; background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 5px; padding: 8px 10px; }
 
-        /* Preview Modal & Notification */
         #notification-area { position: fixed; top: 20px; right: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; }
         .notification { padding: 14px 22px; border-radius: 10px; color: white; font-size: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); opacity: 0; transform: translateX(50px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-weight: 600; }
         .notification.show { opacity: 1; transform: translateX(0); }
@@ -261,51 +256,23 @@
         .preview-image-item img { width: 100%; display: block; border-radius: 4px; -webkit-touch-callout: default !important; user-select: auto !important; -webkit-user-select: auto !important; }
         .page-number { text-align: center; font-weight: bold; color: #7f8c8d; margin-bottom: 5px; font-size: 12px; }
 
-        /* Print Styles */
         @media print {
             @page { size: A4; margin: 10mm; }
             body { padding: 0 !important; margin: 0 !important; background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-size: 11pt; }
             body > * { display: none !important; }
-            
             #mainPage, #summarySection, #summaryPrintContainer, #summaryTableContainer { 
-                display: block !important; 
-                width: 100% !important; 
-                margin: 0 !important; 
-                padding: 0 !important; 
-                position: static !important; 
-                visibility: visible !important; 
-                overflow: visible !important; 
-                max-height: none !important; 
-                border: none !important; 
+                display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; 
+                position: static !important; visibility: visible !important; overflow: visible !important; max-height: none !important; border: none !important; 
             }
-
-            table { 
-                width: 100% !important; 
-                border-collapse: collapse !important; 
-                page-break-after: auto;
-            }
+            table { width: 100% !important; border-collapse: collapse !important; page-break-after: auto; }
             tr { page-break-inside: avoid !important; page-break-after: auto; }
             thead { display: table-header-group !important; }
             tfoot { display: table-footer-group !important; }
             tbody { display: table-row-group !important; }
-            
-            th, td { 
-                border: 1px solid #000 !important; 
-                position: static !important;
-            }
+            th, td { border: 1px solid #000 !important; position: static !important; }
             th { background: #107c41 !important; color: white !important; }
-            
-            #summaryTotalRow td { 
-                background-color: #5d4037 !important; 
-                color: white !important; 
-                font-weight: bold !important; 
-                border: 1px solid #000 !important; 
-                position: static !important; 
-            }
-            
-            .controls-panel, .summary-actions-bottom, .home-menu-grid, .nav-header, .simple-animated-logo, #notification-area, #actionButtonContainer { 
-                display: none !important; 
-            }
+            #summaryTotalRow td { background-color: #5d4037 !important; color: white !important; font-weight: bold !important; border: 1px solid #000 !important; position: static !important; }
+            .controls-panel, .summary-actions-bottom, .home-menu-grid, .nav-header, .simple-animated-logo, #notification-area, #actionButtonContainer { display: none !important; }
             #summaryTitle, #summaryDate { text-align: center !important; display: block !important; }
         }
     </style>
@@ -345,7 +312,6 @@
                     </div>
                 </div>
 
-                <!-- Ô CHỌN CÓ LẤY BIỂU 35 HAY KHÔNG -->
                 <div style="margin-top: 8px;">
                     <label style="font-size: 13.5px; cursor: pointer; color: #0078d4; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; margin: 0;">
                         <input type="checkbox" id="cbFetchBieu35Home" checked> Lấy cả Biểu 35 (XSKT)
@@ -395,12 +361,12 @@
             </div>
 
             <div class="controls-panel">
-                <div style="border-bottom: 1px dashed #dcdde1; padding-bottom: 10px;">
+                <div style="border-bottom: 1px dashed #dcdde1; padding-bottom: 10px; position: relative;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <label style="color: #0078d4; margin: 0; cursor: pointer;" onclick="toggleWinCalendar('winCalendarBox')">
+                        <label id="lblWinCalToggle" style="color: #0078d4; margin: 0; cursor: pointer;" onclick="toggleWinCalendar('winCalendarBox', event)">
                             📅 Lọc Ngày (<span id="winCalSelectedCount">Tất cả</span>) ▾
                         </label>
-                        <button class="secondary" style="padding: 3px 8px; font-size: 12px; height: 26px;" onclick="toggleWinCalendar('winCalendarBox')">Đổi ngày</button>
+                        <button id="btnWinCalToggle" class="secondary" style="padding: 3px 8px; font-size: 12px; height: 26px;" onclick="toggleWinCalendar('winCalendarBox', event)">Đổi ngày</button>
                     </div>
 
                     <div id="winCalendarBox" class="win-calendar-box" style="display: none;">
@@ -452,7 +418,6 @@
                 </div>
             </div>
 
-            <!-- Khung bao gồm đầy đủ Tiêu đề, Ngày tháng & Bảng để in/chụp ảnh -->
             <div id="summaryPrintContainer" style="background:#ffffff; padding: 4px; border-radius: 4px;">
                 <h3 id="summaryTitle" style="margin: 5px 0;">Bảng Báo Cáo Tổng Hợp</h3>
                 <h4 id="summaryDate" class="report-date"></h4>
@@ -501,12 +466,12 @@
                 </div>
 
                 <!-- LỊCH TRA CỨU ĐẠI LÝ -->
-                <div id="detailedDatePickerContainer" style="display: none; border-top: 1px dashed #dcdde1; padding-top: 8px; margin-top: 6px;">
+                <div id="detailedDatePickerContainer" style="display: none; border-top: 1px dashed #dcdde1; padding-top: 8px; margin-top: 6px; position: relative;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <label style="font-size: 12.5px; color: #0078d4; margin: 0; font-weight: bold; cursor: pointer;" onclick="toggleWinCalendar('detailedWinCalBox')">
+                        <label id="lblDetailedWinCalToggle" style="font-size: 12.5px; color: #0078d4; margin: 0; font-weight: bold; cursor: pointer;" onclick="toggleWinCalendar('detailedWinCalBox', event)">
                             📅 Lịch Ngày Đang Chọn (<span id="detailedSelectedCount">Tất cả</span>) ▾
                         </label>
-                        <button class="secondary" style="padding: 2px 8px; font-size: 11.5px; height: 24px;" onclick="toggleWinCalendar('detailedWinCalBox')">Đổi ngày</button>
+                        <button id="btnDetailedWinCalToggle" class="secondary" style="padding: 2px 8px; font-size: 11.5px; height: 24px;" onclick="toggleWinCalendar('detailedWinCalBox', event)">Đổi ngày</button>
                     </div>
 
                     <div id="detailedWinCalBox" class="win-calendar-box" style="display: none; margin: 8px auto 0 auto;">
@@ -636,7 +601,7 @@
 
     </div>
 
-    <!-- PREVIEW MODAL GỐC -->
+    <!-- PREVIEW MODAL -->
     <div id="imagePreviewModal" class="modal-overlay">
         <div class="modal-content" style="max-width: 95%; width: auto; background-color: #f8f9fa;">
             <span id="closePreviewModalBtn" class="modal-close-btn">&times;</span>
@@ -842,10 +807,40 @@
         }
     }
 
-    window.toggleWinCalendar = function(boxId) {
+    window.toggleWinCalendar = function(boxId, event) {
+        if (event) event.stopPropagation();
         const box = document.getElementById(boxId);
-        if (box) box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
+        if (box) {
+            const isHidden = (box.style.display === 'none' || !box.style.display);
+            box.style.display = isHidden ? 'block' : 'none';
+        }
     };
+
+    document.addEventListener('click', function(e) {
+        const cal1 = document.getElementById('winCalendarBox');
+        const cal2 = document.getElementById('detailedWinCalBox');
+        if (cal1 && cal1.style.display === 'block') {
+            const isInside = cal1.contains(e.target) || e.target.id === 'btnWinCalToggle' || e.target.id === 'lblWinCalToggle';
+            if (!isInside) cal1.style.display = 'none';
+        }
+        if (cal2 && cal2.style.display === 'block') {
+            const isInside = cal2.contains(e.target) || e.target.id === 'btnDetailedWinCalToggle' || e.target.id === 'lblDetailedWinCalToggle';
+            if (!isInside) cal2.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('touchend', function(e) {
+        const cal1 = document.getElementById('winCalendarBox');
+        const cal2 = document.getElementById('detailedWinCalBox');
+        if (cal1 && cal1.style.display === 'block') {
+            const isInside = cal1.contains(e.target) || e.target.id === 'btnWinCalToggle' || e.target.id === 'lblWinCalToggle';
+            if (!isInside) cal1.style.display = 'none';
+        }
+        if (cal2 && cal2.style.display === 'block') {
+            const isInside = cal2.contains(e.target) || e.target.id === 'btnDetailedWinCalToggle' || e.target.id === 'lblDetailedWinCalToggle';
+            if (!isInside) cal2.style.display = 'none';
+        }
+    });
 
     window.navWinCalendar = function(dir, type) {
         let view = type === 'summary' ? summaryCalView : detailedCalView;
@@ -872,8 +867,11 @@
             return;
         }
         globalSelectedDates = isSelectAll ? [...globalAllDates] : [];
+        currentSearchSelectedDates = [...globalSelectedDates];
         renderWinCalendarGrid();
+        renderDetailedWinCalendar();
         generateSummaryView();
+        if (state.currentSoSo) createReport();
     };
 
     function renderWinCalendarGrid() {
@@ -906,9 +904,13 @@
             const idx = globalSelectedDates.indexOf(matchedDate);
             if (idx > -1) globalSelectedDates.splice(idx, 1);
             else globalSelectedDates.push(matchedDate);
+            
+            currentSearchSelectedDates = [...globalSelectedDates];
             cell.classList.toggle('active');
             countTxt.textContent = globalSelectedDates.length === globalAllDates.length ? "Tất cả" : `${globalSelectedDates.length} ngày`;
             generateSummaryView();
+            renderDetailedWinCalendar();
+            if (state.currentSoSo) createReport();
         };
 
         for (let i = startOffset - 1; i >= 0; i--) {
@@ -964,19 +966,22 @@
             showNotification("Dữ liệu là tổng hợp cả kỳ, không thể tách lọc ngày!", "warning");
             return;
         }
-        currentSearchSelectedDates = isSelectAll ? [...currentSearchAllDates] : [];
+        currentSearchSelectedDates = isSelectAll ? [...globalAllDates] : [];
+        globalSelectedDates = [...currentSearchSelectedDates];
         renderDetailedWinCalendar();
-        if (DOM.reportContainer.innerHTML !== '') createReport();
+        renderWinCalendarGrid();
+        generateSummaryView();
+        if (state.currentSoSo) createReport();
     };
 
     function renderDetailedWinCalendar() {
         const grid = document.getElementById('detailedWinCalGrid');
         const countTxt = document.getElementById('detailedSelectedCount');
         const monthYearTxt = document.getElementById('detailedWinCalMonthYear');
-        if (!grid || currentSearchAllDates.length === 0) return;
+        if (!grid || globalAllDates.length === 0) return;
         grid.innerHTML = '';
 
-        countTxt.textContent = currentSearchSelectedDates.length === currentSearchAllDates.length ? "Tất cả" : `${currentSearchSelectedDates.length} ngày`;
+        countTxt.textContent = currentSearchSelectedDates.length === globalAllDates.length ? "Tất cả" : `${currentSearchSelectedDates.length} ngày`;
 
         const year = detailedCalView.year;
         const month = detailedCalView.month;
@@ -999,9 +1004,13 @@
             const idx = currentSearchSelectedDates.indexOf(matchedDate);
             if (idx > -1) currentSearchSelectedDates.splice(idx, 1);
             else currentSearchSelectedDates.push(matchedDate);
+            
+            globalSelectedDates = [...currentSearchSelectedDates];
             cell.classList.toggle('active');
-            countTxt.textContent = currentSearchSelectedDates.length === currentSearchAllDates.length ? "Tất cả" : `${currentSearchSelectedDates.length} ngày`;
-            if (DOM.reportContainer.innerHTML !== '') createReport();
+            countTxt.textContent = currentSearchSelectedDates.length === globalAllDates.length ? "Tất cả" : `${currentSearchSelectedDates.length} ngày`;
+            renderWinCalendarGrid();
+            generateSummaryView();
+            if (state.currentSoSo) createReport();
         };
 
         for (let i = startOffset - 1; i >= 0; i--) {
@@ -1010,7 +1019,7 @@
             cell.className = 'win-cal-cell dimmed'; 
             cell.textContent = dayNum; 
 
-            const matchedDate = matchDateString(dayNum, prevM, prevY, currentSearchAllDates);
+            const matchedDate = matchDateString(dayNum, prevM, prevY, globalAllDates);
             if (matchedDate) {
                 cell.classList.add('has-data');
                 if (currentSearchSelectedDates.includes(matchedDate)) cell.classList.add('active');
@@ -1024,7 +1033,7 @@
             cell.className = 'win-cal-cell'; 
             cell.textContent = day;
 
-            const matchedDate = matchDateString(day, month, year, currentSearchAllDates);
+            const matchedDate = matchDateString(day, month, year, globalAllDates);
             if (matchedDate) {
                 cell.classList.add('has-data');
                 if (currentSearchSelectedDates.includes(matchedDate)) cell.classList.add('active');
@@ -1042,7 +1051,7 @@
             cell.className = 'win-cal-cell dimmed'; 
             cell.textContent = i; 
 
-            const matchedDate = matchDateString(i, nextM, nextY, currentSearchAllDates);
+            const matchedDate = matchDateString(i, nextM, nextY, globalAllDates);
             if (matchedDate) {
                 cell.classList.add('has-data');
                 if (currentSearchSelectedDates.includes(matchedDate)) cell.classList.add('active');
@@ -1085,14 +1094,23 @@
         
         if (allParsedDates.size > 0) {
             globalAllDates = Array.from(allParsedDates).sort();
-            globalSelectedDates = [...globalAllDates];
+            if (globalSelectedDates.length === 0) {
+                globalSelectedDates = [...globalAllDates];
+            } else {
+                globalSelectedDates = globalSelectedDates.filter(d => globalAllDates.includes(d));
+                if (globalSelectedDates.length === 0) globalSelectedDates = [...globalAllDates];
+            }
+            currentSearchSelectedDates = [...globalSelectedDates];
             dateRangeText = getFormattedDateRange(globalSelectedDates);
 
             const lastDate = globalAllDates[globalAllDates.length - 1];
             const p = lastDate.split('/');
             summaryCalView.month = parseInt(p[1], 10);
             summaryCalView.year = p.length === 3 ? (parseInt(p[2], 10) < 100 ? parseInt(p[2], 10) + 2000 : parseInt(p[2], 10)) : 2026;
+            detailedCalView = { ...summaryCalView };
+
             renderWinCalendarGrid();
+            renderDetailedWinCalendar();
         }
     }
 
@@ -1210,7 +1228,6 @@
         }
     });
 
-    // Đồng bộ checkbox Lấy Biểu 35 giữa 2 màn hình
     DOM.cbFetchBieu35Home.onchange = function() {
         if (DOM.cbFetchBieu35Main) DOM.cbFetchBieu35Main.checked = this.checked;
     };
@@ -1219,7 +1236,6 @@
         handleMainMonthChange();
     };
 
-    // --- 1. TỰ ĐỘNG QUÉT DANH MỤC THÁNG THỰC TẾ TỪ GITHUB & SẮP XẾP ---
     async function autoDetectMonthsFromRepo() {
         const pat = localStorage.getItem('github_pat') || '';
         const headers = pat ? { 'Authorization': `Bearer ${pat}` } : {};
@@ -1298,7 +1314,6 @@
         return fileList;
     }
 
-    // --- 2. QUÉT & TẢI GỘP NHIỀU THÁNG TỪ "FROM_MONTH" ĐẾN "TO_MONTH" ---
     async function autoFetchDataRange(fromMonth, toMonth) {
         if (!fromMonth || !toMonth) return;
 
@@ -1326,7 +1341,6 @@
 
         try {
             for (const monthFolder of selectedMonths) {
-                // 1. Quét nạp Biểu 31 (Lô tô)
                 const list31 = await fetchFilesFromFolder(`31/${monthFolder}`);
                 for (const url of list31) {
                     try {
@@ -1350,7 +1364,6 @@
                     } catch (err) {}
                 }
 
-                // 2. Quét nạp Biểu 35 (XSKT) - CHỈ TẢI NẾU ĐƯỢC CHỌN
                 if (shouldFetchBieu35) {
                     const list35 = await fetchFilesFromFolder(`35/${monthFolder}`);
                     for (const url of list35) {
@@ -1568,7 +1581,6 @@
         let globalDateDisplay = getFormattedDateRange(globalSelectedDates);
         let xsktDateLine = '';
 
-        // Chỉ hiển thị dòng XSKT khi file Biểu 35 là dạng báo cáo gộp cố định cả kỳ
         const isB35Period = excelData2.some(r => Array.isArray(r._parsedDate) && r._parsedDate.length > 1);
         if (hasXSKT && isB35Period && bieu35DateRange && bieu35DateRange !== globalDateDisplay) {
             xsktDateLine = `<br><span style="font-size:12.5px; color:#e67e22; font-weight:700;">📅 XSKT: ${bieu35DateRange}</span>`;
@@ -1632,15 +1644,19 @@
 
         DOM.detailedDatePickerContainer.style.display = 'block';
         currentSearchAllDates = Array.from(availableDates).sort();
-        if (currentSearchAgentCode !== baseId) {
-            currentSearchAgentCode = baseId;
+        currentSearchAgentCode = baseId;
+        
+        if (globalSelectedDates.length > 0) {
+            currentSearchSelectedDates = [...globalSelectedDates];
+        } else {
             currentSearchSelectedDates = [...currentSearchAllDates];
-            
-            const lastDate = currentSearchAllDates[currentSearchAllDates.length - 1];
-            const p = lastDate.split('/');
-            detailedCalView.month = parseInt(p[1], 10);
-            detailedCalView.year = p.length === 3 ? (parseInt(p[2], 10) < 100 ? parseInt(p[2], 10) + 2000 : parseInt(p[2], 10)) : 2026;
         }
+
+        const lastDate = currentSearchAllDates[currentSearchAllDates.length - 1];
+        const p = lastDate.split('/');
+        detailedCalView.month = parseInt(p[1], 10);
+        detailedCalView.year = p.length === 3 ? (parseInt(p[2], 10) < 100 ? parseInt(p[2], 10) + 2000 : parseInt(p[2], 10)) : 2026;
+        
         renderDetailedWinCalendar();
     });
 
@@ -1660,7 +1676,6 @@
         }
     });
 
-    // LẮNG NGHE THAY ĐỔI CỦA BỘ LỌC CHI TIẾT
     DOM.selBranchMode_Detailed.addEventListener('change', function() {
         if (!DOM.soSoInput.value.trim()) return;
         if (state.currentSoSo) createReport();
@@ -1842,13 +1857,15 @@
         const agentName = [...state.accountCodes].join(', ') || state.currentSoSo;
         const reportDate = getFormattedDateRange(currentSearchSelectedDates);
 
+        let tableContentHtml = '';
+
         if (currentReportType === 'summary') {
-            DOM.reportContainer.innerHTML = `
+            tableContentHtml = `
             <table class="report-table" style="border: 1px solid var(--border-color); width: 100%;">
                 <colgroup><col style="width: 34%;"><col style="width: 33%;"><col style="width: 33%;"></colgroup>
                 <tbody>
-                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="2" class="so-so">${agentName}</td></tr>
-                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="2" style="font-weight:600;">${reportDate}</td></tr>
+                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="2" class="so-so" style="font-size: 28px !important; font-weight: 900 !important;">${agentName}</td></tr>
+                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="2" style="font-weight:700; font-size:14.5px;">${reportDate}</td></tr>
                     <tr style="background:#107c41; color:#fff;"><th>Loại hình</th><th>Doanh thu</th><th>Hoa hồng</th></tr>
                     <tr><td>Lôtô ĐB</td><td>${formatNumberHiddenK(d.t.lotoDB)}</td><td>${formatNumberHiddenK(d.c.ldb)}</td></tr>
                     <tr><td>Lôtô cặp</td><td>${formatNumberHiddenK(d.t.loCap)}</td><td>${formatNumberHiddenK(d.c.lc)}</td></tr>
@@ -1858,35 +1875,37 @@
                     <tr id="tongCongRow"><td>Tổng</td><td id="tongDT"></td><td id="tongHH"></td></tr>
                     <tr id="mainBonusRow" style="background-color: var(--success-color); color: white; font-weight: bold;"><td>Thưởng</td><td colspan="2">${formatNumberHiddenK(state.baseThuong)}</td></tr>
                     <tr id="finalResultRow"><td id="ketQuaLabel"></td><td colspan="2" id="ketQuaValue"></td></tr>
-                    <tr id="bangChuRow"><td class="header" style="font-size:12px;">Bằng chữ</td><td colspan="2" id="ketQuaBangChu" class="bang-chu-cell"></td></tr>
+                    <tr id="bangChuRow"><td class="header" style="font-size:13px;">Bằng chữ</td><td colspan="2" id="ketQuaBangChu" class="bang-chu-cell"></td></tr>
                 </tbody>
             </table>`;
         } else {
             let rowsHtml = '';
             d.detailedItems.forEach(it => {
                 rowsHtml += `<tr>
-                    <td style="text-align:left; padding-left:6px; white-space: normal;">${it.date} - <b>${it.type}</b></td>
+                    <td style="text-align:left; padding-left:6px; white-space: nowrap; font-size: 13.5px;">${it.date} - <b>${it.type}</b></td>
                     <td>${formatNumberHiddenK(it.rev)}</td>
                     <td>${formatNumberHiddenK(it.com)}</td>
                     <td>${it.bonus > 0 ? formatNumberHiddenK(it.bonus) : '-'}</td>
                     <td style="font-weight:bold; color:${it.net>=0?'var(--danger-color)':'var(--success-color)'};">${formatNumberHiddenK(it.net)}</td>
                 </tr>`;
             });
-            DOM.reportContainer.innerHTML = `
+            tableContentHtml = `
             <table class="report-table" style="border: 1px solid var(--border-color); width: 100%;">
-                <colgroup><col style="width: 28%;"><col style="width: 19%;"><col style="width: 16%;"><col style="width: 16%;"><col style="width: 21%;"></colgroup>
+                <colgroup><col style="width: 35%;"><col style="width: 17%;"><col style="width: 15%;"><col style="width: 15%;"><col style="width: 18%;"></colgroup>
                 <tbody>
-                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="4" class="so-so">${agentName}</td></tr>
-                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="4" style="font-weight:600;">${reportDate}</td></tr>
+                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="4" class="so-so" style="font-size: 28px !important; font-weight: 900 !important;">${agentName}</td></tr>
+                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="4" style="font-weight:700; font-size:14px;">${reportDate}</td></tr>
                     <tr style="background:#107c41; color:#fff;"><th>Ngày/Loại</th><th>D.Thu</th><th>H.Hồng</th><th>Thưởng</th><th>Nộp/Lấy</th></tr>
                     ${rowsHtml}
-                    <tr id="tongCongRow" style="font-weight:bold; background:#eaeaea;"><td>Tổng</td><td id="tongDT"></td><td id="tongHH"></td><td>${formatNumberHiddenK(state.baseThuong)}</td><td></td></tr>
+                    <tr id="tongCongRow" style="font-weight:bold; background:#eaeaea;"><td>Tổng</td><td id="tongDT"></td><td id="tongHH"></td><td></td><td></td></tr>
                     <tr id="mainBonusRow" style="background-color: var(--success-color); color: white; font-weight: bold;"><td>Thưởng</td><td colspan="4">${formatNumberHiddenK(state.baseThuong)}</td></tr>
                     <tr id="finalResultRow"><td id="ketQuaLabel"></td><td colspan="4" id="ketQuaValue"></td></tr>
-                    <tr id="bangChuRow"><td class="header" style="font-size:12px;">Bằng chữ</td><td colspan="4" id="ketQuaBangChu" class="bang-chu-cell"></td></tr>
+                    <tr id="bangChuRow"><td class="header" style="font-size:13px;">Bằng chữ</td><td colspan="4" id="ketQuaBangChu" class="bang-chu-cell"></td></tr>
                 </tbody>
             </table>`;
         }
+
+        DOM.reportContainer.innerHTML = tableContentHtml;
 
         renderAddedTickets();
         updateDetailedView();
@@ -2225,11 +2244,12 @@
         return `${soso}_${safeDate}`;
     }
 
-    async function splitCanvasToCanvases(canvas, targetTable, rootElement) {
+    async function splitCanvasToA4Canvases(canvas, targetTable, rootElement) {
         const canvases = []; 
         const contentWidth = canvas.width; 
         const totalHeight = canvas.height; 
-        const pageHeight = Math.floor(contentWidth * 1.414);
+        const pageHeight = Math.floor(contentWidth * 1.4142);
+        
         let theadH_inCanvas = 0; 
         let theadY_inCanvas = 0;
         if (targetTable && rootElement) {
@@ -2239,7 +2259,7 @@
                 const theadRect = thead.getBoundingClientRect();
                 const relativeY = theadRect.top - rootRect.top; 
                 const scale = 2; 
-                const adjustment = 5;
+                const adjustment = 2;
                 theadY_inCanvas = Math.max(0, (relativeY - adjustment) * scale); 
                 theadH_inCanvas = (thead.offsetHeight + adjustment) * scale;
             }
@@ -2250,7 +2270,8 @@
         let pageIndex = 0; 
         const scale = 2; 
         let tableRows = [];
-        if (targetTable) {
+        
+        if (targetTable && rootElement) {
             const rows = targetTable.querySelectorAll('tbody tr'); 
             const rootRect = rootElement.getBoundingClientRect();
             rows.forEach(tr => { 
@@ -2267,14 +2288,17 @@
                 tableRows.push({ top, bottom }); 
             });
         }
+        
         while (currentY < totalHeight) {
             const isFirstPage = (pageIndex === 0); 
             const availableContentHeight = isFirstPage ? pageHeight : (pageHeight - repeatHeaderHeight);
             let splitPoint = Math.min(currentY + availableContentHeight, totalHeight);
+            
             if (splitPoint < totalHeight && tableRows.length > 0) { 
                 const splittingRow = tableRows.find(row => row.top < splitPoint && row.bottom > splitPoint); 
                 if (splittingRow && splittingRow.top > currentY) splitPoint = splittingRow.top; 
             }
+            
             let sliceHeight = splitPoint - currentY;
             const pageCanvas = document.createElement('canvas'); 
             pageCanvas.width = contentWidth; 
@@ -2282,9 +2306,13 @@
             const ctx = pageCanvas.getContext('2d'); 
             ctx.fillStyle = "#ffffff"; 
             ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-            if (!isFirstPage && repeatHeaderHeight > 0) ctx.drawImage(canvas, 0, repeatHeaderSourceY, contentWidth, repeatHeaderHeight, 0, 0, contentWidth, repeatHeaderHeight);
+            
+            if (!isFirstPage && repeatHeaderHeight > 0) {
+                ctx.drawImage(canvas, 0, repeatHeaderSourceY, contentWidth, repeatHeaderHeight, 0, 0, contentWidth, repeatHeaderHeight);
+            }
             const destY = isFirstPage ? 0 : repeatHeaderHeight; 
             ctx.drawImage(canvas, 0, currentY, contentWidth, sliceHeight, 0, destY, contentWidth, sliceHeight);
+            
             canvases.push(pageCanvas); 
             currentY = splitPoint; 
             pageIndex++;
@@ -2338,163 +2366,109 @@
     }
 
     async function copyElementAsImage(sel, msg, btn) {
-        const el = document.querySelector(sel); 
-        if(!el || !el.innerHTML.trim()) return showNotification("Chưa có nội dung!", 'info');
         const oldTxt = btn ? btn.textContent : ''; 
         if(btn) btn.textContent = 'Đang xử lý...';
-        if(sel === '#reportContainer') { 
-            el.classList.add('capturing-image'); 
-            await new Promise(r => setTimeout(r, 100)); 
-        }
 
-        const delBtns = el.querySelectorAll('.remove-ticket-btn');
-        delBtns.forEach(b => b.style.display = 'none');
-
-        const hiddenEls = [el.querySelector('.summary-actions-bottom'), el.querySelector('.controls-panel'), document.getElementById('actionButtonContainer'), document.getElementById('sellTicketControls'), el.querySelector('.nav-header'), document.querySelector('.home-menu-grid')].filter(Boolean);
-        hiddenEls.forEach(e => e.style.display = 'none');
-
-        const footer = document.createElement('div'); 
-        footer.innerText = "© 2026 ZENG FINANCE";
-        footer.style.width = "100%"; 
-        footer.style.textAlign = "center"; 
-        footer.style.marginTop = "20px"; 
-        footer.style.padding = "10px 0"; 
-        footer.style.fontSize = "14px"; 
-        footer.style.fontWeight = "bold"; 
-        footer.style.color = "#7f8c8d"; 
-        footer.style.backgroundColor = "#ffffff";
-        el.appendChild(footer);
-
-        const inputsToFreeze = el.querySelectorAll('input.dynamic-input, textarea.dynamic-input'); 
-        const frozenState = [];
-        inputsToFreeze.forEach(input => {
-            const val = input.value || ''; 
-            const parent = input.parentNode;
-            if(parent) {
-                const replacement = document.createElement('div'); 
-                replacement.textContent = val;
-                const computedStyle = window.getComputedStyle(input);
-                replacement.style.cssText = `color:${computedStyle.color}; font-weight:bold; text-align:center; width:100%; font-size:inherit; display:flex; align-items:center; justify-content:center; padding:20px 0; white-space:pre-wrap; line-height:1.5;`;
-                frozenState.push({ input, replacement, parent, nextSibling: input.nextSibling }); 
-                parent.removeChild(input); 
-                parent.appendChild(replacement);
+        // 1. COPY BÁO CÁO CÁ NHÂN ĐẠI LÝ (Khung 360px nhỏ gọn, ôm khít 100%, khử triệt để khoảng trắng)
+        if (sel === '#reportContainer') {
+            const reportTable = document.querySelector('#reportContainer table');
+            if(!reportTable || !reportTable.innerHTML.trim()) {
+                if(btn) btn.textContent = oldTxt;
+                return showNotification("Chưa có nội dung!", 'info');
             }
-        });
 
-        const tableContainer = document.getElementById('summaryTableContainer'); 
-        const reportContainer = document.getElementById('reportContainer'); 
-        let targetContainer = (sel.includes('summary') && tableContainer) ? tableContainer : (sel === '#reportContainer' ? reportContainer : null);
-        let targetTable = targetContainer ? targetContainer.querySelector('table') : null;
-        const originalStyles = { maxHeight: '', overflowX: '', overflowY: '', width: '' }; 
-        let stickyElements = [];
+            const inputsToFreeze = reportTable.querySelectorAll('input.dynamic-input, textarea.dynamic-input'); 
+            const frozenState = [];
+            inputsToFreeze.forEach(input => {
+                const val = input.value || ''; 
+                const parent = input.parentNode;
+                if(parent) {
+                    const replacement = document.createElement('div'); 
+                    replacement.textContent = val;
+                    const computedStyle = window.getComputedStyle(input);
+                    replacement.style.cssText = `color:${computedStyle.color}; font-weight:bold; text-align:center; width:100%; font-size:inherit; display:flex; align-items:center; justify-content:center; padding:12px 0; white-space:pre-wrap; line-height:1.4;`;
+                    frozenState.push({ input, replacement, parent, nextSibling: input.nextSibling }); 
+                    parent.removeChild(input); 
+                    parent.appendChild(replacement);
+                }
+            });
 
-        if (targetContainer) {
-            originalStyles.maxHeight = targetContainer.style.maxHeight; 
-            originalStyles.overflowX = targetContainer.style.overflowX; 
-            originalStyles.overflowY = targetContainer.style.overflowY;
-            targetContainer.style.setProperty('max-height', 'none', 'important');
-            targetContainer.style.setProperty('overflow', 'visible', 'important');
-            stickyElements = Array.from(targetContainer.querySelectorAll('th, #summaryTotalRow td'));
-            stickyElements.forEach(elem => { elem.dataset.originalPosition = elem.style.position; elem.style.position = 'static'; elem.style.borderTop = '1px solid #dfe6e9'; });
-            
-            const realWidth = targetTable ? targetTable.scrollWidth : targetContainer.scrollWidth;
-            targetContainer.style.width = realWidth + 'px';
-            el.style.width = realWidth + 'px';
-        }
+            const cloneWrapper = document.createElement('div');
+            cloneWrapper.style.position = 'fixed';
+            cloneWrapper.style.left = '-9999px';
+            cloneWrapper.style.top = '0';
+            cloneWrapper.style.width = '360px';
+            cloneWrapper.style.height = 'auto';
+            cloneWrapper.style.background = '#ffffff';
+            cloneWrapper.style.padding = '0';
+            cloneWrapper.style.margin = '0';
+            cloneWrapper.style.boxSizing = 'border-box';
+            cloneWrapper.style.display = 'block';
 
-        setTimeout(async()=>{
-            try {
-                window.scrollTo(0,0);
-                const captureWidth = targetTable ? Math.max(targetTable.scrollWidth, el.scrollWidth) : el.scrollWidth;
-                const captureHeight = el.scrollHeight;
+            const clonedTable = reportTable.cloneNode(true);
+            clonedTable.style.width = '100%';
+            clonedTable.style.margin = '0';
+            clonedTable.style.tableLayout = 'auto';
+            clonedTable.querySelectorAll('.remove-ticket-btn').forEach(b => b.remove());
+            cloneWrapper.appendChild(clonedTable);
 
-                const canvas = await html2canvas(el, { 
-                    backgroundColor: "#ffffff", 
-                    scale: 2, 
-                    useCORS: true, 
-                    scrollY: 0, 
-                    x: 0, 
-                    y: 0, 
-                    width: captureWidth, 
-                    height: captureHeight,
-                    windowWidth: captureWidth + 50
-                });
-                
-                if(sel === '#reportContainer') el.classList.remove('capturing-image');
-                frozenState.forEach(({ input, replacement, parent, nextSibling }) => { 
-                    if(parent.contains(replacement)) parent.removeChild(replacement); 
-                    if(nextSibling) parent.insertBefore(input, nextSibling); 
-                    else parent.appendChild(input); 
-                });
+            const footer = document.createElement('div'); 
+            footer.innerText = "© 2026 ZENG FINANCE";
+            footer.style.width = "100%"; 
+            footer.style.textAlign = "center"; 
+            footer.style.margin = "0"; 
+            footer.style.padding = "3px 0 2px 0"; 
+            footer.style.fontSize = "8.5px"; 
+            footer.style.fontWeight = "700"; 
+            footer.style.color = "#aaaaaa"; 
+            footer.style.backgroundColor = "#ffffff";
+            footer.style.lineHeight = "1";
+            cloneWrapper.appendChild(footer);
 
-                const limitHeight = canvas.width * 2; 
-                const previewHolder = document.getElementById('imagePreviewHolder'); 
-                previewHolder.innerHTML = ''; 
-                currentGeneratedImages = [];
-                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-                const instructText = isIOS ? 'Nhấn giữ ảnh dưới đây -> Chọn "Sao chép" để dán vào Zalo' : 'Click chuột phải / nhấn giữ để sao chép';
+            document.body.appendChild(cloneWrapper);
 
-                if (canvas.height > limitHeight && sel !== '#reportContainer') {
-                    const canvases = await splitCanvasToCanvases(canvas, targetTable, el);
+            setTimeout(async()=>{
+                try {
+                    const rect = cloneWrapper.getBoundingClientRect();
+                    const targetW = 360;
+                    const targetH = Math.ceil(rect.height);
 
-                    if (canvases.length <= 3) {
-                        const mergedCanvas = mergeCanvases(canvases);
-                        const imgSrc = mergedCanvas.toDataURL('image/png');
-                        currentGeneratedImages = [imgSrc];
+                    const rawCanvas = await html2canvas(cloneWrapper, { 
+                        backgroundColor: "#ffffff", 
+                        scale: 2, 
+                        useCORS: true, 
+                        scrollY: 0, 
+                        scrollX: 0, 
+                        x: 0, 
+                        y: 0, 
+                        width: targetW, 
+                        height: targetH,
+                        windowWidth: targetW,
+                        windowHeight: targetH
+                    });
 
-                        const showPreviewModal = () => {
-                            const div = document.createElement('div');
-                            div.className = 'preview-image-item';
-                            div.innerHTML = `<div class="page-number">Ảnh ghép từ ${canvases.length} trang (${instructText})</div><img src="${imgSrc}">`;
-                            previewHolder.appendChild(div);
+                    frozenState.forEach(({ input, replacement, parent, nextSibling }) => { 
+                        if(parent.contains(replacement)) parent.removeChild(replacement); 
+                        if(nextSibling) parent.insertBefore(input, nextSibling); 
+                        else parent.appendChild(input); 
+                    });
 
-                            DOM.btnSaveAllImages.textContent = '💾 TẢI ẢNH VỀ MÁY';
-                            DOM.btnSaveAllImages.style.display = 'inline-block';
-                            if (navigator.share) { DOM.btnShareImage.style.display = 'inline-block'; } else { DOM.btnShareImage.style.display = 'none'; }
-                            DOM.imagePreviewModal.style.display = 'block';
-                        };
+                    const finalCanvas = document.createElement('canvas');
+                    finalCanvas.width = targetW * 2;
+                    finalCanvas.height = targetH * 2;
+                    const ctx = finalCanvas.getContext('2d');
+                    ctx.fillStyle = "#ffffff";
+                    ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+                    ctx.drawImage(rawCanvas, 0, 0, targetW * 2, targetH * 2, 0, 0, targetW * 2, targetH * 2);
 
-                        if (navigator.clipboard && navigator.clipboard.write) {
-                            const copyPromise = new Promise((resolve, reject) => {
-                                try {
-                                    mergedCanvas.toBlob((blob) => {
-                                        if (blob) resolve(blob);
-                                        else reject(new Error("Không thể chuyển đổi ảnh"));
-                                    }, 'image/png');
-                                } catch (e) { reject(e); }
-                            });
-
-                            navigator.clipboard.write([
-                                new ClipboardItem({ 'image/png': copyPromise })
-                            ]).then(() => {
-                                showNotification('Đã ghép ' + canvases.length + ' trang thành 1 ảnh và sao chép vào Clipboard!', 'success');
-                                DOM.imagePreviewModal.style.display = 'none';
-                            }).catch((err) => {
-                                console.warn("Lỗi ghi clipboard:", err);
-                                showPreviewModal();
-                            });
-                        } else {
-                            showPreviewModal();
-                        }
-                    } else {
-                        const images = canvases.map(c => c.toDataURL('image/png'));
-                        currentGeneratedImages = images;
-                        images.forEach((imgSrc, index) => {
-                            const div = document.createElement('div');
-                            div.className = 'preview-image-item';
-                            div.innerHTML = `<div class="page-number">Trang ${index + 1}/${images.length} (${instructText})</div><img src="${imgSrc}">`;
-                            previewHolder.appendChild(div);
-                        });
-                        showNotification(`Đã chia thành ${images.length} trang`, 'info');
-                        DOM.btnSaveAllImages.textContent = '💾 TẢI TẤT CẢ ẢNH';
-                        DOM.btnSaveAllImages.style.display = 'inline-block';
-                        if (navigator.share) { DOM.btnShareImage.style.display = 'inline-block'; } else { DOM.btnShareImage.style.display = 'none'; }
-                        DOM.imagePreviewModal.style.display = 'block';
-                    }
-                } else {
-                    const imgSrc = canvas.toDataURL('image/png'); 
+                    const imgSrc = finalCanvas.toDataURL('image/png'); 
                     currentGeneratedImages = [imgSrc];
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                    const instructText = isIOS ? 'Nhấn giữ ảnh dưới đây -> Chọn "Sao chép" để dán vào Zalo' : 'Click chuột phải / nhấn giữ để sao chép';
+
                     const showPreviewModal = () => {
+                        const previewHolder = document.getElementById('imagePreviewHolder'); 
+                        previewHolder.innerHTML = ''; 
                         const pageInfo = document.createElement('div');
                         pageInfo.className = 'page-number';
                         pageInfo.textContent = `Ảnh báo cáo (${instructText})`;
@@ -2507,10 +2481,11 @@
                         if (navigator.share) { DOM.btnShareImage.style.display = 'inline-block'; } else { DOM.btnShareImage.style.display = 'none'; }
                         DOM.imagePreviewModal.style.display = 'block';
                     };
+
                     if (navigator.clipboard && navigator.clipboard.write) {
                         const copyPromise = new Promise((resolve, reject) => {
                             try {
-                                canvas.toBlob((blob) => {
+                                finalCanvas.toBlob((blob) => {
                                     if (blob) resolve(blob);
                                     else reject(new Error("Không thể chuyển đổi ảnh"));
                                 }, 'image/png');
@@ -2522,39 +2497,146 @@
                         ]).then(() => {
                             showNotification(msg, 'success');
                             DOM.imagePreviewModal.style.display = 'none';
-                        }).catch((err) => {
-                            console.warn("Lỗi ghi clipboard:", err);
-                            showPreviewModal();
-                        });
+                        }).catch(() => showPreviewModal());
                     } else {
                         showPreviewModal();
                     }
+                } catch(e) {
+                    console.error(e);
+                    showNotification('Lỗi tạo ảnh', 'error');
+                } finally {
+                    if (cloneWrapper && cloneWrapper.parentNode) cloneWrapper.parentNode.removeChild(cloneWrapper);
+                    if(btn) btn.textContent = oldTxt;
                 }
-            } catch(e){
-                console.error(e); 
-                showNotification('Lỗi tạo ảnh', 'error'); 
-                if(sel === '#reportContainer') el.classList.remove('capturing-image');
-                frozenState.forEach(({ input, replacement, parent, nextSibling }) => { 
-                    if(parent.contains(replacement)) parent.removeChild(replacement); 
-                    if(nextSibling) parent.insertBefore(input, nextSibling); 
-                    else parent.appendChild(input); 
+            }, 80);
+            return;
+        }
+
+        // 2. COPY BẢNG TỔNG HỢP (Khổ chuẩn A4)
+        const summaryElem = document.querySelector('#summaryPrintContainer');
+        const summaryTable = document.querySelector('#summaryTableContainer table');
+        const summaryContainer = document.getElementById('summaryTableContainer');
+
+        if (!summaryElem || !summaryTable) {
+            if(btn) btn.textContent = oldTxt;
+            return showNotification("Chưa có nội dung tổng hợp!", 'info');
+        }
+
+        const A4_STANDARD_WIDTH = 900;
+        const origTableStyles = { maxHeight: summaryContainer.style.maxHeight, overflow: summaryContainer.style.overflow, width: summaryContainer.style.width };
+        const origElemWidth = summaryElem.style.width;
+
+        summaryContainer.style.setProperty('max-height', 'none', 'important');
+        summaryContainer.style.setProperty('overflow', 'visible', 'important');
+        summaryContainer.style.width = '100%';
+        summaryElem.style.width = A4_STANDARD_WIDTH + 'px';
+
+        const stickyElements = Array.from(summaryContainer.querySelectorAll('th, #summaryTotalRow td'));
+        stickyElements.forEach(elem => { elem.dataset.origPos = elem.style.position; elem.style.position = 'static'; elem.style.borderTop = '1px solid #dfe6e9'; });
+
+        const footer = document.createElement('div'); 
+        footer.innerText = "© 2026 ZENG FINANCE";
+        footer.style.width = "100%"; 
+        footer.style.textAlign = "center"; 
+        footer.style.margin = "10px 0 0 0"; 
+        footer.style.padding = "4px 0"; 
+        footer.style.fontSize = "10px"; 
+        footer.style.fontWeight = "700"; 
+        footer.style.color = "#888888"; 
+        footer.style.backgroundColor = "#ffffff";
+        summaryElem.appendChild(footer);
+
+        setTimeout(async () => {
+            try {
+                window.scrollTo(0,0);
+                const actualSummaryHeight = Math.ceil(summaryElem.scrollHeight);
+                const canvas = await html2canvas(summaryElem, {
+                    backgroundColor: "#ffffff",
+                    scale: 2,
+                    useCORS: true,
+                    scrollY: 0,
+                    scrollX: 0,
+                    x: 0,
+                    y: 0,
+                    width: A4_STANDARD_WIDTH,
+                    height: actualSummaryHeight,
+                    windowWidth: A4_STANDARD_WIDTH,
+                    windowHeight: actualSummaryHeight
                 });
-            } finally {
-                delBtns.forEach(b => b.style.display = 'inline-block');
-                if(footer && footer.parentNode) footer.parentNode.removeChild(footer); 
-                hiddenEls.forEach(e => e.style.display = ''); 
-                if(btn) btn.textContent = oldTxt;
-                if (targetContainer) {
-                    targetContainer.style.removeProperty('max-height');
-                    targetContainer.style.removeProperty('overflow');
-                    targetContainer.style.overflowX = originalStyles.overflowX;
-                    targetContainer.style.overflowY = originalStyles.overflowY;
-                    targetContainer.style.width = ''; 
-                    el.style.width = '';
-                    stickyElements.forEach(elem => { elem.style.position = elem.dataset.originalPosition || ''; elem.style.borderTop = ''; });
+
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                const instructText = isIOS ? 'Nhấn giữ ảnh dưới đây -> Chọn "Sao chép" để dán vào Zalo' : 'Click chuột phải / nhấn giữ để sao chép';
+
+                const previewHolder = document.getElementById('imagePreviewHolder');
+                previewHolder.innerHTML = '';
+                currentGeneratedImages = [];
+
+                const canvases = await splitCanvasToA4Canvases(canvas, summaryTable, summaryElem);
+
+                if (canvases.length <= 3) {
+                    const mergedCanvas = mergeCanvases(canvases);
+                    const imgSrc = mergedCanvas.toDataURL('image/png');
+                    currentGeneratedImages = [imgSrc];
+
+                    const showModal = () => {
+                        const div = document.createElement('div');
+                        div.className = 'preview-image-item';
+                        div.innerHTML = `<div class="page-number">Bảng tổng hợp A4 (${canvases.length > 1 ? `ghép từ ${canvases.length} trang - ` : ''}${instructText})</div><img src="${imgSrc}">`;
+                        previewHolder.appendChild(div);
+
+                        DOM.btnSaveAllImages.textContent = '💾 TẢI ẢNH VỀ MÁY';
+                        DOM.btnSaveAllImages.style.display = 'inline-block';
+                        if (navigator.share) { DOM.btnShareImage.style.display = 'inline-block'; } else { DOM.btnShareImage.style.display = 'none'; }
+                        DOM.imagePreviewModal.style.display = 'block';
+                    };
+
+                    if (navigator.clipboard && navigator.clipboard.write) {
+                        const copyPromise = new Promise((resolve, reject) => {
+                            try {
+                                mergedCanvas.toBlob((blob) => {
+                                    if (blob) resolve(blob);
+                                    else reject(new Error("Lỗi chuyển đổi Blob"));
+                                }, 'image/png');
+                            } catch (e) { reject(e); }
+                        });
+
+                        navigator.clipboard.write([
+                            new ClipboardItem({ 'image/png': copyPromise })
+                        ]).then(() => {
+                            showNotification(canvases.length > 1 ? `Đã ghép ${canvases.length} trang A4 thành 1 ảnh và copy vào Clipboard!` : 'Đã copy ảnh bảng Tổng Hợp A4!', 'success');
+                            DOM.imagePreviewModal.style.display = 'none';
+                        }).catch(() => showModal());
+                    } else {
+                        showModal();
+                    }
+                } else {
+                    const images = canvases.map(c => c.toDataURL('image/png'));
+                    currentGeneratedImages = images;
+                    images.forEach((imgSrc, index) => {
+                        const div = document.createElement('div');
+                        div.className = 'preview-image-item';
+                        div.innerHTML = `<div class="page-number">Trang ${index + 1}/${images.length} (Khổ A4 - ${instructText})</div><img src="${imgSrc}">`;
+                        previewHolder.appendChild(div);
+                    });
+                    showNotification(`Dữ liệu dài đã được chia thành ${images.length} trang A4`, 'info');
+                    DOM.btnSaveAllImages.textContent = '💾 TẢI TẤT CẢ TRANG';
+                    DOM.btnSaveAllImages.style.display = 'inline-block';
+                    if (navigator.share) { DOM.btnShareImage.style.display = 'inline-block'; } else { DOM.btnShareImage.style.display = 'none'; }
+                    DOM.imagePreviewModal.style.display = 'block';
                 }
+            } catch (err) {
+                console.error(err);
+                showNotification('Lỗi tạo ảnh tổng hợp A4', 'error');
+            } finally {
+                if (footer && footer.parentNode) footer.parentNode.removeChild(footer);
+                summaryContainer.style.maxHeight = origTableStyles.maxHeight;
+                summaryContainer.style.overflow = origTableStyles.overflow;
+                summaryContainer.style.width = origTableStyles.width;
+                summaryElem.style.width = origElemWidth;
+                stickyElements.forEach(elem => { elem.style.position = elem.dataset.origPos || ''; elem.style.borderTop = ''; });
+                if(btn) btn.textContent = oldTxt;
             }
-        }, 100);
+        }, 80);
     }
 
     DOM.btnCopySummary.onclick = function() { copyElementAsImage('#summaryPrintContainer', 'Đã copy ảnh bảng Tổng Hợp!', this); };
@@ -2635,13 +2717,8 @@
     let configData = [];
     let currentFileSha = '';
 
-    function utf8_to_b64(str) {
-        return window.btoa(unescape(encodeURIComponent(str)));
-    }
-
-    function b64_to_utf8(str) {
-        return decodeURIComponent(escape(window.atob(str)));
-    }
+    function utf8_to_b64(str) { return window.btoa(unescape(encodeURIComponent(str))); }
+    function b64_to_utf8(str) { return decodeURIComponent(escape(window.atob(str))); }
 
     function applyXemmaText(text) {
         if (!text) return;
