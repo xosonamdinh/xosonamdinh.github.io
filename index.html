@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Báo cáo thu tiền - XSKT Nam Định</title>
+    <title>Báo Cáo - XSKT Nam Định</title>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -366,7 +366,7 @@
 
         <div class="controls-panel">
             <div style="display: flex; gap: 4px; background: #eee; padding: 2px; border-radius: 4px; margin-bottom: 5px;">
-                <button class="tab-btn active" style="flex:1;">⚡ Cơ sở dữ liệu </button>
+                <button class="tab-btn active" style="flex:1;">⚡ Máy Chủ</button>
                 <button class="tab-btn secondary" style="flex:1;" onclick="openConfigWithAuth()">⚙️ Cấu hình</button>
             </div>
 
@@ -384,7 +384,7 @@
                 </div>
 
                 <button id="btnFetchSupabaseHome" class="success" style="padding: 12px 15px; width: 100%; margin-top: 14px; font-size: 15px;">
-                    ⚡ TẢI DỮ LIỆU TỪ MÁY CHỦ
+                    ⚡ TẢI DỮ LIỆU
                 </button>
             </div>
 
@@ -632,8 +632,8 @@
                     <div style="flex: 1;">
                         <label>Danh mục bảng cấu hình:</label>
                         <select id="cfgTableSelect" onchange="loadSupabaseConfigTable()">
-                            <option value="config_donvi">Danh sách Tổ / Nhánh / Huyện</option>
-                            <option value="config_xemma">Chế độ xem Chi Nhánh</option>
+                            <option value="config_donvi">config_donvi (Danh sách Tổ / Nhánh / Huyện)</option>
+                            <option value="config_xemma">config_xemma (Chế độ xem Chi Nhánh)</option>
                         </select>
                     </div>
                     <button onclick="loadSupabaseConfigTable()" class="secondary" style="height: 38px;">🔄 Tải lại</button>
@@ -1564,9 +1564,9 @@
                 displayDate = `Tháng ${parseInt(p[1], 10)}`;
             }
 
-            // GẮN TÊN ĐẠI LÝ MỞ NGOẶC NẾU CÓ KÝ TỰ CHỮ Ở ĐẦU (VD: J01, P09)
-            const isPrefixed = /[a-zA-Z]/i.test(name);
-            const suffix = isPrefixed ? ` (${name})` : '';
+            // CHỈ LẤY PHẦN KÝ TỰ CHỮ CÁI ĐẦU ĐỂ TIẾT KIỆM DIỆN TÍCH (VD: P21/P27 -> (P), J01 -> (J))
+            const prefixMatch = name.match(/^[a-zA-Z]+/);
+            const suffix = prefixMatch ? ` (${prefixMatch[0].toUpperCase()})` : '';
 
             const sortTime = new Date(r.ngay).getTime();
 
