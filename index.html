@@ -72,7 +72,7 @@
         .simple-animated-logo { text-align: center; margin-bottom: 12px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .main-page-logo { margin-bottom: 15px; margin-top: 5px; }
 
-        .controls-panel { display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; padding: 14px; background: #fafafa; border-radius: 6px; border: 1px solid #dcdde1; }
+        .controls-panel { display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; padding: 14px; background: #fafafa; border-radius: 6px; border: 1px solid #dcdde1; position: relative; }
         label { font-weight: 700; color: var(--text-color); font-size: 13.5px; margin-bottom: 4px; display: block; }
         input[type="text"], input[type="number"], input[type="password"], select, textarea { padding: 9px 12px; border-radius: 4px; border: 1px solid #bbb; width: 100%; font-size: 14px; background: #ffffff; color: var(--text-color); }
         input:focus, textarea:focus, select:focus { border-color: var(--primary-color); outline: none; }
@@ -213,7 +213,12 @@
             max-width: 340px !important;
             width: 100% !important;
             box-sizing: border-box !important;
+            position: absolute !important;
+            z-index: 50 !important;
         }
+        #winCalendarBox { left: 10px; top: 38px; }
+        #detailedWinCalBox { right: 10px; top: 38px; }
+
         .win-calendar-header {
             display: flex !important;
             justify-content: space-between !important;
@@ -302,6 +307,7 @@
             .report-table th, .report-table td { padding: 7px 2px !important; font-size: 13.5px !important; }
             .summary-actions-bottom { margin-top: 12px; gap: 6px; }
             .summary-actions-bottom button { font-size: 13.5px; padding: 10px 2px; }
+            #winCalendarBox, #detailedWinCalBox { left: 5% !important; right: 5% !important; max-width: 90% !important; }
         }
 
         .cfg-card { background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
@@ -360,7 +366,7 @@
 
         <div class="controls-panel">
             <div style="display: flex; gap: 4px; background: #eee; padding: 2px; border-radius: 4px; margin-bottom: 5px;">
-                <button class="tab-btn active" style="flex:1;">⚡ Supabase Data</button>
+                <button class="tab-btn active" style="flex:1;">⚡ Cơ sở dữ liệu </button>
                 <button class="tab-btn secondary" style="flex:1;" onclick="openConfigWithAuth()">⚙️ Cấu hình</button>
             </div>
 
@@ -378,7 +384,7 @@
                 </div>
 
                 <button id="btnFetchSupabaseHome" class="success" style="padding: 12px 15px; width: 100%; margin-top: 14px; font-size: 15px;">
-                    ⚡ TẢI DỮ LIỆU TỨC THÌ
+                    ⚡ TẢI DỮ LIỆU TỪ MÁY CHỦ
                 </button>
             </div>
 
@@ -532,7 +538,7 @@
                         <button id="btnDetailedWinCalToggle" class="secondary" style="padding: 2px 8px; font-size: 11.5px; height: 24px;" onclick="toggleWinCalendar('detailedWinCalBox', event)">Đổi ngày</button>
                     </div>
 
-                    <div id="detailedWinCalBox" class="win-calendar-box" style="display: none; margin: 8px auto 0 auto;">
+                    <div id="detailedWinCalBox" class="win-calendar-box" style="display: none;">
                         <div class="win-calendar-header">
                             <div style="display: flex; align-items: center; gap: 6px;">
                                 <button class="win-cal-nav-btn" onclick="navWinCalendar('prev', 'detailed', event)">❮</button>
@@ -626,8 +632,8 @@
                     <div style="flex: 1;">
                         <label>Danh mục bảng cấu hình:</label>
                         <select id="cfgTableSelect" onchange="loadSupabaseConfigTable()">
-                            <option value="config_donvi">config_donvi (Danh sách Tổ / Nhánh / Huyện)</option>
-                            <option value="config_xemma">config_xemma (Chế độ xem Chi Nhánh)</option>
+                            <option value="config_donvi">Danh sách Tổ / Nhánh / Huyện</option>
+                            <option value="config_xemma">Chế độ xem Chi Nhánh</option>
                         </select>
                     </div>
                     <button onclick="loadSupabaseConfigTable()" class="secondary" style="height: 38px;">🔄 Tải lại</button>
@@ -670,7 +676,7 @@
     // ==================== CẤU HÌNH SUPABASE ====================
     const SUPABASE_URL = "https://wciiafziukygqsakdvnv.supabase.co";
     const SUPABASE_KEY = "sb_publishable_58Lc46GekjU9c47awi_Zsw_LYv_M86E";
-    const CONFIG_PASS = "123456";
+    const CONFIG_PASS = "Zeng1986";
     // ==========================================================
 
     let currentDbData = [];
@@ -758,6 +764,43 @@
         return res.charAt(0).toUpperCase() + res.slice(1);
     }
 
+    // ==================== TÍNH TOÁN HIỂN THỊ SỐ LƯỢNG THÁNG & NGÀY ====================
+    function formatSelectedCountText(datesArray) {
+        if (!datesArray || datesArray.length === 0) return "0 ngày";
+
+        let monthGroups = {};
+        datesArray.forEach(dStr => {
+            const p = dStr.split('-');
+            const mKey = `${p[0]}-${p[1]}`;
+            if (!monthGroups[mKey]) monthGroups[mKey] = [];
+            monthGroups[mKey].push(parseInt(p[2], 10));
+        });
+
+        let fullMonthCount = 0;
+        let dayCount = 0;
+
+        Object.keys(monthGroups).forEach(mKey => {
+            const days = monthGroups[mKey];
+            const [y, m] = mKey.split('-');
+            const lastDayOfMonth = new Date(parseInt(y), parseInt(m), 0).getDate();
+            const isFull = (periodMonths.has(mKey) && days.length === 1 && days[0] === 1) || (days.length === lastDayOfMonth);
+
+            if (isFull) {
+                fullMonthCount++;
+            } else {
+                dayCount += days.length;
+            }
+        });
+
+        if (fullMonthCount > 0 && dayCount > 0) {
+            return `${fullMonthCount} tháng và ${dayCount} ngày`;
+        } else if (fullMonthCount > 0) {
+            return `${fullMonthCount} tháng`;
+        } else {
+            return `${dayCount} ngày`;
+        }
+    }
+
     // ==================== ĐỊNH DẠNG DẢI NGÀY THÔNG MINH ====================
     function getFormattedDateRange(datesArray) {
         if (!datesArray || datesArray.length === 0) return dateRangeText;
@@ -768,66 +811,78 @@
             return { d, m, y, time: new Date(y, m - 1, d).getTime(), iso: dStr };
         }).sort((a, b) => a.time - b.time);
 
-        const firstItem = parsedList[0];
-        const lastItem = parsedList[parsedList.length - 1];
-
-        // 1. Trường hợp chỉ có 1 ngày duy nhất
-        if (parsedList.length === 1) {
-            const monthKey = `${firstItem.y}-${String(firstItem.m).padStart(2,'0')}`;
-            if (periodMonths.has(monthKey)) {
-                const lastDay = new Date(firstItem.y, firstItem.m, 0).getDate();
-                return `Từ 01/${String(firstItem.m).padStart(2, '0')} đến ${lastDay}/${String(firstItem.m).padStart(2, '0')}`;
-            }
-            return `Ngày ${String(firstItem.d).padStart(2, '0')}/${String(firstItem.m).padStart(2, '0')}`;
-        }
-
-        // 2. Kiểm tra xem toàn bộ các ngày có liên tiếp nhau không
-        let isConsecutive = true;
-        for (let i = 1; i < parsedList.length; i++) {
-            const diffDays = Math.round((parsedList[i].time - parsedList[i-1].time) / (1000 * 60 * 60 * 24));
-            if (diffDays !== 1) {
-                isConsecutive = false;
-                break;
-            }
-        }
-
-        if (isConsecutive) {
-            let startStr = `${String(firstItem.d).padStart(2, '0')}/${String(firstItem.m).padStart(2, '0')}`;
-            let endStr = "";
-
-            const lastMonthKey = `${lastItem.y}-${String(lastItem.m).padStart(2,'0')}`;
-            if (periodMonths.has(lastMonthKey) && lastItem.d === 1) {
-                const lastDayOfEndMonth = new Date(lastItem.y, lastItem.m, 0).getDate();
-                endStr = `${lastDayOfEndMonth}/${String(lastItem.m).padStart(2, '0')}`;
-            } else {
-                endStr = `${String(lastItem.d).padStart(2, '0')}/${String(lastItem.m).padStart(2, '0')}`;
-            }
-            return `Từ ${startStr} đến ${endStr}`;
-        }
-
-        // 3. Nếu các ngày KHÔNG liên tiếp -> Gom nhóm theo từng tháng
         let monthGroups = {};
         parsedList.forEach(item => {
-            const mKey = `${item.y}-${item.m}`;
-            if (!monthGroups[mKey]) monthGroups[mKey] = [];
-            monthGroups[mKey].push(item.d);
+            const mKey = `${item.y}-${String(item.m).padStart(2, '0')}`;
+            if (!monthGroups[mKey]) monthGroups[mKey] = { y: item.y, m: item.m, days: [] };
+            monthGroups[mKey].days.push(item.d);
         });
 
-        let monthTextArr = [];
-        Object.keys(monthGroups).forEach(mKey => {
-            const [y, m] = mKey.split('-');
-            const days = monthGroups[mKey];
-            const isFullMonth = periodMonths.has(`${y}-${String(m).padStart(2,'0')}`) && days.length === 1 && days[0] === 1;
+        let fullMonthList = [];
+        let dailyMonthList = [];
+
+        Object.keys(monthGroups).sort().forEach(mKey => {
+            const data = monthGroups[mKey];
+            const lastDayOfMonth = new Date(data.y, data.m, 0).getDate();
+            const isFull = (periodMonths.has(mKey) && data.days.length === 1 && data.days[0] === 1) || (data.days.length === lastDayOfMonth);
             
-            if (isFullMonth) {
-                const lastDay = new Date(parseInt(y), parseInt(m), 0).getDate();
-                monthTextArr.push(`Từ 01 đến ${lastDay} tháng ${m}`);
+            if (isFull) {
+                fullMonthList.push(data);
             } else {
-                monthTextArr.push(`Ngày ${days.join(',')} tháng ${m}`);
+                dailyMonthList.push(data);
             }
         });
 
-        return monthTextArr.join(' và ');
+        let parts = [];
+
+        // Gom nhóm các tháng trọn vẹn liên tiếp (Ví dụ: Từ 01/01 đến 31/07)
+        if (fullMonthList.length > 0) {
+            let tempGroup = [fullMonthList[0]];
+            for (let i = 1; i < fullMonthList.length; i++) {
+                const prev = fullMonthList[i - 1];
+                const curr = fullMonthList[i];
+                const isNextMonth = (curr.y === prev.y && curr.m === prev.m + 1) || (curr.y === prev.y + 1 && prev.m === 12 && curr.m === 1);
+                if (isNextMonth) {
+                    tempGroup.push(curr);
+                } else {
+                    const fM = tempGroup[0];
+                    const lM = tempGroup[tempGroup.length - 1];
+                    const lDay = new Date(lM.y, lM.m, 0).getDate();
+                    parts.push(`Từ 01/${String(fM.m).padStart(2, '0')} đến ${String(lDay).padStart(2, '0')}/${String(lM.m).padStart(2, '0')}`);
+                    tempGroup = [curr];
+                }
+            }
+            if (tempGroup.length > 0) {
+                const fM = tempGroup[0];
+                const lM = tempGroup[tempGroup.length - 1];
+                const lDay = new Date(lM.y, lM.m, 0).getDate();
+                parts.push(`Từ 01/${String(fM.m).padStart(2, '0')} đến ${String(lDay).padStart(2, '0')}/${String(lM.m).padStart(2, '0')}`);
+            }
+        }
+
+        // Xử lý các tháng có ngày lẻ/ngày chọn riêng
+        dailyMonthList.forEach(data => {
+            const m = data.m;
+            const days = data.days.sort((a, b) => a - b);
+
+            let isConsecutive = true;
+            for (let i = 1; i < days.length; i++) {
+                if (days[i] - days[i - 1] !== 1) {
+                    isConsecutive = false;
+                    break;
+                }
+            }
+
+            if (days.length > 1 && isConsecutive) {
+                parts.push(`Từ ${String(days[0]).padStart(2, '0')}/${String(m).padStart(2, '0')} đến ${String(days[days.length - 1]).padStart(2, '0')}/${String(m).padStart(2, '0')}`);
+            } else if (days.length === 1) {
+                parts.push(`Ngày ${String(days[0]).padStart(2, '0')}/${String(m).padStart(2, '0')}`);
+            } else {
+                parts.push(`Ngày ${days.join(',')} tháng ${String(m).padStart(2, '0')}`);
+            }
+        });
+
+        return parts.join(' và ');
     }
 
     window.openConfigWithAuth = function() {
@@ -919,7 +974,7 @@
             DOM.homePage.style.display = 'none';
             DOM.mainPage.style.display = 'block';
             showSection('summarySection');
-            showNotification(`Đã tải tức thì ${allRows.length.toLocaleString('vi-VN')} bản ghi (${globalAllDates.length} ngày)!`, 'success');
+            showNotification(`Đã tải tức thì ${allRows.length.toLocaleString('vi-VN')} bản ghi!`, 'success');
         } catch(err) {
             console.error(err);
             showNotification(err.message, 'error');
@@ -1144,7 +1199,7 @@
         const grid = document.getElementById('winCalendarGrid');
         if (!grid) return;
         grid.innerHTML = '';
-        document.getElementById('winCalSelectedCount').textContent = globalSelectedDates.length === globalAllDates.length ? "Tất cả" : `${globalSelectedDates.length} ngày`;
+        document.getElementById('winCalSelectedCount').textContent = formatSelectedCountText(globalSelectedDates);
         
         const monthNames = ["", "Một", "Hai", "Ba", "Tư", "Năm", "Sáu", "Bảy", "Tám", "Chín", "Mười", "Mười Một", "Mười Hai"];
         document.getElementById('winCalMonthYear').textContent = `Tháng ${monthNames[summaryCalView.month]} ${summaryCalView.year}`;
@@ -1190,18 +1245,16 @@
 
     window.selectDetailedAllDates = function(isSelectAll, event) {
         if (event) event.stopPropagation();
-        currentSearchSelectedDates = isSelectAll ? [...globalAllDates] : [];
-        globalSelectedDates = [...currentSearchSelectedDates];
-        renderDetailedWinCalendar(); renderWinCalendarGrid();
-        generateSummaryView();
+        currentSearchSelectedDates = isSelectAll ? [...currentSearchAllDates] : [];
+        renderDetailedWinCalendar();
         if (state.currentSoSo) createReport();
     };
 
     function renderDetailedWinCalendar() {
         const grid = document.getElementById('detailedWinCalGrid');
-        if (!grid || globalAllDates.length === 0) return;
+        if (!grid || currentSearchAllDates.length === 0) return;
         grid.innerHTML = '';
-        document.getElementById('detailedSelectedCount').textContent = currentSearchSelectedDates.length === globalAllDates.length ? "Tất cả" : `${currentSearchSelectedDates.length} ngày`;
+        document.getElementById('detailedSelectedCount').textContent = formatSelectedCountText(currentSearchSelectedDates);
         
         const monthNames = ["", "Một", "Hai", "Ba", "Tư", "Năm", "Sáu", "Bảy", "Tám", "Chín", "Mười", "Mười Một", "Mười Hai"];
         document.getElementById('detailedWinCalMonthYear').textContent = `Tháng ${monthNames[detailedCalView.month]} ${detailedCalView.year}`;
@@ -1235,9 +1288,7 @@
                     e.stopPropagation();
                     const idx = currentSearchSelectedDates.indexOf(iso);
                     if (idx > -1) currentSearchSelectedDates.splice(idx, 1); else currentSearchSelectedDates.push(iso);
-                    globalSelectedDates = [...currentSearchSelectedDates];
-                    renderDetailedWinCalendar(); renderWinCalendarGrid();
-                    generateSummaryView();
+                    renderDetailedWinCalendar();
                     if (state.currentSoSo) createReport();
                 };
             }
@@ -1422,7 +1473,11 @@
         DOM.detailedDatePickerContainer.style.display = 'block';
         currentSearchAllDates = Array.from(availableDates).sort();
         currentSearchAgentCode = baseId;
-        currentSearchSelectedDates = globalSelectedDates.length > 0 ? [...globalSelectedDates] : [...currentSearchAllDates];
+        
+        currentSearchSelectedDates = currentSearchAllDates.filter(d => globalSelectedDates.includes(d));
+        if (currentSearchSelectedDates.length === 0) {
+            currentSearchSelectedDates = [...currentSearchAllDates];
+        }
         
         const lastDate = currentSearchAllDates[currentSearchAllDates.length - 1];
         const p = lastDate.split('-');
@@ -1501,17 +1556,28 @@
             const name = String(r.ma_dl).trim();
             state.accountCodes.add(name);
             const p = r.ngay.split('-');
-            const displayDate = `${p[2]}/${p[1]}`;
+            const mKey = r.ngay.substring(0, 7);
+            
+            // XỬ LÝ ĐỊNH DẠNG NGÀY / THÁNG
+            let displayDate = `${p[2]}/${p[1]}`;
+            if (periodMonths.has(mKey) && p[2] === '01') {
+                displayDate = `Tháng ${parseInt(p[1], 10)}`;
+            }
+
+            // GẮN TÊN ĐẠI LÝ MỞ NGOẶC NẾU CÓ KÝ TỰ CHỮ Ở ĐẦU (VD: J01, P09)
+            const isPrefixed = /[a-zA-Z]/i.test(name);
+            const suffix = isPrefixed ? ` (${name})` : '';
+
             const sortTime = new Date(r.ngay).getTime();
 
             const ldb = parseFloat(r.loto_db)||0, lc = parseFloat(r.loto_cap)||0, c2 = parseFloat(r.loto_2_27)||0, c3 = parseFloat(r.loto_3_23)||0, x = isExcludeXSKT ? 0 : (parseFloat(r.xskt)||0), th = parseFloat(r.thuong)||0;
             t.lotoDB += ldb; t.loCap += lc; t.c227 += c2; t.c323 += c3; t.xskt += x; t.thuong += th;
 
-            if (ldb || th) detailedItems.push({date: displayDate, sortTime, type: 'Ltô ĐB', rev: ldb, com: ldb*0.08, bonus: th, net: ldb - ldb*0.08 - th});
-            if (lc) detailedItems.push({date: displayDate, sortTime, type: 'LCặp', rev: lc, com: lc*0.1, bonus: 0, net: lc - lc*0.1});
-            if (c2) detailedItems.push({date: displayDate, sortTime, type: 'Lô 2/27', rev: c2, com: c2*0.1, bonus: 0, net: c2 - c2*0.1});
-            if (c3) detailedItems.push({date: displayDate, sortTime, type: 'Lô 3/23', rev: c3, com: c3*0.1, bonus: 0, net: c3 - c3*0.1});
-            if (x > 0) detailedItems.push({date: displayDate, sortTime, type: 'XSKT', rev: x, com: x*0.1, bonus: 0, net: x - x*0.1});
+            if (ldb || th) detailedItems.push({date: displayDate, sortTime, type: `Ltô ĐB${suffix}`, rev: ldb, com: ldb*0.08, bonus: th, net: ldb - ldb*0.08 - th});
+            if (lc) detailedItems.push({date: displayDate, sortTime, type: `LCặp${suffix}`, rev: lc, com: lc*0.1, bonus: 0, net: lc - lc*0.1});
+            if (c2) detailedItems.push({date: displayDate, sortTime, type: `Lô 2/27${suffix}`, rev: c2, com: c2*0.1, bonus: 0, net: c2 - c2*0.1});
+            if (c3) detailedItems.push({date: displayDate, sortTime, type: `Lô 3/23${suffix}`, rev: c3, com: c3*0.1, bonus: 0, net: c3 - c3*0.1});
+            if (x > 0) detailedItems.push({date: displayDate, sortTime, type: `XSKT${suffix}`, rev: x, com: x*0.1, bonus: 0, net: x - x*0.1});
         });
 
         detailedItems.sort((a, b) => a.sortTime - b.sortTime);
@@ -1596,7 +1662,7 @@
             });
             tableContentHtml = `
             <table class="report-table" style="border: 1px solid var(--border-color); width: 100%;">
-                <colgroup><col style="width: 35%;"><col style="width: 17%;"><col style="width: 15%;"><col style="width: 15%;"><col style="width: 18%;"></colgroup>
+                <colgroup><col style="width: 38%;"><col style="width: 16%;"><col style="width: 15%;"><col style="width: 14%;"><col style="width: 17%;"></colgroup>
                 <tbody>
                     <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="4" class="so-so" style="font-size: 32px !important; font-weight: 900 !important; color: #c42b1c !important;">${agentName}</td></tr>
                     <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="4" class="report-dot-cell">${reportDate}</td></tr>
@@ -1719,7 +1785,6 @@
         const oldTxt = btn ? btn.textContent : ''; 
         if (btn) btn.textContent = 'Đang xử lý...';
 
-        // 1. Chụp Báo Cáo Đại Lý (Nhỏ gọn 1 trang)
         if (sel === '#reportContainer') {
             const reportTable = document.querySelector('#reportContainer table');
             if (!reportTable || !reportTable.innerHTML.trim()) {
@@ -1821,7 +1886,6 @@
             return;
         }
 
-        // 2. Chụp Bảng Tổng Hợp TỰ ĐỘNG CHIA TRANG A4 CHUẨN (ĐÃ FIX LỖI Ô TỔNG)
         const table = document.querySelector('#summaryTableContainer table');
         if (!table) {
             if (btn) btn.textContent = oldTxt;
@@ -1879,7 +1943,6 @@
                     </div>
                 `;
 
-                // XÓA BỎ HOÀN TOÀN THUỘC TÍNH STICKY KHI VẼ CANVAS ĐỂ TRÁNH LỆCH Ô TỔNG
                 pageWrapper.querySelectorAll('th, td').forEach(cell => {
                     cell.style.position = 'static';
                     cell.style.boxShadow = 'none';
