@@ -87,15 +87,16 @@
         th, td { border-right: 1px solid #dcdde1; border-bottom: 1px solid #dcdde1; padding: 8px 6px; text-align: center; vertical-align: middle; font-size: 13.5px; white-space: nowrap; }
         th { background: #107c41; color: #ffffff; font-weight: 700; position: sticky; top: 0; z-index: 20; border-top: none; }
         
-        /* CỐ ĐỊNH DUY NHẤT CỘT ĐL (CỘT THỨ 2) Ở MÉP TRÁI */
+        /* CỐ ĐỊNH DUY NHẤT CỘT ĐL (CỘT 2) VÀ Ô "TỔNG" CHÂN TRANG Ở MÉP TRÁI */
         #summaryTableContainer table th:nth-child(2),
-        #summaryTableContainer table td:nth-child(2) {
+        #summaryTableContainer table tbody td:nth-child(2),
+        #summaryTotalRow td.total-label-cell {
             position: sticky;
             left: 0;
             z-index: 10;
-            width: 70px;
-            min-width: 70px;
-            max-width: 70px;
+            width: 65px;
+            min-width: 65px;
+            max-width: 65px;
             box-shadow: 2px 0 4px rgba(0,0,0,0.08);
         }
 
@@ -114,12 +115,11 @@
         }
 
         #summaryTotalRow td { background-color: #5d4037 !important; color: #ffffff !important; font-weight: 700; position: sticky; bottom: 0; z-index: 20; }
-        #summaryTotalRow td:nth-child(1) {
-            position: sticky;
-            left: 0;
+        
+        #summaryTotalRow td.total-label-cell {
             z-index: 30;
             background-color: #5d4037 !important;
-            box-shadow: 2px 0 4px rgba(0,0,0,0.2);
+            box-shadow: 2px 0 4px rgba(0,0,0,0.25);
         }
 
         .group-total-row td { background-color: #fafafa; font-weight: bold; }
@@ -132,13 +132,14 @@
         .clickable-agent-code { cursor: pointer !important; }
         .clickable-agent-code:hover { text-decoration: underline !important; }
         
-        .so-so { font-size: 30px !important; font-weight: 900 !important; color: var(--primary-color); text-align: center; letter-spacing: 0.5px; padding: 8px 4px !important; }
+        /* Cỡ chữ số sổ đại lý - MÀU ĐỎ ĐẬM TO ĐẸP */
+        .so-so { font-size: 32px !important; font-weight: 900 !important; color: #c42b1c !important; text-align: center; letter-spacing: 0.5px; padding: 8px 4px !important; }
         
         #tongCongRow { background-color: #eaeaea; color: var(--text-color); font-weight: 800 !important; font-size: 15px !important; }
         .negative-value { color: var(--danger-color); }
         .final-amount-positive { background-color: var(--danger-color) !important; color: #ffffff !important; }
         .final-amount-negative { background-color: var(--success-color) !important; color: #ffffff !important; }
-        tr.final-amount-positive td, tr.final-amount-negative td { font-size: 26px !important; font-weight: 900; padding: 12px 6px !important; }
+        tr.final-amount-positive td, tr.final-amount-negative td { font-size: 28px !important; font-weight: 900; padding: 10px 4px !important; }
 
         .report-table { width: 100%; max-width: 100%; table-layout: auto; }
         .report-table th { padding: 9px 4px; font-size: 14px; font-weight: 800; }
@@ -421,16 +422,20 @@
                     </div>
                 </div>
 
+                <!-- BỐ CỤC LỌC GỌN GÀNG 2 HÀNG -->
                 <div style="margin-top: 4px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
-                        <label style="color: var(--danger-color); margin: 0;">Lọc theo Tổ / Nhánh:</label>
-                        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                            <label style="color: var(--danger-color); margin: 0;">Lọc theo Tổ / Nhánh:</label>
                             <label style="margin: 0; font-size: 13px; font-weight: bold; color: #2c3e50; display: flex; align-items: center; gap: 5px; white-space: nowrap;">
                                 Chế độ Chi Nhánh:
                                 <select id="selBranchMode" style="padding: 3px 6px; font-size: 12.5px; font-weight: bold; border: 1px solid #ccc; border-radius: 4px; color: #2c3e50; cursor: pointer;">
                                     <option value="all">Xem Tất Cả</option>
                                 </select>
                             </label>
+                        </div>
+                        
+                        <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding-top: 2px;">
                             <label style="font-size: 13px; cursor: pointer; color: var(--danger-color); display: flex; align-items: center; gap: 4px; margin: 0;">
                                 <input type="checkbox" id="cbExcludeNumeric"> Bỏ Bán Vé
                             </label>
@@ -438,11 +443,11 @@
                                 <input type="checkbox" id="cbExcludeXSKT"> Bỏ XSKT
                             </label>
                             <label style="font-size: 13px; cursor: pointer; color: #0078d4; font-weight: bold; display: flex; align-items: center; gap: 4px; margin: 0;">
-                                <input type="checkbox" id="cbSortDesc"> DS Cao-Thấp
+                                <input type="checkbox" id="cbSortDesc"> DS Cao–Thấp
                             </label>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 8px; align-items: center; margin-top: 6px;">
+                    <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px;">
                         <select id="regionSelect" style="flex: 1; border: 1.5px solid var(--primary-color); font-weight: 700;">
                             <option value="all">--- Tất cả các tổ ---</option>
                         </select>
@@ -1595,8 +1600,10 @@
 
         htmlBody += `</tbody>`;
 
+        // TÁCH Ô "TỔNG" KHỚP CHUẨN CỘT ĐL
         let htmlFoot = `<tfoot><tr id="summaryTotalRow">
-            <td colspan="2">TỔNG</td>
+            <td class="stt-col"></td>
+            <td class="total-label-cell">TỔNG</td>
             <td>${formatNumberHiddenK(totals.lotoDB)}</td>
             <td>${formatNumberHiddenK(totals.lotoCap)}</td>
             <td>${formatNumberHiddenK(totals.c323)}</td>
@@ -1897,7 +1904,7 @@
             <table class="report-table" style="border: 1px solid var(--border-color); width: 100%;">
                 <colgroup><col style="width: 34%;"><col style="width: 33%;"><col style="width: 33%;"></colgroup>
                 <tbody>
-                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="2" class="so-so">${agentName}</td></tr>
+                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="2" class="so-so" style="font-size: 32px !important; font-weight: 900 !important; color: #c42b1c !important;">${agentName}</td></tr>
                     <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="2" style="font-weight:700; font-size:14.5px;">${reportDate}</td></tr>
                     <tr style="background:#107c41; color:#fff;"><th>Loại hình</th><th>Doanh thu</th><th>Hoa hồng</th></tr>
                     <tr><td>Lôtô ĐB</td><td>${formatNumberHiddenK(d.t.lotoDB)}</td><td>${formatNumberHiddenK(d.c.ldb)}</td></tr>
@@ -1926,7 +1933,7 @@
             <table class="report-table" style="border: 1px solid var(--border-color); width: 100%;">
                 <colgroup><col style="width: 35%;"><col style="width: 17%;"><col style="width: 15%;"><col style="width: 15%;"><col style="width: 18%;"></colgroup>
                 <tbody>
-                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="4" class="so-so">${agentName}</td></tr>
+                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="4" class="so-so" style="font-size: 32px !important; font-weight: 900 !important; color: #c42b1c !important;">${agentName}</td></tr>
                     <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="4" style="font-weight:700; font-size:14px;">${reportDate}</td></tr>
                     <tr style="background:#107c41; color:#fff;"><th>Ngày/Loại</th><th>D.Thu</th><th>H.Hồng</th><th>Thưởng</th><th>Nộp/Lấy</th></tr>
                     ${rowsHtml}
@@ -2433,14 +2440,14 @@
             cloneWrapper.style.width = '360px';
             cloneWrapper.style.height = 'auto';
             cloneWrapper.style.background = '#ffffff';
-            cloneWrapper.style.padding = '0';
+            cloneWrapper.style.padding = '12px 8px 8px 8px'; // Hạ bảng xuống 12px cân đối
             cloneWrapper.style.margin = '0';
             cloneWrapper.style.boxSizing = 'border-box';
             cloneWrapper.style.display = 'block';
 
             const clonedTable = reportTable.cloneNode(true);
             clonedTable.style.width = '100%';
-            clonedTable.style.margin = '0';
+            clonedTable.style.margin = '0 auto';
             clonedTable.style.tableLayout = 'auto';
             clonedTable.querySelectorAll('.remove-ticket-btn').forEach(b => b.remove());
             cloneWrapper.appendChild(clonedTable);
@@ -2449,8 +2456,8 @@
             footer.innerText = "© 2026 ZENG FINANCE";
             footer.style.width = "100%"; 
             footer.style.textAlign = "center"; 
-            footer.style.margin = "0"; 
-            footer.style.padding = "3px 0 2px 0"; 
+            footer.style.margin = "6px 0 0 0"; 
+            footer.style.padding = "0"; 
             footer.style.fontSize = "8.5px"; 
             footer.style.fontWeight = "700"; 
             footer.style.color = "#aaaaaa"; 
@@ -2462,9 +2469,8 @@
 
             setTimeout(async()=>{
                 try {
-                    const rect = cloneWrapper.getBoundingClientRect();
                     const targetW = 360;
-                    const targetH = Math.ceil(rect.height);
+                    const targetH = Math.ceil(cloneWrapper.scrollHeight);
 
                     const rawCanvas = await html2canvas(cloneWrapper, { 
                         backgroundColor: "#ffffff", 
