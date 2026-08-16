@@ -56,7 +56,18 @@
         h2 { font-size: 22px; font-weight: 800; text-align: center; color: var(--text-color); margin-bottom: 15px; }
         h3 { font-size: 17px; font-weight: 700; text-align: center; color: var(--text-color); margin: 15px 0 10px 0; }
         h4 { margin-top: 0; text-align: center; color: var(--text-color); font-weight: 600;}
-        .report-date { text-align:center; font-weight: 600; margin-top: -5px; margin-bottom: 15px; color: var(--text-light); font-size: 13.5px; }
+        .report-date { 
+            text-align: center; 
+            font-weight: 600; 
+            margin-top: -5px; 
+            margin-bottom: 15px; 
+            color: var(--text-light); 
+            font-size: 13.5px;
+            white-space: normal !important;
+            word-break: break-word !important;
+            line-height: 1.5 !important;
+            padding: 0 5px;
+        }
 
         .simple-animated-logo { text-align: center; margin-bottom: 12px; cursor: pointer; display: flex; justify-content: center; align-items: center; }
         .main-page-logo { margin-bottom: 15px; margin-top: 5px; }
@@ -90,8 +101,7 @@
         th { background: #107c41; color: #ffffff; font-weight: 700; position: sticky; top: 0; z-index: 20; border-top: none; }
         
         #summaryTableContainer table th:nth-child(2),
-        #summaryTableContainer table tbody td:nth-child(2),
-        #summaryTotalRow td.total-label-cell {
+        #summaryTableContainer table tbody td:nth-child(2) {
             position: sticky;
             left: 0;
             z-index: 10;
@@ -115,9 +125,18 @@
             background: #fafafa !important;
         }
 
-        #summaryTotalRow td { background-color: #5d4037 !important; color: #ffffff !important; font-weight: 700; position: sticky; bottom: 0; z-index: 20; }
+        #summaryTotalRow td { 
+            background-color: #5d4037 !important; 
+            color: #ffffff !important; 
+            font-weight: 700; 
+            position: sticky; 
+            bottom: 0; 
+            z-index: 20; 
+        }
         
-        #summaryTotalRow td.total-label-cell {
+        #summaryTotalRow td:nth-child(2) {
+            position: sticky;
+            left: 0;
             z-index: 30;
             background-color: #5d4037 !important;
             box-shadow: 2px 0 4px rgba(0,0,0,0.25);
@@ -144,6 +163,16 @@
         .report-table { width: 100%; max-width: 100%; table-layout: auto; }
         .report-table th { padding: 9px 4px; font-size: 14px; font-weight: 800; }
         .report-table td { padding: 7.5px 4px; font-size: 14px; font-weight: 600; }
+
+        .report-dot-cell {
+            white-space: normal !important;
+            word-break: break-word !important;
+            line-height: 1.4 !important;
+            font-weight: 700 !important;
+            font-size: 13.5px !important;
+            padding: 8px 6px !important;
+            text-align: center !important;
+        }
 
         .dynamic-input { width: 100%; border: none !important; background: transparent !important; font-family: inherit; font-size: inherit; font-weight: bold; text-align: center; padding: 5px; outline: none !important; color: inherit; box-shadow: none !important; }
         #actionButtonContainer { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; max-width: 750px; margin-left: auto; margin-right: auto; }
@@ -289,7 +318,7 @@
         #loading-indicator { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(28,28,30,0.9); color: white; padding: 15px 30px; border-radius: 10px; z-index: 3000; font-weight: 700; box-shadow: 0 10px 25px rgba(0,0,0,0.2); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
 
         .modal-overlay { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding-top: 60px; overflow: auto; animation: fadeIn 0.2s; }
-        .modal-content { background-color: #fff; margin: auto; padding: 25px; width: 95%; max-width: 600px; border-radius: 16px; position: relative; animation: slideIn 0.3s; box-shadow: 0 20px 40px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); }
+        .modal-content { background-color: #fff; margin: auto; padding: 25px; width: 95%; max-width: 650px; border-radius: 16px; position: relative; animation: slideIn 0.3s; box-shadow: 0 20px 40px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); }
         .modal-close-btn { position: absolute; top: 12px; right: 18px; font-size: 28px; cursor: pointer; color: #aaa; z-index: 100; transition: color 0.2s; }
         .modal-close-btn:hover { color: var(--danger-color); }
         .preview-images-container { display: flex; flex-direction: column; gap: 15px; align-items: center; background: #f4f6f8; padding: 12px; border-radius: 10px; }
@@ -398,13 +427,13 @@
                     <div id="winCalendarBox" class="win-calendar-box" style="display: none;">
                         <div class="win-calendar-header">
                             <div style="display: flex; align-items: center; gap: 6px;">
-                                <button class="win-cal-nav-btn" onclick="navWinCalendar('prev', 'summary')">❮</button>
+                                <button class="win-cal-nav-btn" onclick="navWinCalendar('prev', 'summary', event)">❮</button>
                                 <span id="winCalMonthYear" style="color:#ffffff; font-weight:bold;">Tháng Tám 2026</span>
-                                <button class="win-cal-nav-btn" onclick="navWinCalendar('next', 'summary')">❯</button>
+                                <button class="win-cal-nav-btn" onclick="navWinCalendar('next', 'summary', event)">❯</button>
                             </div>
                             <div style="display:flex; gap: 4px;">
-                                <button class="secondary" style="padding: 2px 6px; font-size: 11px; background: transparent; color: #fff; border-color: #555;" onclick="selectAllDates(true)">Chọn hết</button>
-                                <button class="secondary" style="padding: 2px 6px; font-size: 11px; background: transparent; color: #fff; border-color: #555;" onclick="selectAllDates(false)">Bỏ hết</button>
+                                <button class="secondary" style="padding: 2px 6px; font-size: 11px; background: transparent; color: #fff; border-color: #555;" onclick="selectAllDates(true, event)">Chọn hết</button>
+                                <button class="secondary" style="padding: 2px 6px; font-size: 11px; background: transparent; color: #fff; border-color: #555;" onclick="selectAllDates(false, event)">Bỏ hết</button>
                             </div>
                         </div>
                         <div class="win-calendar-weekdays">
@@ -506,19 +535,19 @@
                     <div id="detailedWinCalBox" class="win-calendar-box" style="display: none; margin: 8px auto 0 auto;">
                         <div class="win-calendar-header">
                             <div style="display: flex; align-items: center; gap: 6px;">
-                                <button class="win-cal-nav-btn" onclick="navWinCalendar('prev', 'detailed')">❮</button>
+                                <button class="win-cal-nav-btn" onclick="navWinCalendar('prev', 'detailed', event)">❮</button>
                                 <span id="detailedWinCalMonthYear" style="color:#ffffff; font-weight:bold;">Tháng Tám 2026</span>
-                                <button class="win-cal-nav-btn" onclick="navWinCalendar('next', 'detailed')">❯</button>
+                                <button class="win-cal-nav-btn" onclick="navWinCalendar('next', 'detailed', event)">❯</button>
                             </div>
                             <div style="display:flex; gap: 4px;">
-                                <button class="secondary" style="padding: 2px 6px; font-size: 11px; background: transparent; color: #fff; border-color: #555;" onclick="selectDetailedAllDates(true)">Chọn hết</button>
-                                <button class="secondary" style="padding: 2px 6px; font-size: 11px; background: transparent; color: #fff; border-color: #555;" onclick="selectDetailedAllDates(false)">Bỏ hết</button>
+                                <button class="secondary" style="padding: 2px 6px; font-size: 11px; background: transparent; color: #fff; border-color: #555;" onclick="selectDetailedAllDates(true, event)">Chọn hết</button>
+                                <button class="secondary" style="padding: 2px 6px; font-size: 11px; background: transparent; color: #fff; border-color: #555;" onclick="selectDetailedAllDates(false, event)">Bỏ hết</button>
                             </div>
                         </div>
                         <div class="win-calendar-weekdays">
                             <div>H</div><div>B</div><div>T</div><div>N</div><div>S</div><div>B</div><div>C</div>
                         </div>
-                        <div id="winCalendarGrid" class="win-calendar-grid"></div>
+                        <div id="detailedWinCalGrid" class="win-calendar-grid"></div>
                     </div>
                 </div>
             </div>
@@ -622,12 +651,12 @@
 
     </div>
 
-    <!-- PREVIEW MODAL -->
-    <div id="imagePreviewModal" class="modal-overlay">
-        <div class="modal-content" style="max-width: 95%; width: auto; background-color: #f8f9fa;">
+    <!-- PREVIEW MODAL CÓ CHIA TRANG & ĐÓNG KHI CLICK RA NGOÀI -->
+    <div id="imagePreviewModal" class="modal-overlay" onclick="handleModalOverlayClick(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
             <span id="closePreviewModalBtn" class="modal-close-btn">&times;</span>
-            <h4 style="margin-top:0; text-align:center; color: #2c3e50;">Sao chép Ảnh</h4>
-            <div style="text-align: center; margin-bottom: 10px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <h4 style="margin-top:0; text-align:center; color: #2c3e50;">Danh sách Ảnh Báo Cáo</h4>
+            <div style="text-align: center; margin-bottom: 12px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
                 <button id="btnSaveAllImages" class="success" style="padding: 10px 20px; font-size: 14px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">💾 LƯU TẤT CẢ ẢNH</button>
                 <button id="btnShareImage" class="info" style="padding: 10px 20px; font-size: 14px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;">📤 CHIA SẺ ẢNH</button>
             </div>
@@ -641,7 +670,7 @@
     // ==================== CẤU HÌNH SUPABASE ====================
     const SUPABASE_URL = "https://wciiafziukygqsakdvnv.supabase.co";
     const SUPABASE_KEY = "sb_publishable_58Lc46GekjU9c47awi_Zsw_LYv_M86E";
-    const CONFIG_PASS = "zeng1986";
+    const CONFIG_PASS = "123456";
     // ==========================================================
 
     let currentDbData = [];
@@ -742,26 +771,63 @@
         const firstItem = parsedList[0];
         const lastItem = parsedList[parsedList.length - 1];
 
+        // 1. Trường hợp chỉ có 1 ngày duy nhất
         if (parsedList.length === 1) {
-            if (periodMonths.has(`${firstItem.y}-${String(firstItem.m).padStart(2,'0')}`)) {
+            const monthKey = `${firstItem.y}-${String(firstItem.m).padStart(2,'0')}`;
+            if (periodMonths.has(monthKey)) {
                 const lastDay = new Date(firstItem.y, firstItem.m, 0).getDate();
                 return `Từ 01/${String(firstItem.m).padStart(2, '0')} đến ${lastDay}/${String(firstItem.m).padStart(2, '0')}`;
             }
             return `Ngày ${String(firstItem.d).padStart(2, '0')}/${String(firstItem.m).padStart(2, '0')}`;
         }
 
-        let startStr = `${String(firstItem.d).padStart(2, '0')}/${String(firstItem.m).padStart(2, '0')}`;
-        let endStr = "";
-
-        const lastMonthKey = `${lastItem.y}-${String(lastItem.m).padStart(2,'0')}`;
-        if (periodMonths.has(lastMonthKey) && lastItem.d === 1) {
-            const lastDayOfEndMonth = new Date(lastItem.y, lastItem.m, 0).getDate();
-            endStr = `${lastDayOfEndMonth}/${String(lastItem.m).padStart(2, '0')}`;
-        } else {
-            endStr = `${String(lastItem.d).padStart(2, '0')}/${String(lastItem.m).padStart(2, '0')}`;
+        // 2. Kiểm tra xem toàn bộ các ngày có liên tiếp nhau không
+        let isConsecutive = true;
+        for (let i = 1; i < parsedList.length; i++) {
+            const diffDays = Math.round((parsedList[i].time - parsedList[i-1].time) / (1000 * 60 * 60 * 24));
+            if (diffDays !== 1) {
+                isConsecutive = false;
+                break;
+            }
         }
 
-        return `Từ ${startStr} đến ${endStr}`;
+        if (isConsecutive) {
+            let startStr = `${String(firstItem.d).padStart(2, '0')}/${String(firstItem.m).padStart(2, '0')}`;
+            let endStr = "";
+
+            const lastMonthKey = `${lastItem.y}-${String(lastItem.m).padStart(2,'0')}`;
+            if (periodMonths.has(lastMonthKey) && lastItem.d === 1) {
+                const lastDayOfEndMonth = new Date(lastItem.y, lastItem.m, 0).getDate();
+                endStr = `${lastDayOfEndMonth}/${String(lastItem.m).padStart(2, '0')}`;
+            } else {
+                endStr = `${String(lastItem.d).padStart(2, '0')}/${String(lastItem.m).padStart(2, '0')}`;
+            }
+            return `Từ ${startStr} đến ${endStr}`;
+        }
+
+        // 3. Nếu các ngày KHÔNG liên tiếp -> Gom nhóm theo từng tháng
+        let monthGroups = {};
+        parsedList.forEach(item => {
+            const mKey = `${item.y}-${item.m}`;
+            if (!monthGroups[mKey]) monthGroups[mKey] = [];
+            monthGroups[mKey].push(item.d);
+        });
+
+        let monthTextArr = [];
+        Object.keys(monthGroups).forEach(mKey => {
+            const [y, m] = mKey.split('-');
+            const days = monthGroups[mKey];
+            const isFullMonth = periodMonths.has(`${y}-${String(m).padStart(2,'0')}`) && days.length === 1 && days[0] === 1;
+            
+            if (isFullMonth) {
+                const lastDay = new Date(parseInt(y), parseInt(m), 0).getDate();
+                monthTextArr.push(`Từ 01 đến ${lastDay} tháng ${m}`);
+            } else {
+                monthTextArr.push(`Ngày ${days.join(',')} tháng ${m}`);
+            }
+        });
+
+        return monthTextArr.join(' và ');
     }
 
     window.openConfigWithAuth = function() {
@@ -834,6 +900,8 @@
 
             globalAllDates = Array.from(dateSet).sort();
             globalSelectedDates = [...globalAllDates];
+            currentSearchAllDates = [...globalAllDates];
+            currentSearchSelectedDates = [...globalSelectedDates];
             dateRangeText = getFormattedDateRange(globalSelectedDates);
 
             if (globalAllDates.length > 0) {
@@ -1020,6 +1088,8 @@
 
         globalAllDates = Array.from(dateSet).sort();
         globalSelectedDates = [...globalAllDates];
+        currentSearchAllDates = [...globalAllDates];
+        currentSearchSelectedDates = [...globalSelectedDates];
         dateRangeText = getFormattedDateRange(globalSelectedDates);
 
         if (globalAllDates.length > 0) {
@@ -1053,14 +1123,16 @@
         if (cal2 && cal2.style.display === 'block' && !cal2.contains(e.target) && e.target.id !== 'btnDetailedWinCalToggle' && e.target.id !== 'lblDetailedWinCalToggle') cal2.style.display = 'none';
     });
 
-    window.navWinCalendar = function(dir, type) {
+    window.navWinCalendar = function(dir, type, event) {
+        if (event) event.stopPropagation();
         let view = type === 'summary' ? summaryCalView : detailedCalView;
         if (dir === 'prev') { view.month--; if (view.month < 1) { view.month = 12; view.year--; } }
         else { view.month++; if (view.month > 12) { view.month = 1; view.year++; } }
         if (type === 'summary') renderWinCalendarGrid(); else renderDetailedWinCalendar();
     };
 
-    window.selectAllDates = function(isSelectAll) {
+    window.selectAllDates = function(isSelectAll, event) {
+        if (event) event.stopPropagation();
         globalSelectedDates = isSelectAll ? [...globalAllDates] : [];
         currentSearchSelectedDates = [...globalSelectedDates];
         renderWinCalendarGrid(); renderDetailedWinCalendar();
@@ -1095,13 +1167,15 @@
 
             if (isPeriodMonth) {
                 cell.classList.add('period-locked');
-                cell.onclick = () => {
+                cell.onclick = (e) => {
+                    e.stopPropagation();
                     showNotification(`Tháng ${month} là dữ liệu gộp cả tháng, không thể tách lọc ngày lẻ!`, "warning");
                 };
             } else if (globalAllDates.includes(iso)) {
                 cell.classList.add('has-data');
                 if (globalSelectedDates.includes(iso)) cell.classList.add('active');
-                cell.onclick = () => {
+                cell.onclick = (e) => {
+                    e.stopPropagation();
                     const idx = globalSelectedDates.indexOf(iso);
                     if (idx > -1) globalSelectedDates.splice(idx, 1); else globalSelectedDates.push(iso);
                     currentSearchSelectedDates = [...globalSelectedDates];
@@ -1114,7 +1188,8 @@
         }
     }
 
-    window.selectDetailedAllDates = function(isSelectAll) {
+    window.selectDetailedAllDates = function(isSelectAll, event) {
+        if (event) event.stopPropagation();
         currentSearchSelectedDates = isSelectAll ? [...globalAllDates] : [];
         globalSelectedDates = [...currentSearchSelectedDates];
         renderDetailedWinCalendar(); renderWinCalendarGrid();
@@ -1149,13 +1224,15 @@
 
             if (isPeriodMonth) {
                 cell.classList.add('period-locked');
-                cell.onclick = () => {
+                cell.onclick = (e) => {
+                    e.stopPropagation();
                     showNotification(`Tháng ${month} là dữ liệu gộp cả tháng, không thể tách lọc ngày lẻ!`, "warning");
                 };
             } else if (currentSearchAllDates.includes(iso)) {
                 cell.classList.add('has-data');
                 if (currentSearchSelectedDates.includes(iso)) cell.classList.add('active');
-                cell.onclick = () => {
+                cell.onclick = (e) => {
+                    e.stopPropagation();
                     const idx = currentSearchSelectedDates.indexOf(iso);
                     if (idx > -1) currentSearchSelectedDates.splice(idx, 1); else currentSearchSelectedDates.push(iso);
                     globalSelectedDates = [...currentSearchSelectedDates];
@@ -1231,6 +1308,7 @@
         return { groups, totals };
     }
 
+    // ==================== SẮP XẾP SỐ SỔ TỪ BÉ ĐẾN LỚN ====================
     function generateSummaryView() {
         if (!currentDbData.length) return;
         const regVal = DOM.regionSelect.value, rules = regVal !== 'all' ? regionDefinitions[regVal] : null;
@@ -1239,12 +1317,24 @@
         let htmlHead = `<thead><tr><th>STT</th><th>ĐL</th><th>LTô</th><th>LCặp</th><th>Lô 3/23</th><th>Lô 2/27</th><th>XSKT</th><th>Dsố</th><th>Thưởng</th><th>Tiền nộp</th></tr></thead>`;
         let htmlBody = `<tbody>`;
 
-        let stt = 1;
         let sortedGroups = [...groups.entries()];
-        if (DOM.cbSortDesc && DOM.cbSortDesc.checked) sortedGroups.sort((a, b) => b[1].gr - a[1].gr);
+        
+        if (DOM.cbSortDesc && DOM.cbSortDesc.checked) {
+            sortedGroups.sort((a, b) => b[1].gr - a[1].gr);
+        } else {
+            sortedGroups.sort((a, b) => {
+                const numA = parseInt(a[0], 10) || 0;
+                const numB = parseInt(b[0], 10) || 0;
+                return numA - numB;
+            });
+        }
 
+        let stt = 1;
         sortedGroups.forEach(([gk, g]) => {
             const isGroup = g.agents.length > 1;
+            
+            g.agents.sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true, sensitivity: 'base' }));
+
             g.agents.forEach((ag, idx) => {
                 const d = ag.data, final = (d.totRev - d.totCom - d.thuong);
                 htmlBody += `<tr class="${isGroup?'group-member-row':'single-agent-row'}">
@@ -1278,17 +1368,17 @@
         });
 
         htmlBody += `</tbody>`;
-        let htmlFoot = `<tfoot><tr id="summaryTotalRow">
-            <td class="stt-col"></td>
-            <td class="total-label-cell">TỔNG</td>
-            <td>${formatNumberHiddenK(totals.lotoDB)}</td>
-            <td>${formatNumberHiddenK(totals.lotoCap)}</td>
-            <td>${formatNumberHiddenK(totals.c323)}</td>
-            <td>${formatNumberHiddenK(totals.c227)}</td>
-            <td>${formatNumberHiddenK(totals.xskt)}</td>
-            <td>${formatNumberHiddenK(totals.rev)}</td>
-            <td>${formatNumberHiddenK(totals.th)}</td>
-            <td class="${totals.final>=0?'final-amount-positive':'final-amount-negative'}">${formatNumberHiddenK(totals.final)}</td>
+        let htmlFoot = `<tfoot><tr id="summaryTotalRow" style="background-color: #5d4037 !important; color: #ffffff !important;">
+            <td class="stt-col" style="background-color: #5d4037 !important; color: #ffffff !important;"></td>
+            <td class="total-label-cell" style="background-color: #5d4037 !important; color: #ffffff !important; font-weight: bold;">TỔNG</td>
+            <td style="background-color: #5d4037 !important; color: #ffffff !important;">${formatNumberHiddenK(totals.lotoDB)}</td>
+            <td style="background-color: #5d4037 !important; color: #ffffff !important;">${formatNumberHiddenK(totals.lotoCap)}</td>
+            <td style="background-color: #5d4037 !important; color: #ffffff !important;">${formatNumberHiddenK(totals.c323)}</td>
+            <td style="background-color: #5d4037 !important; color: #ffffff !important;">${formatNumberHiddenK(totals.c227)}</td>
+            <td style="background-color: #5d4037 !important; color: #ffffff !important;">${formatNumberHiddenK(totals.xskt)}</td>
+            <td style="background-color: #5d4037 !important; color: #ffffff !important;">${formatNumberHiddenK(totals.rev)}</td>
+            <td style="background-color: #5d4037 !important; color: #ffffff !important;">${formatNumberHiddenK(totals.th)}</td>
+            <td class="${totals.final>=0?'final-amount-positive':'final-amount-negative'}" style="color: #ffffff !important;">${formatNumberHiddenK(totals.final)}</td>
         </tr></tfoot>`;
 
         DOM.summaryTableContainer.innerHTML = `<table>${htmlHead}${htmlBody}${htmlFoot}</table>`;
@@ -1480,7 +1570,7 @@
                 <colgroup><col style="width: 34%;"><col style="width: 33%;"><col style="width: 33%;"></colgroup>
                 <tbody>
                     <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="2" class="so-so" style="font-size: 32px !important; font-weight: 900 !important; color: #c42b1c !important;">${agentName}</td></tr>
-                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="2" style="font-weight:700; font-size:14.5px;">${reportDate}</td></tr>
+                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="2" class="report-dot-cell">${reportDate}</td></tr>
                     <tr style="background:#107c41; color:#fff;"><th>Loại hình</th><th>Doanh thu</th><th>Hoa hồng</th></tr>
                     <tr><td>Lôtô ĐB</td><td>${formatNumberHiddenK(d.t.lotoDB)}</td><td>${formatNumberHiddenK(d.c.ldb)}</td></tr>
                     <tr><td>Lôtô cặp</td><td>${formatNumberHiddenK(d.t.loCap)}</td><td>${formatNumberHiddenK(d.c.lc)}</td></tr>
@@ -1509,7 +1599,7 @@
                 <colgroup><col style="width: 35%;"><col style="width: 17%;"><col style="width: 15%;"><col style="width: 15%;"><col style="width: 18%;"></colgroup>
                 <tbody>
                     <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="4" class="so-so" style="font-size: 32px !important; font-weight: 900 !important; color: #c42b1c !important;">${agentName}</td></tr>
-                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="4" style="font-weight:700; font-size:14px;">${reportDate}</td></tr>
+                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="4" class="report-dot-cell">${reportDate}</td></tr>
                     <tr style="background:#107c41; color:#fff;"><th>Ngày/Loại</th><th>D.Thu</th><th>H.Hồng</th><th>Thưởng</th><th>Nộp/Lấy</th></tr>
                     ${rowsHtml}
                     <tr id="tongCongRow" style="font-weight:bold; background:#eaeaea;"><td>Tổng</td><td id="tongDT"></td><td id="tongHH"></td><td></td><td></td></tr>
@@ -1624,11 +1714,12 @@
     DOM.btnCreateSummaryReport.onclick = () => { currentReportType = 'summary'; createReport(); };
     DOM.btnPrintReport.onclick = () => window.print();
 
-    // ==================== CHỤP ẢNH BÁO CÁO & SAO CHÉP TRỰC TIẾP VÀO CLIPBOARD ====================
+    // ==================== CHỤP ẢNH BÁO CÁO & XUẤT ẢNH CÓ CHIA TRANG ====================
     async function copyElementAsImage(sel, msg, btn) {
         const oldTxt = btn ? btn.textContent : ''; 
-        if (btn) btn.textContent = 'Đang copy...';
+        if (btn) btn.textContent = 'Đang xử lý...';
 
+        // 1. Chụp Báo Cáo Đại Lý (Nhỏ gọn 1 trang)
         if (sel === '#reportContainer') {
             const reportTable = document.querySelector('#reportContainer table');
             if (!reportTable || !reportTable.innerHTML.trim()) {
@@ -1712,13 +1803,13 @@
                             if (blob) {
                                 navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(() => {
                                     showNotification('✅ Đã copy ảnh! Bạn có thể dán (Ctrl+V) vào Zalo ngay.', 'success');
-                                }).catch(() => showPreviewModal(imgSrc));
+                                }).catch(() => showPreviewModal([imgSrc]));
                             } else {
-                                showPreviewModal(imgSrc);
+                                showPreviewModal([imgSrc]);
                             }
                         }, 'image/png');
                     } else {
-                        showPreviewModal(imgSrc);
+                        showPreviewModal([imgSrc]);
                     }
                 } catch(e) {
                     console.error(e); showNotification('Lỗi tạo ảnh', 'error');
@@ -1730,46 +1821,169 @@
             return;
         }
 
-        // BẢNG TỔNG HỢP A4
-        const summaryElem = document.querySelector('#summaryPrintContainer');
-        if (!summaryElem) return;
-        setTimeout(async () => {
-            try {
-                const canvas = await html2canvas(summaryElem, { backgroundColor: "#ffffff", scale: 2, useCORS: true });
-                const imgSrc = canvas.toDataURL('image/png');
-                
-                if (navigator.clipboard && navigator.clipboard.write) {
-                    canvas.toBlob(blob => {
-                        if (blob) {
-                            navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(() => {
-                                showNotification('✅ Đã copy ảnh Bảng Tổng Hợp vào Clipboard! Dán vào Zalo ngay.', 'success');
-                            }).catch(() => showPreviewModal(imgSrc));
-                        } else {
-                            showPreviewModal(imgSrc);
-                        }
-                    }, 'image/png');
-                } else {
-                    showPreviewModal(imgSrc);
-                }
-            } catch(e) {
-                showNotification('Lỗi tạo ảnh tổng hợp', 'error');
-            } finally {
-                if (btn) btn.textContent = oldTxt;
+        // 2. Chụp Bảng Tổng Hợp TỰ ĐỘNG CHIA TRANG A4 CHUẨN (ĐÃ FIX LỖI Ô TỔNG)
+        const table = document.querySelector('#summaryTableContainer table');
+        if (!table) {
+            if (btn) btn.textContent = oldTxt;
+            return showNotification("Chưa có dữ liệu!", "warning");
+        }
+
+        const allRows = Array.from(table.querySelectorAll('tbody tr'));
+        if (!allRows.length) {
+            if (btn) btn.textContent = oldTxt;
+            return showNotification("Bảng không có dữ liệu!", "warning");
+        }
+
+        const ROWS_PER_PAGE = 26;
+        const totalPages = Math.ceil(allRows.length / ROWS_PER_PAGE) || 1;
+        const theadHtml = table.querySelector('thead').outerHTML;
+        const tfootHtml = table.querySelector('tfoot') ? table.querySelector('tfoot').outerHTML : '';
+        const titleHtml = DOM.summaryTitle.innerHTML;
+        const dateHtml = DOM.summaryDate.innerHTML;
+
+        currentGeneratedImages = [];
+        showLoading();
+
+        try {
+            for (let page = 0; page < totalPages; page++) {
+                const startIdx = page * ROWS_PER_PAGE;
+                const endIdx = Math.min(startIdx + ROWS_PER_PAGE, allRows.length);
+                const pageRows = allRows.slice(startIdx, endIdx);
+
+                const pageWrapper = document.createElement('div');
+                pageWrapper.style.position = 'fixed';
+                pageWrapper.style.left = '-9999px';
+                pageWrapper.style.top = '0';
+                pageWrapper.style.width = '820px';
+                pageWrapper.style.background = '#ffffff';
+                pageWrapper.style.padding = '18px 16px 14px 16px';
+                pageWrapper.style.boxSizing = 'border-box';
+                pageWrapper.style.display = 'block';
+
+                let tbodyChunkHtml = `<tbody>` + pageRows.map(r => r.outerHTML).join('') + `</tbody>`;
+                let isLastPage = (page === totalPages - 1);
+
+                pageWrapper.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 10px;">
+                        <h3 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 800; color: #201f1e;">${titleHtml}</h3>
+                        <div style="font-size: 13.5px; font-weight: 600; color: #605e5c; line-height: 1.4;">${dateHtml}</div>
+                    </div>
+                    <table style="width: 100%; border-collapse: collapse; background: #ffffff;">
+                        ${theadHtml}
+                        ${tbodyChunkHtml}
+                        ${isLastPage ? tfootHtml : ''}
+                    </table>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11px; font-weight: bold; color: #888;">
+                        <span>Trang ${page + 1}/${totalPages}</span>
+                        <span>© 2026 ZENG FINANCE</span>
+                    </div>
+                `;
+
+                // XÓA BỎ HOÀN TOÀN THUỘC TÍNH STICKY KHI VẼ CANVAS ĐỂ TRÁNH LỆCH Ô TỔNG
+                pageWrapper.querySelectorAll('th, td').forEach(cell => {
+                    cell.style.position = 'static';
+                    cell.style.boxShadow = 'none';
+                    cell.style.left = 'auto';
+                    cell.style.bottom = 'auto';
+                });
+
+                document.body.appendChild(pageWrapper);
+
+                const canvas = await html2canvas(pageWrapper, {
+                    backgroundColor: "#ffffff",
+                    scale: 2,
+                    useCORS: true,
+                    width: 820,
+                    height: Math.ceil(pageWrapper.scrollHeight)
+                });
+
+                document.body.removeChild(pageWrapper);
+                currentGeneratedImages.push(canvas.toDataURL('image/png'));
             }
-        }, 80);
+
+            showPreviewModal(currentGeneratedImages);
+
+            if (navigator.clipboard && navigator.clipboard.write && currentGeneratedImages.length > 0) {
+                fetch(currentGeneratedImages[0])
+                    .then(res => res.blob())
+                    .then(blob => {
+                        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+                        showNotification(`Đã xuất ${totalPages} trang ảnh & copy trang 1 vào Clipboard!`, "success");
+                    }).catch(() => {});
+            } else {
+                showNotification(`Đã xuất ${totalPages} trang ảnh thành công!`, "success");
+            }
+        } catch(e) {
+            console.error(e);
+            showNotification("Lỗi tạo ảnh chia trang: " + e.message, "error");
+        } finally {
+            hideLoading();
+            if (btn) btn.textContent = oldTxt;
+        }
     }
 
-    function showPreviewModal(imgSrc) {
+    function showPreviewModal(imgList) {
         const previewHolder = document.getElementById('imagePreviewHolder');
-        previewHolder.innerHTML = `<div class="preview-image-item"><img src="${imgSrc}"></div>`;
+        previewHolder.innerHTML = '';
+        imgList.forEach((src, idx) => {
+            const item = document.createElement('div');
+            item.className = 'preview-image-item';
+            item.innerHTML = `
+                <div style="font-size: 12px; font-weight: bold; color: #555; margin-bottom: 4px;">Trang ${idx + 1}/${imgList.length}</div>
+                <img src="${src}">
+            `;
+            previewHolder.appendChild(item);
+        });
+
+        if (navigator.share && navigator.canShare) {
+            DOM.btnShareImage.style.display = 'inline-flex';
+        } else {
+            DOM.btnShareImage.style.display = 'none';
+        }
+
         DOM.imagePreviewModal.style.display = 'block';
     }
+
+    window.handleModalOverlayClick = function(event) {
+        if (event.target === DOM.imagePreviewModal) {
+            DOM.imagePreviewModal.style.display = 'none';
+        }
+    };
+
+    DOM.btnSaveAllImages.onclick = () => {
+        if (!currentGeneratedImages.length) return;
+        currentGeneratedImages.forEach((src, idx) => {
+            const a = document.createElement('a');
+            a.href = src;
+            a.download = `Bao_Cao_Trang_${idx + 1}.png`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        });
+        showNotification(`Đã tải xuống ${currentGeneratedImages.length} ảnh!`, 'success');
+    };
+
+    DOM.btnShareImage.onclick = async () => {
+        if (!currentGeneratedImages.length || !navigator.share) return;
+        try {
+            const files = await Promise.all(currentGeneratedImages.map(async (dataUrl, idx) => {
+                const blob = await (await fetch(dataUrl)).blob();
+                return new File([blob], `Bao_Cao_Trang_${idx + 1}.png`, { type: 'image/png' });
+            }));
+            await navigator.share({
+                title: 'Báo cáo Thu Tiền - XSKT Nam Định',
+                files: files
+            });
+        } catch (err) {
+            if (err.name !== 'AbortError') showNotification('Lỗi chia sẻ ảnh: ' + err.message, 'error');
+        }
+    };
 
     DOM.btnCopySummary.onclick = function() { copyElementAsImage('#summaryPrintContainer', 'Đã copy ảnh bảng Tổng Hợp!', this); };
     DOM.btnCopyReport.onclick = function() { copyElementAsImage('#reportContainer', 'Đã copy ảnh Công nợ!', this); };
     DOM.closePreviewModalBtn.onclick = () => DOM.imagePreviewModal.style.display = 'none';
 
-    // ==================== KHÔI PHỤC XUẤT FILE EXCEL ĐẦY ĐỦ MÀU SẮC ====================
+    // ==================== XUẤT FILE EXCEL ĐẦY ĐỦ MÀU SẮC ====================
     DOM.btnExportExcel.onclick = function() {
         const table = document.querySelector('#summaryTableContainer table');
         if (!table) return showNotification("Chưa có dữ liệu để xuất Excel!", "warning");
@@ -1953,6 +2167,7 @@
             {v: "9", t: "Tháng 9"}, {v: "10", t: "Tháng 10"}, {v: "11", t: "Tháng 11"}, {v: "12", t: "Tháng 12"}
         ];
         const fill = (el, def) => {
+            if (!el) return;
             el.innerHTML = '';
             months.forEach(m => {
                 const opt = document.createElement('option'); opt.value = m.v; opt.textContent = m.t;
@@ -2173,6 +2388,7 @@
         }
     });
 
+    // Khởi tạo
     initMonthDropdowns();
     initSupabaseConfigs();
 })();
