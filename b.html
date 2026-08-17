@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Báo cáo thu tiền - XSKT Nam Định</title>
+    <title>Báo Cáo - XSKT Nam Định</title>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -203,21 +203,20 @@
             border: 1px solid rgba(0,0,0,0.1);
         }
 
+        /* LỊCH THIẾT KẾ ĐẨY NỘI DUNG TỰ NHIÊN (KHÔNG CHE BẢNG) */
         .win-calendar-box {
             background: #202020 !important;
             color: #ffffff !important;
             border-radius: 6px !important;
             padding: 12px !important;
-            margin-top: 8px !important;
+            margin: 10px auto 4px auto !important;
             box-shadow: 0 4px 16px rgba(0,0,0,0.35) !important;
             max-width: 340px !important;
             width: 100% !important;
             box-sizing: border-box !important;
-            position: absolute !important;
-            z-index: 50 !important;
+            position: relative !important;
+            z-index: 10 !important;
         }
-        #winCalendarBox { left: 10px; top: 38px; }
-        #detailedWinCalBox { right: 10px; top: 38px; }
 
         .win-calendar-header {
             display: flex !important;
@@ -295,7 +294,7 @@
         }
         .win-cal-cell.dimmed { color: #555555 !important; }
 
-        /* GIAO DIỆN QUẢN LÝ CẤU HÌNH HIỆN ĐẠI */
+        /* GIAO DIỆN QUẢN LÝ CẤU HÌNH */
         .cfg-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
@@ -373,7 +372,6 @@
             .report-table th, .report-table td { padding: 7px 2px !important; font-size: 13.5px !important; }
             .summary-actions-bottom { margin-top: 12px; gap: 6px; }
             .summary-actions-bottom button { font-size: 13.5px; padding: 10px 2px; }
-            #winCalendarBox, #detailedWinCalBox { left: 5% !important; right: 5% !important; max-width: 90% !important; }
             
             .cfg-item-row { flex-wrap: wrap; gap: 6px; padding: 8px; }
             .cfg-badge-idx { width: 24px; height: 24px; font-size: 11px; }
@@ -388,34 +386,6 @@
         .notification.error { background-color: var(--danger-color); }
         .notification.info { background-color: #0078d4; }
         #loading-indicator { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(28,28,30,0.9); color: white; padding: 15px 30px; border-radius: 10px; z-index: 3000; font-weight: 700; box-shadow: 0 10px 25px rgba(0,0,0,0.2); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-
-        .modal-overlay { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding-top: 60px; overflow: auto; animation: fadeIn 0.2s; }
-        .modal-content { background-color: #fff; margin: auto; padding: 25px; width: 95%; max-width: 650px; border-radius: 16px; position: relative; animation: slideIn 0.3s; box-shadow: 0 20px 40px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); }
-        .modal-close-btn { position: absolute; top: 12px; right: 18px; font-size: 28px; cursor: pointer; color: #aaa; z-index: 100; transition: color 0.2s; }
-        .modal-close-btn:hover { color: var(--danger-color); }
-        .preview-images-container { display: flex; flex-direction: column; gap: 15px; align-items: center; background: #f4f6f8; padding: 12px; border-radius: 10px; }
-        .preview-image-item { width: 100%; background: #fff; padding: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; border-radius: 8px; }
-        .preview-image-item img { width: 100%; display: block; border-radius: 4px; -webkit-touch-callout: default !important; user-select: auto !important; -webkit-user-select: auto !important; }
-
-        @media print {
-            @page { size: A4; margin: 10mm; }
-            body { padding: 0 !important; margin: 0 !important; background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-size: 11pt; }
-            body > * { display: none !important; }
-            #mainPage, #summarySection, #summaryPrintContainer, #summaryTableContainer { 
-                display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; 
-                position: static !important; visibility: visible !important; overflow: visible !important; max-height: none !important; border: none !important; 
-            }
-            table { width: 100% !important; border-collapse: collapse !important; page-break-after: auto; }
-            tr { page-break-inside: avoid !important; page-break-after: auto; }
-            thead { display: table-header-group !important; }
-            tfoot { display: table-footer-group !important; }
-            tbody { display: table-row-group !important; }
-            th, td { border: 1px solid #000 !important; position: static !important; }
-            th { background: #107c41 !important; color: white !important; }
-            #summaryTotalRow td { background-color: #5d4037 !important; color: white !important; font-weight: bold !important; border: 1px solid #000 !important; position: static !important; }
-            .controls-panel, .summary-actions-bottom, .home-menu-grid, .nav-header, .simple-animated-logo, #notification-area, #actionButtonContainer { display: none !important; }
-            #summaryTitle, #summaryDate { text-align: center !important; display: block !important; }
-        }
     </style>
 </head>
 <body>
@@ -488,7 +458,7 @@
             </div>
 
             <div class="controls-panel">
-                <div style="border-bottom: 1px dashed #dcdde1; padding-bottom: 10px; position: relative;">
+                <div style="border-bottom: 1px dashed #dcdde1; padding-bottom: 10px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <label id="lblWinCalToggle" style="color: #0078d4; margin: 0; cursor: pointer;" onclick="toggleWinCalendar('winCalendarBox', event)">
                             📅 Lọc Ngày (<span id="winCalSelectedCount">Tất cả</span>) ▾
@@ -595,8 +565,8 @@
                     <button id="btnCreateSummaryReport" class="danger" style="flex: 1; padding: 10px 4px;">Công nợ</button>
                 </div>
 
-                <!-- LỊCH TRA CỨU ĐẠI LÝ -->
-                <div id="detailedDatePickerContainer" style="display: none; border-top: 1px dashed #dcdde1; padding-top: 8px; margin-top: 6px; position: relative;">
+                <!-- LỊCH TRA CỨU ĐẠI LÝ (ĐÃ FIX KHÔNG BỊ CHE KHUẤT) -->
+                <div id="detailedDatePickerContainer" style="display: none; border-top: 1px dashed #dcdde1; padding-top: 8px; margin-top: 6px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <label id="lblDetailedWinCalToggle" style="font-size: 12.5px; color: #0078d4; margin: 0; font-weight: bold; cursor: pointer;" onclick="toggleWinCalendar('detailedWinCalBox', event)">
                             📅 Lịch Ngày Đang Chọn (<span id="detailedSelectedCount">Tất cả</span>) ▾
@@ -619,7 +589,7 @@
                         <div class="win-calendar-weekdays">
                             <div>H</div><div>B</div><div>T</div><div>N</div><div>S</div><div>B</div><div>C</div>
                         </div>
-                        <div id="winCalendarGrid" class="win-calendar-grid"></div>
+                        <div id="detailedWinCalGrid" class="win-calendar-grid"></div>
                     </div>
                 </div>
             </div>
@@ -723,19 +693,6 @@
 
     </div>
 
-    <!-- PREVIEW MODAL CÓ CHIA TRANG & ĐÓNG KHI CLICK RA NGOÀI -->
-    <div id="imagePreviewModal" class="modal-overlay" onclick="handleModalOverlayClick(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <span id="closePreviewModalBtn" class="modal-close-btn">&times;</span>
-            <h4 style="margin-top:0; text-align:center; color: #2c3e50;">Danh sách Ảnh Báo Cáo</h4>
-            <div style="text-align: center; margin-bottom: 12px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                <button id="btnSaveAllImages" class="success" style="padding: 10px 20px; font-size: 14px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">💾 LƯU TẤT CẢ ẢNH</button>
-                <button id="btnShareImage" class="info" style="padding: 10px 20px; font-size: 14px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;">📤 CHIA SẺ ẢNH</button>
-            </div>
-            <div id="imagePreviewHolder" class="preview-images-container"></div>
-        </div>
-    </div>
-
 <script>
 'use strict';
 (function() {
@@ -750,7 +707,6 @@
     let dateRangeText = "Chưa có ngày";
     let regionDefinitions = {};
     let currentReportType = 'detailed';
-    let currentGeneratedImages = [];
 
     let branchModes = { 'all': { label: 'Xem Tất Cả', prefixes: [] } };
     let globalAllDates = [];
@@ -787,8 +743,6 @@
         btnAddTicket: document.getElementById('btnAddTicket'), sellQuantityInput: document.getElementById('sellQuantityInput'),
         customTicketName: document.getElementById('customTicketName'), customTicketPrice: document.getElementById('customTicketPrice'), customTicketRate: document.getElementById('customTicketRate'),
         notificationArea: document.getElementById('notification-area'), loadingIndicator: document.getElementById('loading-indicator'),
-        imagePreviewModal: document.getElementById('imagePreviewModal'), closePreviewModalBtn: document.getElementById('closePreviewModalBtn'), imagePreviewHolder: document.getElementById('imagePreviewHolder'),
-        btnSaveAllImages: document.getElementById('btnSaveAllImages'), btnShareImage: document.getElementById('btnShareImage'),
         regionSelect: document.getElementById('regionSelect'), btnClearRevenueFilter: document.getElementById('btnClearRevenueFilter'),
         selBranchMode: document.getElementById('selBranchMode'), selBranchMode_Detailed: document.getElementById('selBranchMode_Detailed'),
         cbExcludeNumeric: document.getElementById('cbExcludeNumeric'), cbExcludeXSKT: document.getElementById('cbExcludeXSKT'),
@@ -1846,10 +1800,10 @@
     DOM.btnCreateSummaryReport.onclick = () => { currentReportType = 'summary'; createReport(); };
     DOM.btnPrintReport.onclick = () => window.print();
 
-    // ==================== CHỤP ẢNH BÁO CÁO & XUẤT ẢNH CÓ CHIA TRANG ====================
+    // ==================== SAO CHÉP ẢNH TRỰC TIẾP VÀO CLIPBOARD ====================
     async function copyElementAsImage(sel, msg, btn) {
         const oldTxt = btn ? btn.textContent : ''; 
-        if (btn) btn.textContent = 'Đang xử lý...';
+        if (btn) btn.textContent = 'Đang copy...';
 
         if (sel === '#reportContainer') {
             const reportTable = document.querySelector('#reportContainer table');
@@ -1926,21 +1880,18 @@
                     ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
                     ctx.drawImage(rawCanvas, 0, 0, targetW * 2, targetH * 2, 0, 0, targetW * 2, targetH * 2);
 
-                    const imgSrc = finalCanvas.toDataURL('image/png'); 
-                    currentGeneratedImages = [imgSrc];
-
                     if (navigator.clipboard && navigator.clipboard.write) {
                         finalCanvas.toBlob(blob => {
                             if (blob) {
                                 navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(() => {
-                                    showNotification('✅ Đã copy ảnh! Bạn có thể dán (Ctrl+V) vào Zalo ngay.', 'success');
-                                }).catch(() => showPreviewModal([imgSrc]));
-                            } else {
-                                showPreviewModal([imgSrc]);
+                                    showNotification('✅ Đã copy ảnh! Dán (Ctrl+V) vào Zalo ngay.', 'success');
+                                }).catch(err => {
+                                    showNotification('Không thể ghi clipboard: ' + err.message, 'error');
+                                });
                             }
                         }, 'image/png');
                     } else {
-                        showPreviewModal([imgSrc]);
+                        showNotification('Trình duyệt không hỗ trợ Clipboard trực tiếp!', 'warning');
                     }
                 } catch(e) {
                     console.error(e); showNotification('Lỗi tạo ảnh', 'error');
@@ -1952,165 +1903,35 @@
             return;
         }
 
-        const table = document.querySelector('#summaryTableContainer table');
-        if (!table) {
-            if (btn) btn.textContent = oldTxt;
-            return showNotification("Chưa có dữ liệu!", "warning");
-        }
-
-        const allRows = Array.from(table.querySelectorAll('tbody tr'));
-        if (!allRows.length) {
-            if (btn) btn.textContent = oldTxt;
-            return showNotification("Bảng không có dữ liệu!", "warning");
-        }
-
-        const ROWS_PER_PAGE = 26;
-        const totalPages = Math.ceil(allRows.length / ROWS_PER_PAGE) || 1;
-        const theadHtml = table.querySelector('thead').outerHTML;
-        const tfootHtml = table.querySelector('tfoot') ? table.querySelector('tfoot').outerHTML : '';
-        const titleHtml = DOM.summaryTitle.innerHTML;
-        const dateHtml = DOM.summaryDate.innerHTML;
-
-        currentGeneratedImages = [];
-        showLoading();
-
-        try {
-            for (let page = 0; page < totalPages; page++) {
-                const startIdx = page * ROWS_PER_PAGE;
-                const endIdx = Math.min(startIdx + ROWS_PER_PAGE, allRows.length);
-                const pageRows = allRows.slice(startIdx, endIdx);
-
-                const pageWrapper = document.createElement('div');
-                pageWrapper.style.position = 'fixed';
-                pageWrapper.style.left = '-9999px';
-                pageWrapper.style.top = '0';
-                pageWrapper.style.width = '820px';
-                pageWrapper.style.background = '#ffffff';
-                pageWrapper.style.padding = '18px 16px 14px 16px';
-                pageWrapper.style.boxSizing = 'border-box';
-                pageWrapper.style.display = 'block';
-
-                let tbodyChunkHtml = `<tbody>` + pageRows.map(r => r.outerHTML).join('') + `</tbody>`;
-                let isLastPage = (page === totalPages - 1);
-
-                pageWrapper.innerHTML = `
-                    <div style="text-align: center; margin-bottom: 10px;">
-                        <h3 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 800; color: #201f1e;">${titleHtml}</h3>
-                        <div style="font-size: 13.5px; font-weight: 600; color: #605e5c; line-height: 1.4;">${dateHtml}</div>
-                    </div>
-                    <table style="width: 100%; border-collapse: collapse; background: #ffffff;">
-                        ${theadHtml}
-                        ${tbodyChunkHtml}
-                        ${isLastPage ? tfootHtml : ''}
-                    </table>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11px; font-weight: bold; color: #888;">
-                        <span>Trang ${page + 1}/${totalPages}</span>
-                        <span>© 2026 ZENG FINANCE</span>
-                    </div>
-                `;
-
-                pageWrapper.querySelectorAll('th, td').forEach(cell => {
-                    cell.style.position = 'static';
-                    cell.style.boxShadow = 'none';
-                    cell.style.left = 'auto';
-                    cell.style.bottom = 'auto';
-                });
-
-                document.body.appendChild(pageWrapper);
-
-                const canvas = await html2canvas(pageWrapper, {
-                    backgroundColor: "#ffffff",
-                    scale: 2,
-                    useCORS: true,
-                    width: 820,
-                    height: Math.ceil(pageWrapper.scrollHeight)
-                });
-
-                document.body.removeChild(pageWrapper);
-                currentGeneratedImages.push(canvas.toDataURL('image/png'));
+        // BẢNG TỔNG HỢP
+        const summaryElem = document.querySelector('#summaryPrintContainer');
+        if (!summaryElem) return;
+        setTimeout(async () => {
+            try {
+                const canvas = await html2canvas(summaryElem, { backgroundColor: "#ffffff", scale: 2, useCORS: true });
+                if (navigator.clipboard && navigator.clipboard.write) {
+                    canvas.toBlob(blob => {
+                        if (blob) {
+                            navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(() => {
+                                showNotification('✅ Đã copy ảnh Bảng Tổng Hợp! Dán (Ctrl+V) vào Zalo ngay.', 'success');
+                            }).catch(err => {
+                                showNotification('Không thể ghi clipboard: ' + err.message, 'error');
+                            });
+                        }
+                    }, 'image/png');
+                } else {
+                    showNotification('Trình duyệt không hỗ trợ Clipboard trực tiếp!', 'warning');
+                }
+            } catch(e) {
+                showNotification('Lỗi tạo ảnh tổng hợp', 'error');
+            } finally {
+                if (btn) btn.textContent = oldTxt;
             }
-
-            showPreviewModal(currentGeneratedImages);
-
-            if (navigator.clipboard && navigator.clipboard.write && currentGeneratedImages.length > 0) {
-                fetch(currentGeneratedImages[0])
-                    .then(res => res.blob())
-                    .then(blob => {
-                        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-                        showNotification(`Đã xuất ${totalPages} trang ảnh & copy trang 1 vào Clipboard!`, "success");
-                    }).catch(() => {});
-            } else {
-                showNotification(`Đã xuất ${totalPages} trang ảnh thành công!`, "success");
-            }
-        } catch(e) {
-            console.error(e);
-            showNotification("Lỗi tạo ảnh chia trang: " + e.message, "error");
-        } finally {
-            hideLoading();
-            if (btn) btn.textContent = oldTxt;
-        }
+        }, 80);
     }
-
-    function showPreviewModal(imgList) {
-        const previewHolder = document.getElementById('imagePreviewHolder');
-        previewHolder.innerHTML = '';
-        imgList.forEach((src, idx) => {
-            const item = document.createElement('div');
-            item.className = 'preview-image-item';
-            item.innerHTML = `
-                <div style="font-size: 12px; font-weight: bold; color: #555; margin-bottom: 4px;">Trang ${idx + 1}/${imgList.length}</div>
-                <img src="${src}">
-            `;
-            previewHolder.appendChild(item);
-        });
-
-        if (navigator.share && navigator.canShare) {
-            DOM.btnShareImage.style.display = 'inline-flex';
-        } else {
-            DOM.btnShareImage.style.display = 'none';
-        }
-
-        DOM.imagePreviewModal.style.display = 'block';
-    }
-
-    window.handleModalOverlayClick = function(event) {
-        if (event.target === DOM.imagePreviewModal) {
-            DOM.imagePreviewModal.style.display = 'none';
-        }
-    };
-
-    DOM.btnSaveAllImages.onclick = () => {
-        if (!currentGeneratedImages.length) return;
-        currentGeneratedImages.forEach((src, idx) => {
-            const a = document.createElement('a');
-            a.href = src;
-            a.download = `Bao_Cao_Trang_${idx + 1}.png`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        });
-        showNotification(`Đã tải xuống ${currentGeneratedImages.length} ảnh!`, 'success');
-    };
-
-    DOM.btnShareImage.onclick = async () => {
-        if (!currentGeneratedImages.length || !navigator.share) return;
-        try {
-            const files = await Promise.all(currentGeneratedImages.map(async (dataUrl, idx) => {
-                const blob = await (await fetch(dataUrl)).blob();
-                return new File([blob], `Bao_Cao_Trang_${idx + 1}.png`, { type: 'image/png' });
-            }));
-            await navigator.share({
-                title: 'Báo cáo Thu Tiền - XSKT Nam Định',
-                files: files
-            });
-        } catch (err) {
-            if (err.name !== 'AbortError') showNotification('Lỗi chia sẻ ảnh: ' + err.message, 'error');
-        }
-    };
 
     DOM.btnCopySummary.onclick = function() { copyElementAsImage('#summaryPrintContainer', 'Đã copy ảnh bảng Tổng Hợp!', this); };
     DOM.btnCopyReport.onclick = function() { copyElementAsImage('#reportContainer', 'Đã copy ảnh Công nợ!', this); };
-    DOM.closePreviewModalBtn.onclick = () => DOM.imagePreviewModal.style.display = 'none';
 
     // ==================== XUẤT FILE EXCEL ĐẦY ĐỦ MÀU SẮC ====================
     DOM.btnExportExcel.onclick = function() {
@@ -2512,9 +2333,7 @@
 
     // ==================== BẢO VỆ MÃ NGUỒN ====================
     document.addEventListener('contextmenu', function(e) {
-        if (!e.target.closest('#imagePreviewModal')) {
-            e.preventDefault();
-        }
+        e.preventDefault();
     });
 
     document.addEventListener('keydown', function(e) {
