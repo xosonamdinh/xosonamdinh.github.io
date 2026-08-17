@@ -925,8 +925,28 @@
     // ==================== CẤU HÌNH SUPABASE ====================
     const SUPABASE_URL = "https://ypnrqrsrobuklgisnlvc.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwbnJxcnNyb2J1a2xnaXNubHZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY5Njc4MjksImV4cCI6MjEwMjU0MzgyOX0.W91K0JBWBxI26bznzsZLMhb3cAZHyOChutSADkVunSQ";
-    const CONFIG_PASS = "Zeng1986";
+    // Mật khẩu đã mã hóa Hash SHA-256 (Tương đương "Zeng1986")
+    const CONFIG_PASS_HASH = "d20e2ef5b4ed638663806f1d07c0ea910bf23d7be271295b9c0250df9c8b7468";
+    const CONFIG_PASS_ENC = "WmVuZzE5ODY=";
     // ==========================================================
+
+    async function sha256(str) {
+        if (window.crypto && window.crypto.subtle && window.crypto.subtle.digest) {
+            try {
+                const msgBuffer = new TextEncoder().encode(str);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            } catch (e) {
+                console.warn("Crypto API error, fallback to obfuscated token check", e);
+            }
+        }
+        try {
+            return btoa(str) === CONFIG_PASS_ENC ? CONFIG_PASS_HASH : 'invalid';
+        } catch(e) {
+            return 'invalid';
+        }
+    }
 
     let currentDbData = [];
     let excelData1 = [], excelData2 = [];
@@ -1042,17 +1062,26 @@
         DOM.authConfigModal.style.display = 'none';
     };
 
-    window.verifyAdminPassword = function() {
+    window.verifyAdminPassword = async function() {
         const inputVal = DOM.txtAdminPassword.value.trim();
-        if (inputVal === CONFIG_PASS) {
-            closeAdminAuthModal();
-            showSection('configSection');
-            loadSupabaseConfigTable();
-        } else {
-            showNotification("Mật khẩu không chính xác!", "error");
-            DOM.txtAdminPassword.value = '';
-            DOM.txtAdminPassword.focus();
+        if (!inputVal) return showNotification("Vui lòng nhập mật khẩu!", "warning");
+        
+        try {
+            const inputHash = await sha256(inputVal);
+            const isEncMatch = (typeof btoa === 'function') && (btoa(inputVal) === CONFIG_PASS_ENC);
+            if (inputHash === CONFIG_PASS_HASH || isEncMatch) {
+                closeAdminAuthModal();
+                showSection('configSection');
+                loadSupabaseConfigTable();
+                return;
+            }
+        } catch (err) {
+            console.error("Auth verification error:", err);
         }
+
+        showNotification("Mật khẩu không chính xác!", "error");
+        DOM.txtAdminPassword.value = '';
+        DOM.txtAdminPassword.focus();
     };
 
     DOM.txtAdminPassword.addEventListener('keydown', function(e) {
@@ -2199,7 +2228,7 @@
             return;
         }
 
-        // 2. SAO CHÉP BẢNG TỔNG HỢP (GỘP TỐI ĐA 4 TRANG A4 DỌC, TRÊN 4 TRANG TÁCH FILE)
+        // 2. SAO CHÉP BẢNG TỔNG HỢP (BẢN 1.0 - CHIA TRANG A4 VÀ GHÉP THÀNH ẢNH CÓ TIÊU ĐỀ & PHÂN TRANG)
         const summaryElem = document.querySelector('#summaryPrintContainer');
         if (!summaryElem) return;
 
@@ -2236,7 +2265,7 @@
         // A. NẾU 1 TRANG (DƯỚI HOẶC BẰNG 14 HÀNG) -> XUẤT 1 TRANG A4 DỌC
         if (totalRows <= ROWS_PER_A4) {
             const cloneSummaryWrapper = document.createElement('div');
-            cloneSummaryWrapper.style.position = 'fixed';
+            cloneSummaryWrapper.style.position = 'absolute';
             cloneSummaryWrapper.style.left = '-9999px';
             cloneSummaryWrapper.style.top = '0';
             cloneSummaryWrapper.style.width = A4_PORTRAIT_WIDTH + 'px';
@@ -2293,7 +2322,7 @@
         if (totalRows > ROWS_PER_A4 && totalRows <= ROWS_PER_A4 * 4) {
             const totalPages = Math.ceil(totalRows / ROWS_PER_A4);
             const multiPageContainer = document.createElement('div');
-            multiPageContainer.style.position = 'fixed';
+            multiPageContainer.style.position = 'absolute';
             multiPageContainer.style.left = '-9999px';
             multiPageContainer.style.top = '0';
             multiPageContainer.style.width = A4_PORTRAIT_WIDTH + 'px';
@@ -2322,7 +2351,7 @@
                             ${isLast ? tfootHtml : ''}
                         </table>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 10.5px; color: #888; font-weight: bold;">
-                            <span>© 2026 ZENG FINANCE</span>
+                            <span>© 2026 ZENG FINANCE - v1.0</span>
                             <span>Trang ${p + 1}/${totalPages}</span>
                         </div>
                     </div>
@@ -2370,7 +2399,7 @@
             const isLast = (p === totalPages - 1);
 
             const singlePageDiv = document.createElement('div');
-            singlePageDiv.style.position = 'fixed';
+            singlePageDiv.style.position = 'absolute';
             singlePageDiv.style.left = '-9999px';
             singlePageDiv.style.top = '0';
             singlePageDiv.style.width = A4_PORTRAIT_WIDTH + 'px';
@@ -2389,7 +2418,7 @@
                     ${isLast ? tfootHtml : ''}
                 </table>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11px; color: #888; font-weight: bold;">
-                    <span>© 2026 ZENG FINANCE</span>
+                    <span>© 2026 ZENG FINANCE - v1.0</span>
                     <span>Trang ${p + 1}/${totalPages}</span>
                 </div>
             `;
@@ -2871,29 +2900,58 @@
         const table = DOM.cfgTableSelect.value;
         showLoading();
         try {
-            const delRes = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=gt.0`, {
-                method: 'DELETE',
-                headers: { 
-                    "apikey": SUPABASE_KEY, 
-                    "Authorization": `Bearer ${SUPABASE_KEY}` 
+            // 1. Lấy danh sách ID hiện tại trong Supabase
+            const getRes = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=id`, {
+                headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+            });
+            const existingRows = getRes.ok ? await getRes.json() : [];
+            const existingIds = existingRows.map(r => r.id);
+
+            // 2. Tách dữ liệu hợp lệ thành 2 nhóm: Đã có ID (Cập nhật) và Chưa có ID (Chèn mới)
+            const validItems = configData.filter(item => item.key.trim() !== '');
+            const existingRecords = [];
+            const newRecords = [];
+
+            validItems.forEach((item, idx) => {
+                if (table === 'config_donvi') {
+                    const rec = { ten_to: item.key.trim(), quy_tac: item.val.trim(), thu_tu: idx + 1 };
+                    if (item.id) {
+                        rec.id = item.id;
+                        existingRecords.push(rec);
+                    } else {
+                        newRecords.push(rec);
+                    }
+                } else {
+                    const rec = { ten_che_do: item.key.trim(), tien_to: item.val.trim(), thu_tu: idx + 1 };
+                    if (item.id) {
+                        rec.id = item.id;
+                        existingRecords.push(rec);
+                    } else {
+                        newRecords.push(rec);
+                    }
                 }
             });
-            if (!delRes.ok) {
-                const errData = await delRes.json().catch(() => ({}));
-                throw new Error("Lỗi xóa cấu hình cũ: " + (errData.message || delRes.statusText));
+
+            // 3. Cập nhật các bản ghi cũ bằng UPSERT
+            if (existingRecords.length > 0) {
+                const upsertRes = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+                    method: 'POST',
+                    headers: {
+                        "apikey": SUPABASE_KEY,
+                        "Authorization": `Bearer ${SUPABASE_KEY}`,
+                        "Content-Type": "application/json",
+                        "Prefer": "resolution=merge-duplicates,return=minimal"
+                    },
+                    body: JSON.stringify(existingRecords)
+                });
+                if (!upsertRes.ok) {
+                    const errData = await upsertRes.json().catch(() => ({}));
+                    throw new Error("Lỗi cập nhật cấu hình: " + (errData.message || upsertRes.statusText));
+                }
             }
 
-            const recordsToInsert = configData
-                .filter(item => item.key.trim() !== '')
-                .map((item, idx) => {
-                    if (table === 'config_donvi') {
-                        return { ten_to: item.key.trim(), quy_tac: item.val.trim(), thu_tu: idx + 1 };
-                    } else {
-                        return { ten_che_do: item.key.trim(), tien_to: item.val.trim(), thu_tu: idx + 1 };
-                    }
-                });
-
-            if (recordsToInsert.length > 0) {
+            // 4. Chèn mới các mục vừa tạo (không có ID)
+            if (newRecords.length > 0) {
                 const insRes = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
                     method: 'POST',
                     headers: {
@@ -2902,20 +2960,34 @@
                         "Content-Type": "application/json",
                         "Prefer": "return=minimal"
                     },
-                    body: JSON.stringify(recordsToInsert)
+                    body: JSON.stringify(newRecords)
                 });
                 if (!insRes.ok) {
                     const errData = await insRes.json().catch(() => ({}));
-                    throw new Error("Lỗi lưu cấu hình: " + (errData.message || insRes.statusText));
+                    throw new Error("Lỗi thêm cấu hình mới: " + (errData.message || insRes.statusText));
                 }
             }
 
-            showNotification(`Đã lưu thành công cấu hình vào ${table}!`, 'success');
+            // 5. Xóa đích danh các ID đã bị gỡ trên giao diện
+            const keptIds = validItems.map(item => item.id).filter(Boolean);
+            const deletedIds = existingIds.filter(id => !keptIds.includes(id));
+
+            if (deletedIds.length > 0) {
+                const delRes = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=in.(${deletedIds.join(',')})`, {
+                    method: 'DELETE',
+                    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+                });
+                if (!delRes.ok) {
+                    console.warn("Lỗi xóa các mục đã chọn xóa:", await delRes.text());
+                }
+            }
+
+            showNotification(`✅ Đã lưu an toàn cấu hình vào ${table}!`, 'success');
             await initSupabaseConfigs();
             generateSummaryView();
         } catch(e) {
             console.error(e);
-            showNotification(e.message, 'error');
+            showNotification("Lỗi lưu cấu hình: " + e.message, 'error');
         } finally {
             hideLoading();
         }
