@@ -2148,13 +2148,13 @@
             const TARGET_MOBILE_WIDTH = 365;
 
             const cloneWrapper = document.createElement('div');
-            cloneWrapper.style.position = 'fixed';
+            cloneWrapper.style.position = 'absolute';
             cloneWrapper.style.left = '-9999px';
             cloneWrapper.style.top = '0';
             cloneWrapper.style.width = TARGET_MOBILE_WIDTH + 'px';
             cloneWrapper.style.maxWidth = TARGET_MOBILE_WIDTH + 'px';
             cloneWrapper.style.background = '#ffffff';
-            cloneWrapper.style.padding = '6px';
+            cloneWrapper.style.padding = '8px 8px 24px 8px';
             cloneWrapper.style.margin = '0';
             cloneWrapper.style.boxSizing = 'border-box';
             cloneWrapper.style.display = 'block';
@@ -2180,11 +2180,11 @@
             cloneWrapper.appendChild(clonedTable);
 
             const footer = document.createElement('div'); 
-            footer.innerText = "© 2026 ZENG FINANCE";
+            footer.innerText = "© 2026 ZENG FINANCE - v1.0";
             footer.style.width = "100%"; 
             footer.style.textAlign = "center"; 
-            footer.style.margin = "6px 0 2px 0"; 
-            footer.style.fontSize = "8.5px"; 
+            footer.style.margin = "10px 0 6px 0"; 
+            footer.style.fontSize = "9px"; 
             footer.style.fontWeight = "700"; 
             footer.style.color = "#aaaaaa"; 
             footer.style.backgroundColor = "#ffffff";
@@ -2194,7 +2194,7 @@
 
             try {
                 const targetW = TARGET_MOBILE_WIDTH;
-                const targetH = Math.ceil(cloneWrapper.scrollHeight);
+                const targetH = Math.ceil(Math.max(cloneWrapper.scrollHeight, cloneWrapper.offsetHeight)) + 30;
 
                 const rawCanvas = await html2canvas(cloneWrapper, { 
                     backgroundColor: "#ffffff", 
@@ -2228,217 +2228,143 @@
             return;
         }
 
-        // 2. SAO CHÉP BẢNG TỔNG HỢP (BẢN 1.0 - CHIA TRANG A4 VÀ GHÉP THÀNH ẢNH CÓ TIÊU ĐỀ & PHÂN TRANG)
+        // 2. SAO CHÉP BẢNG TỔNG HỢP (XUẤT 1 ẢNH LIỀN MẠCH VỪA KHỔ DI ĐỘNG NHƯ BÁO CÁO CHI TIẾT)
         const summaryElem = document.querySelector('#summaryPrintContainer');
         if (!summaryElem) return;
 
-        const originalTable = summaryElem.querySelector('table');
-        if (!originalTable) return showNotification("Chưa có dữ liệu bảng tổng hợp!", "warning");
+        const TARGET_SUMMARY_WIDTH = 460; 
+        const colWidths = ['6%', '10%', '11%', '10%', '10%', '10%', '10%', '11%', '10%', '12%'];
 
-        const tbodyRows = Array.from(originalTable.querySelectorAll('tbody tr'));
-        
-        const theadNode = originalTable.querySelector('thead') ? originalTable.querySelector('thead').cloneNode(true) : null;
-        if (theadNode) {
-            theadNode.querySelectorAll('th').forEach(th => { th.style.position = 'static'; th.style.boxShadow = 'none'; });
+        const cloneSummaryWrapper = document.createElement('div');
+        cloneSummaryWrapper.style.position = 'absolute';
+        cloneSummaryWrapper.style.left = '-9999px';
+        cloneSummaryWrapper.style.top = '0';
+        cloneSummaryWrapper.style.width = TARGET_SUMMARY_WIDTH + 'px';
+        cloneSummaryWrapper.style.maxWidth = TARGET_SUMMARY_WIDTH + 'px';
+        cloneSummaryWrapper.style.background = '#ffffff';
+        cloneSummaryWrapper.style.padding = '12px 10px 24px 10px';
+        cloneSummaryWrapper.style.boxSizing = 'border-box';
+        cloneSummaryWrapper.style.display = 'block';
+
+        const cloned = summaryElem.cloneNode(true);
+        cloned.style.width = '100%';
+        cloned.style.height = 'auto';
+        cloned.style.maxHeight = 'none';
+        cloned.style.overflow = 'visible';
+
+        const clonedTableContainer = cloned.querySelector('#summaryTableContainer');
+        if (clonedTableContainer) {
+            clonedTableContainer.style.height = 'auto';
+            clonedTableContainer.style.minHeight = '0';
+            clonedTableContainer.style.maxHeight = 'none';
+            clonedTableContainer.style.overflow = 'visible';
+            clonedTableContainer.style.border = 'none';
         }
-        const theadHtml = theadNode ? theadNode.outerHTML : '';
 
-        const tfootNode = originalTable.querySelector('tfoot') ? originalTable.querySelector('tfoot').cloneNode(true) : null;
-        if (tfootNode) {
-            tfootNode.querySelectorAll('td').forEach(td => { td.style.position = 'static'; td.style.boxShadow = 'none'; });
-        }
-        const tfootHtml = tfootNode ? tfootNode.outerHTML : '';
+        const clonedTable = cloned.querySelector('table');
+        if (clonedTable) {
+            clonedTable.style.width = '100%';
+            clonedTable.style.height = 'auto';
+            clonedTable.style.tableLayout = 'fixed';
+            clonedTable.style.borderCollapse = 'collapse';
+            clonedTable.style.border = '1px solid #1e293b';
 
-        const titleText = DOM.summaryTitle.innerHTML;
-        const dateText = DOM.summaryDate.innerHTML;
-
-        const A4_PORTRAIT_WIDTH = 794;
-        const ROWS_PER_A4 = 14;
-        const totalRows = tbodyRows.length;
-
-        const cloneRow = (r) => {
-            const tr = r.cloneNode(true);
-            tr.querySelectorAll('td').forEach(td => { td.style.position = 'static'; td.style.boxShadow = 'none'; });
-            return tr.outerHTML;
-        };
-
-        // A. NẾU 1 TRANG (DƯỚI HOẶC BẰNG 14 HÀNG) -> XUẤT 1 TRANG A4 DỌC
-        if (totalRows <= ROWS_PER_A4) {
-            const cloneSummaryWrapper = document.createElement('div');
-            cloneSummaryWrapper.style.position = 'absolute';
-            cloneSummaryWrapper.style.left = '-9999px';
-            cloneSummaryWrapper.style.top = '0';
-            cloneSummaryWrapper.style.width = A4_PORTRAIT_WIDTH + 'px';
-            cloneSummaryWrapper.style.background = '#ffffff';
-            cloneSummaryWrapper.style.padding = '20px 16px';
-            cloneSummaryWrapper.style.boxSizing = 'border-box';
-            cloneSummaryWrapper.style.display = 'block';
-
-            const cloned = summaryElem.cloneNode(true);
-            cloned.style.width = '100%';
-            cloned.style.maxHeight = 'none';
-            cloned.style.overflow = 'visible';
-
-            const clonedTableContainer = cloned.querySelector('#summaryTableContainer');
-            if (clonedTableContainer) {
-                clonedTableContainer.style.maxHeight = 'none';
-                clonedTableContainer.style.overflow = 'visible';
-                clonedTableContainer.style.border = 'none';
-            }
-
-            cloned.querySelectorAll('th, td').forEach(c => { 
-                c.style.position = 'static'; 
-                c.style.boxShadow = 'none'; 
+            clonedTable.querySelectorAll('th, td').forEach((cell) => {
+                cell.style.position = 'static';
+                cell.style.bottom = 'auto';
+                cell.style.left = 'auto';
+                cell.style.top = 'auto';
+                cell.style.boxShadow = 'none';
             });
 
-            cloneSummaryWrapper.appendChild(cloned);
-            document.body.appendChild(cloneSummaryWrapper);
+            clonedTable.querySelectorAll('thead th').forEach((th, idx) => {
+                th.style.background = '#0b6623';
+                th.style.color = '#ffffff';
+                th.style.fontSize = '10.5px';
+                th.style.fontWeight = '800';
+                th.style.padding = '6px 1px';
+                th.style.border = '1px solid #1e293b';
+                th.style.width = colWidths[idx] || 'auto';
+            });
 
-            try {
-                const targetW = A4_PORTRAIT_WIDTH;
-                const targetH = Math.ceil(cloneSummaryWrapper.scrollHeight);
-                const canvas = await html2canvas(cloneSummaryWrapper, { 
-                    backgroundColor: "#ffffff", scale: 2, useCORS: true,
-                    width: targetW, height: targetH, windowWidth: targetW, windowHeight: targetH
+            clonedTable.querySelectorAll('tbody tr').forEach(tr => {
+                tr.querySelectorAll('td').forEach((td, idx) => {
+                    td.style.fontSize = '10.5px';
+                    td.style.padding = '5px 1px';
+                    td.style.border = '1px solid #1e293b';
+                    if (idx === 0) td.style.fontWeight = '800';
+                    if (idx === 1) { td.style.fontWeight = '800'; td.style.color = '#107c41'; }
+                    if (td.innerText.includes('-') || td.querySelector('.negative-value')) {
+                        td.style.color = '#c42b1c';
+                        td.style.fontWeight = '700';
+                    }
                 });
+            });
 
-                if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
-                    const blobPromise = new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-                    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise })]);
-                    showNotification('✅ Đã copy ảnh Bảng Tổng Hợp A4 dọc! Dán (Ctrl+V) vào Zalo ngay.', 'success');
-                } else {
-                    showPreviewModal([canvas.toDataURL('image/png')]);
-                }
-            } catch (e) {
-                console.error(e);
-            } finally {
-                if (cloneSummaryWrapper.parentNode) cloneSummaryWrapper.parentNode.removeChild(cloneSummaryWrapper);
-                if (btn) btn.textContent = oldTxt;
-            }
-            return;
+            clonedTable.querySelectorAll('tfoot tr td').forEach((td) => {
+                td.style.background = '#5d4037';
+                td.style.color = '#ffffff';
+                td.style.fontSize = '10.5px';
+                td.style.fontWeight = '800';
+                td.style.padding = '6px 1px';
+                td.style.border = '1px solid #1e293b';
+            });
         }
 
-        // B. NẾU TỪ 2 ĐẾN 4 TRANG (15 - 56 HÀNG) -> GỘP TOÀN BỘ 4 TRANG THEO CHIỀU DỌC THÀNH 1 ẢNH DUY NHẤT
-        if (totalRows > ROWS_PER_A4 && totalRows <= ROWS_PER_A4 * 4) {
-            const totalPages = Math.ceil(totalRows / ROWS_PER_A4);
-            const multiPageContainer = document.createElement('div');
-            multiPageContainer.style.position = 'absolute';
-            multiPageContainer.style.left = '-9999px';
-            multiPageContainer.style.top = '0';
-            multiPageContainer.style.width = A4_PORTRAIT_WIDTH + 'px';
-            multiPageContainer.style.background = '#ffffff';
-            multiPageContainer.style.padding = '20px 16px';
-            multiPageContainer.style.display = 'flex';
-            multiPageContainer.style.flexDirection = 'column';
-            multiPageContainer.style.gap = '20px';
-            multiPageContainer.style.boxSizing = 'border-box';
+        cloneSummaryWrapper.appendChild(cloned);
 
-            let fullHtml = '';
-            for (let p = 0; p < totalPages; p++) {
-                const curRows = tbodyRows.slice(p * ROWS_PER_A4, (p + 1) * ROWS_PER_A4);
-                const isFirst = (p === 0);
-                const isLast = (p === totalPages - 1);
+        // Footer bản quyền duy nhất bên dưới cùng ảnh
+        const footer = document.createElement('div');
+        footer.innerText = "© 2026 ZENG FINANCE - v1.0";
+        footer.style.textAlign = "center";
+        footer.style.fontSize = "9.5px";
+        footer.style.fontWeight = "700";
+        footer.style.color = "#aaaaaa";
+        footer.style.marginTop = "10px";
+        cloneSummaryWrapper.appendChild(footer);
 
-                fullHtml += `
-                    <div style="width: 100%; background: #ffffff;">
-                        ${isFirst ? `
-                            <h3 style="margin: 4px 0 2px 0; font-size: 16px; text-align: center;">${titleText}</h3>
-                            <div style="font-size: 12.5px; font-weight: 600; text-align: center; color: #605e5c; margin-bottom: 8px;">${dateText}</div>
-                        ` : ''}
-                        <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-                            ${theadHtml}
-                            <tbody>${curRows.map(cloneRow).join('')}</tbody>
-                            ${isLast ? tfootHtml : ''}
-                        </table>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 10.5px; color: #888; font-weight: bold;">
-                            <span>© 2026 ZENG FINANCE - v1.0</span>
-                            <span>Trang ${p + 1}/${totalPages}</span>
-                        </div>
-                    </div>
-                `;
+        document.body.appendChild(cloneSummaryWrapper);
 
-                if (!isLast) {
-                    fullHtml += `<div style="border-top: 1.5px dashed #cbd5e1; width: 100%; margin: 2px 0;"></div>`;
-                }
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        try {
+            const targetW = TARGET_SUMMARY_WIDTH;
+            const targetH = Math.ceil(Math.max(
+                cloneSummaryWrapper.scrollHeight, 
+                cloneSummaryWrapper.offsetHeight, 
+                cloneSummaryWrapper.getBoundingClientRect().height
+            )) + 30;
+
+            let scaleVal = 2.2;
+            if (targetH * scaleVal > 3800) {
+                scaleVal = Math.max(1.2, 3800 / targetH);
             }
 
-            multiPageContainer.innerHTML = fullHtml;
-            document.body.appendChild(multiPageContainer);
+            const canvas = await html2canvas(cloneSummaryWrapper, { 
+                backgroundColor: "#ffffff", 
+                scale: scaleVal, 
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                scrollY: 0, scrollX: 0, x: 0, y: 0, 
+                width: targetW, height: targetH, 
+                windowWidth: targetW, windowHeight: targetH
+            });
 
-            try {
-                const targetW = A4_PORTRAIT_WIDTH;
-                const targetH = Math.ceil(multiPageContainer.scrollHeight);
-                const canvas = await html2canvas(multiPageContainer, { 
-                    backgroundColor: "#ffffff", scale: 2, useCORS: true,
-                    width: targetW, height: targetH, windowWidth: targetW, windowHeight: targetH
-                });
-
-                if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
-                    const blobPromise = new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-                    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise })]);
-                    showNotification(`✅ Đã ghép ${totalPages} trang A4 theo hàng dọc thành 1 ảnh! Dán (Ctrl+V) vào Zalo ngay.`, 'success');
-                } else {
-                    showPreviewModal([canvas.toDataURL('image/png')]);
-                }
-            } catch (e) {
-                console.error(e);
-            } finally {
-                if (multiPageContainer.parentNode) multiPageContainer.parentNode.removeChild(multiPageContainer);
-                if (btn) btn.textContent = oldTxt;
+            if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
+                const blobPromise = new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                await navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise })]);
+                showNotification('✅ Đã copy 1 ảnh Bảng Tổng Hợp vừa màn hình! Dán (Ctrl+V) vào Zalo ngay.', 'success');
+            } else {
+                showPreviewModal([canvas.toDataURL('image/png')]);
             }
-            return;
+        } catch (e) {
+            console.error(e);
+            showNotification("Lỗi tạo ảnh: " + e.message, "error");
+        } finally {
+            if (cloneSummaryWrapper.parentNode) cloneSummaryWrapper.parentNode.removeChild(cloneSummaryWrapper);
+            if (btn) btn.textContent = oldTxt;
         }
-
-        // C. NẾU TỪ TRANG THỨ 5 TRỞ ĐI (TRÊN 56 HÀNG) -> CHIA THÀNH TỪNG TRANG A4 RIÊNG BIỆT TRONG POPUP PREVIEW
-        const totalPages = Math.ceil(totalRows / ROWS_PER_A4);
-        let imageResults = [];
-
-        for (let p = 0; p < totalPages; p++) {
-            const curRows = tbodyRows.slice(p * ROWS_PER_A4, (p + 1) * ROWS_PER_A4);
-            const isFirst = (p === 0);
-            const isLast = (p === totalPages - 1);
-
-            const singlePageDiv = document.createElement('div');
-            singlePageDiv.style.position = 'absolute';
-            singlePageDiv.style.left = '-9999px';
-            singlePageDiv.style.top = '0';
-            singlePageDiv.style.width = A4_PORTRAIT_WIDTH + 'px';
-            singlePageDiv.style.background = '#ffffff';
-            singlePageDiv.style.padding = '20px 16px';
-            singlePageDiv.style.boxSizing = 'border-box';
-
-            singlePageDiv.innerHTML = `
-                ${isFirst ? `
-                    <h3 style="margin: 4px 0 2px 0; font-size: 16px; text-align: center;">${titleText}</h3>
-                    <div style="font-size: 12.5px; font-weight: 600; text-align: center; color: #605e5c; margin-bottom: 8px;">${dateText}</div>
-                ` : ''}
-                <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
-                    ${theadHtml}
-                    <tbody>${curRows.map(cloneRow).join('')}</tbody>
-                    ${isLast ? tfootHtml : ''}
-                </table>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11px; color: #888; font-weight: bold;">
-                    <span>© 2026 ZENG FINANCE - v1.0</span>
-                    <span>Trang ${p + 1}/${totalPages}</span>
-                </div>
-            `;
-
-            document.body.appendChild(singlePageDiv);
-            try {
-                const c = await html2canvas(singlePageDiv, { backgroundColor: "#ffffff", scale: 2, useCORS: true });
-                imageResults.push(c.toDataURL('image/png'));
-            } catch (err) {
-                console.error(err);
-            } finally {
-                if (singlePageDiv.parentNode) singlePageDiv.parentNode.removeChild(singlePageDiv);
-            }
-        }
-
-        if (imageResults.length > 0) {
-            showPreviewModal(imageResults);
-            showNotification(`Dữ liệu dài (${totalPages} trang), đã chia thành từng trang A4 để gửi Zalo!`, 'info');
-        }
-        if (btn) btn.textContent = oldTxt;
     }
 
     function showPreviewModal(imgList) {
