@@ -30,7 +30,16 @@
             --logo-color: #107c41;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            touch-action: manipulation;
+        }
+
+        html, body {
+            touch-action: manipulation;
+            -ms-touch-action: manipulation;
+        }
 
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -152,32 +161,56 @@
         .clickable-agent-code { cursor: pointer !important; }
         .clickable-agent-code:hover { text-decoration: underline !important; }
         
-        .so-so { font-size: 32px !important; font-weight: 900 !important; color: #c42b1c !important; text-align: center; letter-spacing: 0.5px; padding: 8px 4px !important; }
-        
-        #tongCongRow { background-color: #eaeaea; color: var(--text-color); font-weight: 800 !important; font-size: 15px !important; }
-        .negative-value { color: var(--danger-color); }
-        .final-amount-positive { background-color: var(--danger-color) !important; color: #ffffff !important; }
-        .final-amount-negative { background-color: var(--success-color) !important; color: #ffffff !important; }
-        tr.final-amount-positive td, tr.final-amount-negative td { font-size: 26px !important; font-weight: 900; padding: 10px 4px !important; }
+        /* BẢNG BÁO CÁO CĂN CHỈNH */
+        .report-table { 
+            width: 100%; 
+            max-width: 100%; 
+            table-layout: fixed; 
+            font-size: 13.5px !important; 
+        }
+        .report-table th { 
+            padding: 7px 2px !important; 
+            font-size: 13px !important; 
+            font-weight: 800; 
+        }
+        .report-table td { 
+            padding: 6px 2px !important; 
+            font-size: 13.5px !important; 
+            font-weight: 600; 
+        }
 
-        .report-table { width: 100%; max-width: 100%; table-layout: auto; }
-        .report-table th { padding: 9px 4px; font-size: 14px; font-weight: 800; }
-        .report-table td { padding: 7.5px 4px; font-size: 14px; font-weight: 600; }
+        /* ĐẠI LÝ / SỐ SỔ TRONG BÁO CÁO TO RÕ NÉT */
+        .report-table td.so-so,
+        .so-so { 
+            font-size: 22px !important; 
+            font-weight: 900 !important; 
+            color: #c42b1c !important; 
+            text-align: center !important; 
+            letter-spacing: 0.5px !important; 
+            padding: 8px 4px !important; 
+            line-height: 1.3 !important;
+        }
 
         .report-dot-cell {
             white-space: normal !important;
             word-break: break-word !important;
-            line-height: 1.4 !important;
+            line-height: 1.35 !important;
             font-weight: 700 !important;
-            font-size: 13.5px !important;
-            padding: 8px 6px !important;
+            font-size: 13px !important;
+            padding: 6px 4px !important;
             text-align: center !important;
         }
 
-        .dynamic-input { width: 100%; border: none !important; background: transparent !important; font-family: inherit; font-size: inherit; font-weight: bold; text-align: center; padding: 5px; outline: none !important; color: inherit; box-shadow: none !important; }
+        #tongCongRow { background-color: #eaeaea; color: var(--text-color); font-weight: 800 !important; font-size: 14.5px !important; }
+        .negative-value { color: var(--danger-color); }
+        .final-amount-positive { background-color: var(--danger-color) !important; color: #ffffff !important; }
+        .final-amount-negative { background-color: var(--success-color) !important; color: #ffffff !important; }
+        tr.final-amount-positive td, tr.final-amount-negative td { font-size: 26px !important; font-weight: 900; padding: 8px 4px !important; }
+
+        .dynamic-input { width: 100%; border: none !important; background: transparent !important; font-family: inherit; font-size: inherit; font-weight: bold; text-align: center; padding: 4px; outline: none !important; color: inherit; box-shadow: none !important; }
         #actionButtonContainer { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; max-width: 750px; margin-left: auto; margin-right: auto; }
         #actionChoices { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; grid-column: 1 / -1; }
-        .bang-chu-cell { text-align: center !important; font-style: italic; padding: 8px 6px !important; font-size: 13.5px !important; color: #444; background: #fff !important; white-space: normal !important; line-height: 1.35; }
+        .bang-chu-cell { text-align: center !important; font-style: italic; padding: 6px 4px !important; font-size: 13.5px !important; color: #444; background: #fff !important; white-space: normal !important; line-height: 1.3; }
 
         .sell-row-container { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
         .sell-row-container > label { min-width: 80px; margin: 0; }
@@ -203,21 +236,20 @@
             border: 1px solid rgba(0,0,0,0.1);
         }
 
+        /* LỊCH THIẾT KẾ ĐẨY NỘI DUNG TỰ NHIÊN */
         .win-calendar-box {
             background: #202020 !important;
             color: #ffffff !important;
             border-radius: 6px !important;
             padding: 12px !important;
-            margin-top: 8px !important;
+            margin: 10px auto 4px auto !important;
             box-shadow: 0 4px 16px rgba(0,0,0,0.35) !important;
             max-width: 340px !important;
             width: 100% !important;
             box-sizing: border-box !important;
-            position: absolute !important;
-            z-index: 50 !important;
+            position: relative !important;
+            z-index: 10 !important;
         }
-        #winCalendarBox { left: 10px; top: 38px; }
-        #detailedWinCalBox { right: 10px; top: 38px; }
 
         .win-calendar-header {
             display: flex !important;
@@ -295,6 +327,208 @@
         }
         .win-cal-cell.dimmed { color: #555555 !important; }
 
+        /* GIAO DIỆN QUẢN LÝ CẤU HÌNH TRẢI DÀI & SWIPE ACTION */
+        .cfg-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .cfg-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-right: 2px;
+            overflow-y: visible;
+        }
+        .cfg-list-container.scrollable-mode {
+            max-height: calc(100vh - 280px);
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        /* SWIPE CONTAINER */
+        .cfg-swipe-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            background: #0078d4;
+            border: 1.5px solid #e2e8f0;
+        }
+        .cfg-swipe-actions-bg {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+        .cfg-btn-edit-trigger {
+            background: transparent !important;
+            color: #ffffff !important;
+            font-weight: 800 !important;
+            font-size: 13.5px !important;
+            width: 100%;
+            height: 100%;
+            border: none !important;
+            cursor: pointer;
+            padding: 0 !important;
+        }
+
+        .cfg-item-card {
+            position: relative;
+            z-index: 2;
+            background: #ffffff;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+            user-select: none;
+            touch-action: pan-y;
+        }
+        .cfg-card-header {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .cfg-badge-idx {
+            font-weight: 800;
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            background: #e2e8f0;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .cfg-card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .cfg-auto-expand {
+            width: 100%;
+            min-height: 42px;
+            max-height: 140px;
+            line-height: 1.4;
+            padding: 8px 10px;
+            box-sizing: border-box;
+            resize: none;
+            overflow-y: hidden;
+            font-size: 13.5px;
+            font-weight: 600;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            transition: min-height 0.2s ease, border-color 0.2s ease;
+        }
+        .cfg-auto-expand:focus {
+            min-height: 75px;
+            border-color: var(--primary-color);
+            background: #ffffff;
+        }
+
+        /* KHUNG CHỨC NĂNG SỬA (LÊN, XUỐNG, XÓA) */
+        .cfg-actions-drawer {
+            display: none;
+            background: #f1f5f9;
+            border-top: 1px dashed #cbd5e1;
+            padding: 8px 10px;
+            margin-top: 4px;
+            border-radius: 6px;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 0.15s ease-out;
+        }
+        .cfg-actions-drawer.open {
+            display: flex;
+        }
+        .cfg-btn-move {
+            background: #ffffff !important;
+            color: #334155 !important;
+            border: 1.5px solid #cbd5e1 !important;
+            border-radius: 6px !important;
+            padding: 6px 14px !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+        }
+        .cfg-btn-move:hover {
+            background: #e2e8f0 !important;
+            color: var(--primary-color) !important;
+        }
+        .cfg-btn-move:disabled {
+            opacity: 0.3 !important;
+            cursor: not-allowed !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* MODAL XÁC THỰC MẬT KHẨU */
+        .auth-modal-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 24px 20px;
+            max-width: 360px;
+            width: 90%;
+            margin: 12vh auto auto auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            text-align: center;
+        }
+
+        /* KHUNG THÔNG BÁO */
+        #notification-area {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 99999 !important;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            width: max-content;
+            max-width: 90vw;
+        }
+        .notification {
+            padding: 12px 22px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 700;
+            text-align: center;
+            pointer-events: auto;
+        }
+        .notification.show { opacity: 1; transform: translateY(0); }
+        .notification.success { background-color: var(--success-color); }
+        .notification.error { background-color: var(--danger-color); }
+        .notification.warning { background-color: var(--warning-color); }
+        .notification.info { background-color: #0078d4; }
+        #loading-indicator { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(28,28,30,0.9); color: white; padding: 15px 30px; border-radius: 10px; z-index: 99999; font-weight: 700; box-shadow: 0 10px 25px rgba(0,0,0,0.2); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+
+        .modal-overlay { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.65); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding-top: 40px; overflow: auto; }
+        .modal-content { background-color: #fff; margin: auto; padding: 20px; width: 95%; max-width: 600px; border-radius: 16px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; text-align: center; }
+        .modal-close-btn { position: absolute; top: 10px; right: 16px; font-size: 28px; cursor: pointer; color: #888; font-weight: bold; }
+        .modal-close-btn:hover { color: var(--danger-color); }
+        .preview-images-container { display: flex; flex-direction: column; gap: 15px; align-items: center; background: #f4f6f8; padding: 10px; border-radius: 8px; }
+        .preview-image-item { width: 100%; background: #fff; padding: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border-radius: 6px; }
+        .preview-image-item img { width: 100%; display: block; border-radius: 4px; }
+
         @media (max-width: 768px) {
             body { padding: 0 !important; background-color: #ffffff; }
             #mainPage, #homePage { border: none !important; border-radius: 0 !important; box-shadow: none !important; padding: 10px 8px !important; width: 100% !important; max-width: 100% !important; }
@@ -303,33 +537,11 @@
             .home-menu-btn { padding: 10px 6px; font-size: 13px; }
             #summaryTableContainer { max-height: calc(100vh - 270px); border-left: none; border-right: none; }
             #reportContainer { max-width: 100% !important; }
-            th, td { padding: 8px 3px !important; font-size: 13px !important; }
-            .report-table th, .report-table td { padding: 7px 2px !important; font-size: 13.5px !important; }
+            th, td { padding: 7px 2px !important; font-size: 12.5px !important; }
+            .report-table th, .report-table td { padding: 6px 1.5px !important; font-size: 12.5px !important; }
             .summary-actions-bottom { margin-top: 12px; gap: 6px; }
             .summary-actions-bottom button { font-size: 13.5px; padding: 10px 2px; }
-            #winCalendarBox, #detailedWinCalBox { left: 5% !important; right: 5% !important; max-width: 90% !important; }
         }
-
-        .cfg-card { background: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .cfg-field { margin-bottom: 12px; }
-        .cfg-field label { font-size: 13px; color: #555; margin-bottom: 4px; }
-        .cfg-item-row { display: flex; gap: 8px; align-items: center; background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 5px; padding: 8px 10px; }
-
-        #notification-area { position: fixed; top: 20px; right: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; }
-        .notification { padding: 14px 22px; border-radius: 10px; color: white; font-size: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); opacity: 0; transform: translateX(50px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); font-weight: 600; }
-        .notification.show { opacity: 1; transform: translateX(0); }
-        .notification.success { background-color: var(--success-color); }
-        .notification.error { background-color: var(--danger-color); }
-        .notification.info { background-color: #0078d4; }
-        #loading-indicator { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: rgba(28,28,30,0.9); color: white; padding: 15px 30px; border-radius: 10px; z-index: 3000; font-weight: 700; box-shadow: 0 10px 25px rgba(0,0,0,0.2); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-
-        .modal-overlay { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding-top: 60px; overflow: auto; animation: fadeIn 0.2s; }
-        .modal-content { background-color: #fff; margin: auto; padding: 25px; width: 95%; max-width: 650px; border-radius: 16px; position: relative; animation: slideIn 0.3s; box-shadow: 0 20px 40px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto; border: 1px solid rgba(0,0,0,0.05); }
-        .modal-close-btn { position: absolute; top: 12px; right: 18px; font-size: 28px; cursor: pointer; color: #aaa; z-index: 100; transition: color 0.2s; }
-        .modal-close-btn:hover { color: var(--danger-color); }
-        .preview-images-container { display: flex; flex-direction: column; gap: 15px; align-items: center; background: #f4f6f8; padding: 12px; border-radius: 10px; }
-        .preview-image-item { width: 100%; background: #fff; padding: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; border-radius: 8px; }
-        .preview-image-item img { width: 100%; display: block; border-radius: 4px; -webkit-touch-callout: default !important; user-select: auto !important; -webkit-user-select: auto !important; }
 
         @media print {
             @page { size: A4; margin: 10mm; }
@@ -357,6 +569,22 @@
     <div id="notification-area"></div>
     <div id="loading-indicator">Đang tải dữ liệu...</div>
 
+    <!-- MODAL NHẬP MẬT KHẨU CẤU HÌNH -->
+    <div id="authConfigModal" class="modal-overlay">
+        <div class="auth-modal-card" onclick="event.stopPropagation()">
+            <div style="font-size: 32px; margin-bottom: 8px;">🔐</div>
+            <h3 style="margin: 0 0 6px 0; font-size: 17px; color: #1e293b;">Quản Trị Cấu Hình</h3>
+            <p style="margin: 0 0 14px 0; font-size: 13px; color: #64748b;">Nhập mật khẩu để truy cập trang cấu hình</p>
+            <input type="text" id="txtAdminPassword" placeholder="Nhập mật khẩu..." 
+                   style="-webkit-text-security: disc; text-align: center; font-size: 16px; font-weight: bold; border: 1.5px solid #cbd5e1; margin-bottom: 14px; border-radius: 6px; padding: 10px;" 
+                   autocapitalize="sentences" autocomplete="off" autocorrect="off" spellcheck="false">
+            <div style="display: flex; gap: 8px;">
+                <button class="secondary" style="flex: 1; padding: 10px;" onclick="closeAdminAuthModal()">Hủy</button>
+                <button class="success" style="flex: 1; padding: 10px;" onclick="verifyAdminPassword()">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
         <div class="simple-animated-logo" onclick="window.location.href = window.location.pathname; return false;">
@@ -372,14 +600,14 @@
 
             <div style="margin-top: 5px;">
                 <label>Chọn Khoảng Thời Gian:</label>
-                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 4px; flex: 1; min-width: 140px;">
-                        <span style="font-size: 13px; font-weight: bold; color: #2c3e50; white-space: nowrap;">Từ:</span>
-                        <select id="selFromMonthHome" style="font-weight: bold; border: 1.5px solid var(--primary-color);"></select>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 13.5px; font-weight: bold; color: #2c3e50; width: 42px; flex-shrink: 0;">Từ:</span>
+                        <select id="selFromMonthHome" style="flex: 1; font-weight: bold; border: 1.5px solid var(--primary-color); padding: 8px 10px;"></select>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 4px; flex: 1; min-width: 140px;">
-                        <span style="font-size: 13px; font-weight: bold; color: #2c3e50; white-space: nowrap;">Đến:</span>
-                        <select id="selToMonthHome" style="font-weight: bold; border: 1.5px solid var(--primary-color);"></select>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 13.5px; font-weight: bold; color: #2c3e50; width: 42px; flex-shrink: 0;">Đến:</span>
+                        <select id="selToMonthHome" style="flex: 1; font-weight: bold; border: 1.5px solid var(--primary-color); padding: 8px 10px;"></select>
                     </div>
                 </div>
 
@@ -422,7 +650,7 @@
             </div>
 
             <div class="controls-panel">
-                <div style="border-bottom: 1px dashed #dcdde1; padding-bottom: 10px; position: relative;">
+                <div style="border-bottom: 1px dashed #dcdde1; padding-bottom: 10px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <label id="lblWinCalToggle" style="color: #0078d4; margin: 0; cursor: pointer;" onclick="toggleWinCalendar('winCalendarBox', event)">
                             📅 Lọc Ngày (<span id="winCalSelectedCount">Tất cả</span>) ▾
@@ -524,13 +752,13 @@
 
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <label for="soSoInput" style="margin: 0; white-space: nowrap;">Số sổ:</label>
-                    <input type="text" id="soSoInput" inputmode="numeric" placeholder="919" style="width: 85px; text-align: center; font-weight: 800; font-size: 16px;">
+                    <input type="text" id="soSoInput" inputmode="numeric" placeholder="919" style="width: 95px; text-align: center; font-weight: 900; font-size: 20px; color: #c42b1c; border: 2px solid var(--primary-color);">
                     <button id="btnCreateDailyReport" class="success" style="flex: 1; padding: 10px 4px;">Chi tiết</button>
                     <button id="btnCreateSummaryReport" class="danger" style="flex: 1; padding: 10px 4px;">Công nợ</button>
                 </div>
 
                 <!-- LỊCH TRA CỨU ĐẠI LÝ -->
-                <div id="detailedDatePickerContainer" style="display: none; border-top: 1px dashed #dcdde1; padding-top: 8px; margin-top: 6px; position: relative;">
+                <div id="detailedDatePickerContainer" style="display: none; border-top: 1px dashed #dcdde1; padding-top: 8px; margin-top: 6px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <label id="lblDetailedWinCalToggle" style="font-size: 12.5px; color: #0078d4; margin: 0; font-weight: bold; cursor: pointer;" onclick="toggleWinCalendar('detailedWinCalBox', event)">
                             📅 Lịch Ngày Đang Chọn (<span id="detailedSelectedCount">Tất cả</span>) ▾
@@ -619,7 +847,7 @@
             </div>
         </div>
 
-        <!-- 4. PHÂN HỆ QUẢN LÝ CẤU HÌNH TRỰC TIẾP SUPABASE (BẢO VỆ BẰNG MẬT KHẨU) -->
+        <!-- 4. PHÂN HỆ QUẢN LÝ CẤU HÌNH -->
         <div id="configSection" class="main-section" style="display: none;">
             <div class="nav-header">
                 <button class="back-btn" onclick="showSection('homePage')">⬅ Về Trang Chủ</button>
@@ -630,8 +858,8 @@
             <div class="cfg-card">
                 <div style="display: flex; gap: 8px; align-items: flex-end;">
                     <div style="flex: 1;">
-                        <label>Danh mục bảng cấu hình:</label>
-                        <select id="cfgTableSelect" onchange="loadSupabaseConfigTable()">
+                        <label style="color: #475569; font-size: 13px;">Danh mục bảng cấu hình:</label>
+                        <select id="cfgTableSelect" onchange="loadSupabaseConfigTable()" style="font-weight: bold; border: 1.5px solid var(--primary-color);">
                             <option value="config_donvi">Danh sách Tổ/ Chi Nhánh/ Huyện</option>
                             <option value="config_xemma">Chế độ xem Chi Nhánh</option>
                         </select>
@@ -641,15 +869,15 @@
             </div>
 
             <div class="cfg-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h4 id="cfgEditorTitle" style="margin: 0; font-size: 14px; text-align: left;">Danh sách mục</h4>
-                    <button onclick="addNewConfigRow()" class="success" style="padding: 5px 10px; font-size: 12px;">➕ Thêm mới</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
+                    <h4 id="cfgEditorTitle" style="margin: 0; font-size: 14.5px; text-align: left; color: #1e293b;">Danh sách mục</h4>
+                    <button onclick="addNewConfigRow()" class="success" style="padding: 6px 12px; font-size: 12.5px;">➕ Thêm mới</button>
                 </div>
-                <div id="cfgEditorList" style="display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow-y: auto;"></div>
+                <div id="cfgEditorList" class="cfg-list-container"></div>
             </div>
 
             <div class="cfg-card" style="display: flex; flex-direction: column; gap: 10px;">
-                <button onclick="saveConfigToSupabase()" class="success" style="width: 100%; padding: 13px; font-size: 15px; font-weight: bold;">
+                <button onclick="saveConfigToSupabase()" class="success" style="width: 100%; padding: 13px; font-size: 15px; font-weight: bold; box-shadow: 0 4px 6px rgba(16,124,65,0.2);">
                     🚀 LƯU VÀO CƠ SỞ DỮ LIỆU
                 </button>
             </div>
@@ -657,15 +885,12 @@
 
     </div>
 
-    <!-- PREVIEW MODAL CÓ CHIA TRANG & ĐÓNG KHI CLICK RA NGOÀI -->
+    <!-- MODAL HỖ TRỢ TRÊN DI ĐỘNG KHI CẦN NHẤN GIỮ COPY -->
     <div id="imagePreviewModal" class="modal-overlay" onclick="handleModalOverlayClick(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <span id="closePreviewModalBtn" class="modal-close-btn">&times;</span>
-            <h4 style="margin-top:0; text-align:center; color: #2c3e50;">Danh sách Ảnh Báo Cáo</h4>
-            <div style="text-align: center; margin-bottom: 12px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                <button id="btnSaveAllImages" class="success" style="padding: 10px 20px; font-size: 14px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">💾 LƯU TẤT CẢ ẢNH</button>
-                <button id="btnShareImage" class="info" style="padding: 10px 20px; font-size: 14px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;">📤 CHIA SẺ ẢNH</button>
-            </div>
+            <h4 style="margin-top:0; color: #2c3e50;">Ảnh Báo Cáo</h4>
+            <div style="font-size: 13px; color: #64748b; margin-bottom: 12px;">👉 <b>Nhấn giữ vào ảnh</b> rồi chọn <b>"Sao chép"</b> hoặc <b>"Chia sẻ"</b> sang Zalo</div>
             <div id="imagePreviewHolder" class="preview-images-container"></div>
         </div>
     </div>
@@ -684,7 +909,6 @@
     let dateRangeText = "Chưa có ngày";
     let regionDefinitions = {};
     let currentReportType = 'detailed';
-    let currentGeneratedImages = [];
 
     let branchModes = { 'all': { label: 'Xem Tất Cả', prefixes: [] } };
     let globalAllDates = [];
@@ -722,7 +946,7 @@
         customTicketName: document.getElementById('customTicketName'), customTicketPrice: document.getElementById('customTicketPrice'), customTicketRate: document.getElementById('customTicketRate'),
         notificationArea: document.getElementById('notification-area'), loadingIndicator: document.getElementById('loading-indicator'),
         imagePreviewModal: document.getElementById('imagePreviewModal'), closePreviewModalBtn: document.getElementById('closePreviewModalBtn'), imagePreviewHolder: document.getElementById('imagePreviewHolder'),
-        btnSaveAllImages: document.getElementById('btnSaveAllImages'), btnShareImage: document.getElementById('btnShareImage'),
+        authConfigModal: document.getElementById('authConfigModal'), txtAdminPassword: document.getElementById('txtAdminPassword'),
         regionSelect: document.getElementById('regionSelect'), btnClearRevenueFilter: document.getElementById('btnClearRevenueFilter'),
         selBranchMode: document.getElementById('selBranchMode'), selBranchMode_Detailed: document.getElementById('selBranchMode_Detailed'),
         cbExcludeNumeric: document.getElementById('cbExcludeNumeric'), cbExcludeXSKT: document.getElementById('cbExcludeXSKT'),
@@ -733,6 +957,16 @@
         btnFetchSupabaseHome: document.getElementById('btnFetchSupabaseHome'),
         cfgTableSelect: document.getElementById('cfgTableSelect'), cfgEditorList: document.getElementById('cfgEditorList'), cfgEditorTitle: document.getElementById('cfgEditorTitle')
     };
+
+    // CHỐNG DOUBLE-TAP ZOOM
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            e.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
 
     function showNotification(msg, type = 'info') {
         const n = document.createElement('div'); n.className = `notification ${type}`; n.textContent = msg;
@@ -764,7 +998,38 @@
         return res.charAt(0).toUpperCase() + res.slice(1);
     }
 
-    // ==================== TÍNH TOÁN HIỂN THỊ SỐ LƯỢNG THÁNG & NGÀY ====================
+    // ==================== XỬ LÝ MẬT KHẨU CẤU HÌNH ====================
+    window.openConfigWithAuth = function() {
+        DOM.txtAdminPassword.value = '';
+        DOM.authConfigModal.style.display = 'block';
+        setTimeout(() => DOM.txtAdminPassword.focus(), 100);
+    };
+
+    window.closeAdminAuthModal = function() {
+        DOM.authConfigModal.style.display = 'none';
+    };
+
+    window.verifyAdminPassword = function() {
+        const inputVal = DOM.txtAdminPassword.value.trim();
+        if (inputVal === CONFIG_PASS) {
+            closeAdminAuthModal();
+            showSection('configSection');
+            loadSupabaseConfigTable();
+        } else {
+            showNotification("Mật khẩu không chính xác!", "error");
+            DOM.txtAdminPassword.value = '';
+            DOM.txtAdminPassword.focus();
+        }
+    };
+
+    DOM.txtAdminPassword.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            verifyAdminPassword();
+        }
+    });
+
+    // ==================== TÍNH TOÁN HIỂN THỊ DẢI NGÀY ====================
     function formatSelectedCountText(datesArray) {
         if (!datesArray || datesArray.length === 0) return "0 ngày";
 
@@ -801,7 +1066,6 @@
         }
     }
 
-    // ==================== ĐỊNH DẠNG DẢI NGÀY THÔNG MINH ====================
     function getFormattedDateRange(datesArray) {
         if (!datesArray || datesArray.length === 0) return dateRangeText;
         
@@ -835,7 +1099,6 @@
 
         let parts = [];
 
-        // Gom nhóm các tháng trọn vẹn liên tiếp (Ví dụ: Từ 01/01 đến 31/07)
         if (fullMonthList.length > 0) {
             let tempGroup = [fullMonthList[0]];
             for (let i = 1; i < fullMonthList.length; i++) {
@@ -860,7 +1123,6 @@
             }
         }
 
-        // Xử lý các tháng có ngày lẻ/ngày chọn riêng
         dailyMonthList.forEach(data => {
             const m = data.m;
             const days = data.days.sort((a, b) => a - b);
@@ -884,16 +1146,6 @@
 
         return parts.join(' và ');
     }
-
-    window.openConfigWithAuth = function() {
-        const pass = prompt("Nhập mật khẩu quản trị cấu hình:");
-        if (pass === CONFIG_PASS) {
-            showSection('configSection');
-            loadSupabaseConfigTable();
-        } else if (pass !== null) {
-            alert("Mật khẩu không chính xác!");
-        }
-    };
 
     // ==================== TẢI DỮ LIỆU TỪ SUPABASE ====================
     async function loadDataFromSupabase(fromMonth, toMonth) {
@@ -1001,7 +1253,7 @@
     DOM.selFromMonthMain.onchange = handleMainMonthChange;
     DOM.selToMonthMain.onchange = handleMainMonthChange;
 
-    // ==================== BÓC TÁCH NẠP FILE EXCEL THỦ CÔNG ====================
+    // ==================== BÓC TÁCH EXCEL THỦ CÔNG ====================
     async function readExcelFileAsync(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -1192,7 +1444,9 @@
         currentSearchSelectedDates = [...globalSelectedDates];
         renderWinCalendarGrid(); renderDetailedWinCalendar();
         generateSummaryView();
-        if (state.currentSoSo) createReport();
+        if (DOM.reportSection.style.display === 'block' && state.currentSoSo) {
+            createReport(true);
+        }
     };
 
     function renderWinCalendarGrid() {
@@ -1236,7 +1490,9 @@
                     currentSearchSelectedDates = [...globalSelectedDates];
                     renderWinCalendarGrid(); renderDetailedWinCalendar();
                     generateSummaryView();
-                    if (state.currentSoSo) createReport();
+                    if (DOM.reportSection.style.display === 'block' && state.currentSoSo) {
+                        createReport(true);
+                    }
                 };
             }
             grid.appendChild(cell);
@@ -1247,7 +1503,7 @@
         if (event) event.stopPropagation();
         currentSearchSelectedDates = isSelectAll ? [...currentSearchAllDates] : [];
         renderDetailedWinCalendar();
-        if (state.currentSoSo) createReport();
+        if (state.currentSoSo) createReport(true);
     };
 
     function renderDetailedWinCalendar() {
@@ -1289,7 +1545,7 @@
                     const idx = currentSearchSelectedDates.indexOf(iso);
                     if (idx > -1) currentSearchSelectedDates.splice(idx, 1); else currentSearchSelectedDates.push(iso);
                     renderDetailedWinCalendar();
-                    if (state.currentSoSo) createReport();
+                    if (state.currentSoSo) createReport(true);
                 };
             }
             grid.appendChild(cell);
@@ -1359,7 +1615,6 @@
         return { groups, totals };
     }
 
-    // ==================== SẮP XẾP SỐ SỔ TỪ BÉ ĐẾN LỚN ====================
     function generateSummaryView() {
         if (!currentDbData.length) return;
         const regVal = DOM.regionSelect.value, rules = regVal !== 'all' ? regionDefinitions[regVal] : null;
@@ -1496,35 +1751,41 @@
         }
     });
 
-    // CẬP NHẬT TỨC THÌ CHO PHÂN HỆ TRA CỨU ĐẠI LÝ
+    // CẬP NHẬT TRA CỨU
     DOM.selBranchMode_Detailed.addEventListener('change', function() {
         if (DOM.selBranchMode) DOM.selBranchMode.value = this.value;
-        if (state.currentSoSo) createReport();
+        if (state.currentSoSo) createReport(true);
     });
     DOM.cbExcludeNumeric_Detailed.addEventListener('change', function() {
         if (DOM.cbExcludeNumeric) DOM.cbExcludeNumeric.checked = this.checked;
-        if (state.currentSoSo) createReport();
+        if (state.currentSoSo) createReport(true);
     });
     DOM.cbExcludeXSKT_Detailed.addEventListener('change', function() {
         if (DOM.cbExcludeXSKT) DOM.cbExcludeXSKT.checked = this.checked;
-        if (state.currentSoSo) createReport();
+        if (state.currentSoSo) createReport(true);
     });
 
-    // CẬP NHẬT TỨC THÌ CHO PHÂN HỆ TỔNG HỢP
+    // CẬP NHẬT TỔNG HỢP (KHÔNG BÁO LỖI NGẦM)
     DOM.selBranchMode.addEventListener('change', function() {
         if (DOM.selBranchMode_Detailed) DOM.selBranchMode_Detailed.value = this.value;
         generateSummaryView();
-        if (state.currentSoSo) createReport();
+        if (DOM.reportSection.style.display === 'block' && state.currentSoSo) {
+            createReport(true);
+        }
     });
     DOM.cbExcludeNumeric.addEventListener('change', function() {
         if (DOM.cbExcludeNumeric_Detailed) DOM.cbExcludeNumeric_Detailed.checked = this.checked;
         generateSummaryView();
-        if (state.currentSoSo) createReport();
+        if (DOM.reportSection.style.display === 'block' && state.currentSoSo) {
+            createReport(true);
+        }
     });
     DOM.cbExcludeXSKT.addEventListener('change', function() {
         if (DOM.cbExcludeXSKT_Detailed) DOM.cbExcludeXSKT_Detailed.checked = this.checked;
         generateSummaryView();
-        if (state.currentSoSo) createReport();
+        if (DOM.reportSection.style.display === 'block' && state.currentSoSo) {
+            createReport(true);
+        }
     });
     DOM.cbSortDesc.addEventListener('change', generateSummaryView);
     DOM.regionSelect.addEventListener('change', generateSummaryView);
@@ -1558,13 +1819,11 @@
             const p = r.ngay.split('-');
             const mKey = r.ngay.substring(0, 7);
             
-            // XỬ LÝ ĐỊNH DẠNG NGÀY / THÁNG
             let displayDate = `${p[2]}/${p[1]}`;
             if (periodMonths.has(mKey) && p[2] === '01') {
                 displayDate = `Tháng ${parseInt(p[1], 10)}`;
             }
 
-            // CHỈ LẤY PHẦN KÝ TỰ CHỮ CÁI ĐẦU ĐỂ TIẾT KIỆM DIỆN TÍCH (VD: P21/P27 -> (P), J01 -> (J))
             const prefixMatch = name.match(/^[a-zA-Z]+/);
             const suffix = prefixMatch ? ` (${prefixMatch[0].toUpperCase()})` : '';
 
@@ -1622,9 +1881,17 @@
         });
     }
 
-    function createReport() {
-        const s = DOM.soSoInput.value.trim(); if (!s) return showNotification("Nhập số sổ!",'error');
-        const d = processDetailedReport(s); if (!d) return showNotification("Không tìm thấy dữ liệu đại lý này",'error');
+    function createReport(silent = false) {
+        const s = DOM.soSoInput.value.trim(); 
+        if (!s) {
+            if (!silent) showNotification("Nhập số sổ!",'error');
+            return;
+        }
+        const d = processDetailedReport(s); 
+        if (!d) {
+            if (!silent) showNotification("Không tìm thấy dữ liệu đại lý này",'error');
+            return;
+        }
 
         const agentName = [...state.accountCodes].join(', ') || state.currentSoSo;
         const reportDate = getFormattedDateRange(currentSearchSelectedDates);
@@ -1635,7 +1902,7 @@
             <table class="report-table" style="border: 1px solid var(--border-color); width: 100%;">
                 <colgroup><col style="width: 34%;"><col style="width: 33%;"><col style="width: 33%;"></colgroup>
                 <tbody>
-                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="2" class="so-so" style="font-size: 32px !important; font-weight: 900 !important; color: #c42b1c !important;">${agentName}</td></tr>
+                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="2" class="so-so" style="font-size: 22px !important; font-weight: 900 !important; color: #c42b1c !important;">${agentName}</td></tr>
                     <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="2" class="report-dot-cell">${reportDate}</td></tr>
                     <tr style="background:#107c41; color:#fff;"><th>Loại hình</th><th>Doanh thu</th><th>Hoa hồng</th></tr>
                     <tr><td>Lôtô ĐB</td><td>${formatNumberHiddenK(d.t.lotoDB)}</td><td>${formatNumberHiddenK(d.c.ldb)}</td></tr>
@@ -1653,7 +1920,7 @@
             let rowsHtml = '';
             d.detailedItems.forEach(it => {
                 rowsHtml += `<tr>
-                    <td style="text-align:left; padding-left:6px; white-space: nowrap; font-size: 13px;">${it.date} - <b>${it.type}</b></td>
+                    <td style="text-align:left; padding-left:5px; white-space: nowrap;">${it.date} - <b>${it.type}</b></td>
                     <td>${formatNumberHiddenK(it.rev)}</td>
                     <td>${formatNumberHiddenK(it.com)}</td>
                     <td>${it.bonus > 0 ? formatNumberHiddenK(it.bonus) : '-'}</td>
@@ -1662,9 +1929,9 @@
             });
             tableContentHtml = `
             <table class="report-table" style="border: 1px solid var(--border-color); width: 100%;">
-                <colgroup><col style="width: 38%;"><col style="width: 16%;"><col style="width: 15%;"><col style="width: 14%;"><col style="width: 17%;"></colgroup>
+                <colgroup><col style="width: 33%;"><col style="width: 16%;"><col style="width: 16%;"><col style="width: 16%;"><col style="width: 19%;"></colgroup>
                 <tbody>
-                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="4" class="so-so" style="font-size: 32px !important; font-weight: 900 !important; color: #c42b1c !important;">${agentName}</td></tr>
+                    <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="4" class="so-so" style="font-size: 22px !important; font-weight: 900 !important; color: #c42b1c !important;">${agentName}</td></tr>
                     <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="4" class="report-dot-cell">${reportDate}</td></tr>
                     <tr style="background:#107c41; color:#fff;"><th>Ngày/Loại</th><th>D.Thu</th><th>H.Hồng</th><th>Thưởng</th><th>Nộp/Lấy</th></tr>
                     ${rowsHtml}
@@ -1687,7 +1954,10 @@
 
     // ==================== BÁN THÊM VÉ ====================
     function handleAddTicketAction() {
-        if (!state.currentSoSo) return showNotification("Chưa có báo cáo để thêm vé!",'error');
+        if (!state.currentSoSo) {
+            showNotification('Hãy tra cứu báo cáo trước!', 'warning');
+            return;
+        }
         const q = parseInt(DOM.sellQuantityInput.value, 10);
         if (!q || q <= 0) return showNotification("Số lượng không hợp lệ!",'error');
 
@@ -1770,7 +2040,10 @@
 
     DOM.btnGoToSummary.onclick = () => { showSection('summarySection'); generateSummaryView(); };
     DOM.btnGoToSell.onclick = () => { 
-        if (!state.currentSoSo) return showNotification('Hãy tra cứu báo cáo trước!', 'warning'); 
+        if (!state.currentSoSo) {
+            showNotification('Hãy tra cứu báo cáo trước!', 'warning');
+            return;
+        }
         showSection('sellSection'); 
         setTimeout(() => DOM.sellQuantityInput.focus(), 100);
     };
@@ -1780,10 +2053,10 @@
     DOM.btnCreateSummaryReport.onclick = () => { currentReportType = 'summary'; createReport(); };
     DOM.btnPrintReport.onclick = () => window.print();
 
-    // ==================== CHỤP ẢNH BÁO CÁO & XUẤT ẢNH CÓ CHIA TRANG ====================
+    // ==================== SAO CHÉP ẢNH TỰ ĐỘNG CHUẨN DI ĐỘNG (KHÔNG LẸM KHUNG) ====================
     async function copyElementAsImage(sel, msg, btn) {
         const oldTxt = btn ? btn.textContent : ''; 
-        if (btn) btn.textContent = 'Đang xử lý...';
+        if (btn) btn.textContent = 'Đang copy...';
 
         if (sel === '#reportContainer') {
             const reportTable = document.querySelector('#reportContainer table');
@@ -1801,35 +2074,52 @@
                     const replacement = document.createElement('div'); 
                     replacement.textContent = val;
                     const computedStyle = window.getComputedStyle(input);
-                    replacement.style.cssText = `color:${computedStyle.color}; font-weight:bold; text-align:center; width:100%; font-size:inherit; display:flex; align-items:center; justify-content:center; padding:12px 0; white-space:pre-wrap; line-height:1.4;`;
+                    replacement.style.cssText = `color:${computedStyle.color}; font-weight:bold; text-align:center; width:100%; font-size:inherit; display:flex; align-items:center; justify-content:center; padding:4px 0; white-space:pre-wrap; line-height:1.2;`;
                     frozenState.push({ input, replacement, parent, nextSibling: input.nextSibling }); 
                     parent.removeChild(input); parent.appendChild(replacement);
                 }
             });
 
+            // KHÓA CHIỀU RỘNG CHUẨN DI ĐỘNG (365px)
+            const TARGET_MOBILE_WIDTH = 365;
+
             const cloneWrapper = document.createElement('div');
             cloneWrapper.style.position = 'fixed';
             cloneWrapper.style.left = '-9999px';
             cloneWrapper.style.top = '0';
-            cloneWrapper.style.width = '360px';
-            cloneWrapper.style.height = 'auto';
+            cloneWrapper.style.width = TARGET_MOBILE_WIDTH + 'px';
+            cloneWrapper.style.maxWidth = TARGET_MOBILE_WIDTH + 'px';
             cloneWrapper.style.background = '#ffffff';
-            cloneWrapper.style.padding = '12px 8px 8px 8px';
+            cloneWrapper.style.padding = '6px';
             cloneWrapper.style.margin = '0';
             cloneWrapper.style.boxSizing = 'border-box';
             cloneWrapper.style.display = 'block';
 
             const clonedTable = reportTable.cloneNode(true);
             clonedTable.style.width = '100%';
+            clonedTable.style.maxWidth = '100%';
+            clonedTable.style.tableLayout = 'fixed';
             clonedTable.style.margin = '0 auto';
+            clonedTable.style.borderCollapse = 'collapse';
+
             clonedTable.querySelectorAll('.remove-ticket-btn').forEach(b => b.remove());
+
+            const isDetailed = clonedTable.querySelectorAll('th').length > 3;
+            clonedTable.querySelectorAll('th, td').forEach(c => {
+                c.style.padding = isDetailed ? '4px 1.5px' : '5px 2px';
+                if (!c.classList.contains('so-so') && !c.parentElement.id.includes('finalResultRow')) {
+                    c.style.fontSize = isDetailed ? '11.5px' : '13px';
+                }
+                c.style.boxSizing = 'border-box';
+            });
+
             cloneWrapper.appendChild(clonedTable);
 
             const footer = document.createElement('div'); 
             footer.innerText = "© 2026 ZENG FINANCE";
             footer.style.width = "100%"; 
             footer.style.textAlign = "center"; 
-            footer.style.margin = "6px 0 0 0"; 
+            footer.style.margin = "6px 0 2px 0"; 
             footer.style.fontSize = "8.5px"; 
             footer.style.fontWeight = "700"; 
             footer.style.color = "#aaaaaa"; 
@@ -1838,149 +2128,96 @@
 
             document.body.appendChild(cloneWrapper);
 
-            setTimeout(async()=>{
-                try {
-                    const targetW = 360;
-                    const targetH = Math.ceil(cloneWrapper.scrollHeight);
+            try {
+                const targetW = TARGET_MOBILE_WIDTH;
+                const targetH = Math.ceil(cloneWrapper.scrollHeight);
 
-                    const rawCanvas = await html2canvas(cloneWrapper, { 
-                        backgroundColor: "#ffffff", scale: 2, useCORS: true, 
-                        scrollY: 0, scrollX: 0, x: 0, y: 0, 
-                        width: targetW, height: targetH, windowWidth: targetW, windowHeight: targetH
-                    });
+                const rawCanvas = await html2canvas(cloneWrapper, { 
+                    backgroundColor: "#ffffff", 
+                    scale: 2.5, 
+                    useCORS: true, 
+                    scrollY: 0, scrollX: 0, x: 0, y: 0, 
+                    width: targetW, height: targetH, 
+                    windowWidth: targetW, windowHeight: targetH
+                });
 
-                    frozenState.forEach(({ input, replacement, parent, nextSibling }) => { 
-                        if (parent.contains(replacement)) parent.removeChild(replacement); 
-                        if (nextSibling) parent.insertBefore(input, nextSibling); else parent.appendChild(input); 
-                    });
+                frozenState.forEach(({ input, replacement, parent, nextSibling }) => { 
+                    if (parent.contains(replacement)) parent.removeChild(replacement); 
+                    if (nextSibling) parent.insertBefore(input, nextSibling); else parent.appendChild(input); 
+                });
 
-                    const finalCanvas = document.createElement('canvas');
-                    finalCanvas.width = targetW * 2; finalCanvas.height = targetH * 2;
-                    const ctx = finalCanvas.getContext('2d');
-                    ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-                    ctx.drawImage(rawCanvas, 0, 0, targetW * 2, targetH * 2, 0, 0, targetW * 2, targetH * 2);
-
-                    const imgSrc = finalCanvas.toDataURL('image/png'); 
-                    currentGeneratedImages = [imgSrc];
-
-                    if (navigator.clipboard && navigator.clipboard.write) {
-                        finalCanvas.toBlob(blob => {
-                            if (blob) {
-                                navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(() => {
-                                    showNotification('✅ Đã copy ảnh! Bạn có thể dán (Ctrl+V) vào Zalo ngay.', 'success');
-                                }).catch(() => showPreviewModal([imgSrc]));
-                            } else {
-                                showPreviewModal([imgSrc]);
-                            }
-                        }, 'image/png');
-                    } else {
-                        showPreviewModal([imgSrc]);
-                    }
-                } catch(e) {
-                    console.error(e); showNotification('Lỗi tạo ảnh', 'error');
-                } finally {
-                    if (cloneWrapper && cloneWrapper.parentNode) cloneWrapper.parentNode.removeChild(cloneWrapper);
-                    if (btn) btn.textContent = oldTxt;
+                if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
+                    const blobPromise = new Promise(resolve => rawCanvas.toBlob(resolve, 'image/png'));
+                    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise })]);
+                    showNotification('✅ Đã copy ảnh vừa màn hình! Dán (Ctrl+V) vào Zalo ngay.', 'success');
+                } else {
+                    showPreviewModal([rawCanvas.toDataURL('image/png')]);
                 }
-            }, 80);
+            } catch (err) {
+                console.error(err);
+                const rawCanvas = await html2canvas(cloneWrapper, { backgroundColor: "#ffffff", scale: 2, useCORS: true });
+                showPreviewModal([rawCanvas.toDataURL('image/png')]);
+            } finally {
+                if (cloneWrapper && cloneWrapper.parentNode) cloneWrapper.parentNode.removeChild(cloneWrapper);
+                if (btn) btn.textContent = oldTxt;
+            }
             return;
         }
 
-        const table = document.querySelector('#summaryTableContainer table');
-        if (!table) {
-            if (btn) btn.textContent = oldTxt;
-            return showNotification("Chưa có dữ liệu!", "warning");
-        }
+        // BẢNG TỔNG HỢP (SUMMARY VIEW)
+        const summaryElem = document.querySelector('#summaryPrintContainer');
+        if (!summaryElem) return;
 
-        const allRows = Array.from(table.querySelectorAll('tbody tr'));
-        if (!allRows.length) {
-            if (btn) btn.textContent = oldTxt;
-            return showNotification("Bảng không có dữ liệu!", "warning");
-        }
+        const tableInside = summaryElem.querySelector('table');
+        const exactSummaryWidth = Math.max(tableInside ? tableInside.scrollWidth : 820, 820);
 
-        const ROWS_PER_PAGE = 26;
-        const totalPages = Math.ceil(allRows.length / ROWS_PER_PAGE) || 1;
-        const theadHtml = table.querySelector('thead').outerHTML;
-        const tfootHtml = table.querySelector('tfoot') ? table.querySelector('tfoot').outerHTML : '';
-        const titleHtml = DOM.summaryTitle.innerHTML;
-        const dateHtml = DOM.summaryDate.innerHTML;
+        const cloneSummaryWrapper = document.createElement('div');
+        cloneSummaryWrapper.style.position = 'fixed';
+        cloneSummaryWrapper.style.left = '-9999px';
+        cloneSummaryWrapper.style.top = '0';
+        cloneSummaryWrapper.style.width = (exactSummaryWidth + 24) + 'px';
+        cloneSummaryWrapper.style.background = '#ffffff';
+        cloneSummaryWrapper.style.padding = '14px 12px';
+        cloneSummaryWrapper.style.boxSizing = 'border-box';
+        cloneSummaryWrapper.style.display = 'flex';
+        cloneSummaryWrapper.style.flexDirection = 'column';
+        cloneSummaryWrapper.style.alignItems = 'center';
 
-        currentGeneratedImages = [];
-        showLoading();
+        const clonedSummary = summaryElem.cloneNode(true);
+        clonedSummary.style.width = '100%';
+        clonedSummary.style.margin = '0 auto';
+        clonedSummary.querySelectorAll('th, td').forEach(c => {
+            c.style.position = 'static';
+            c.style.boxShadow = 'none';
+        });
+
+        cloneSummaryWrapper.appendChild(clonedSummary);
+        document.body.appendChild(cloneSummaryWrapper);
 
         try {
-            for (let page = 0; page < totalPages; page++) {
-                const startIdx = page * ROWS_PER_PAGE;
-                const endIdx = Math.min(startIdx + ROWS_PER_PAGE, allRows.length);
-                const pageRows = allRows.slice(startIdx, endIdx);
+            const targetW = exactSummaryWidth + 24;
+            const targetH = Math.ceil(cloneSummaryWrapper.scrollHeight);
+            const canvas = await html2canvas(cloneSummaryWrapper, { 
+                backgroundColor: "#ffffff", 
+                scale: 2, 
+                useCORS: true,
+                width: targetW, height: targetH,
+                windowWidth: targetW, windowHeight: targetH
+            });
 
-                const pageWrapper = document.createElement('div');
-                pageWrapper.style.position = 'fixed';
-                pageWrapper.style.left = '-9999px';
-                pageWrapper.style.top = '0';
-                pageWrapper.style.width = '820px';
-                pageWrapper.style.background = '#ffffff';
-                pageWrapper.style.padding = '18px 16px 14px 16px';
-                pageWrapper.style.boxSizing = 'border-box';
-                pageWrapper.style.display = 'block';
-
-                let tbodyChunkHtml = `<tbody>` + pageRows.map(r => r.outerHTML).join('') + `</tbody>`;
-                let isLastPage = (page === totalPages - 1);
-
-                pageWrapper.innerHTML = `
-                    <div style="text-align: center; margin-bottom: 10px;">
-                        <h3 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 800; color: #201f1e;">${titleHtml}</h3>
-                        <div style="font-size: 13.5px; font-weight: 600; color: #605e5c; line-height: 1.4;">${dateHtml}</div>
-                    </div>
-                    <table style="width: 100%; border-collapse: collapse; background: #ffffff;">
-                        ${theadHtml}
-                        ${tbodyChunkHtml}
-                        ${isLastPage ? tfootHtml : ''}
-                    </table>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11px; font-weight: bold; color: #888;">
-                        <span>Trang ${page + 1}/${totalPages}</span>
-                        <span>© 2026 ZENG FINANCE</span>
-                    </div>
-                `;
-
-                pageWrapper.querySelectorAll('th, td').forEach(cell => {
-                    cell.style.position = 'static';
-                    cell.style.boxShadow = 'none';
-                    cell.style.left = 'auto';
-                    cell.style.bottom = 'auto';
-                });
-
-                document.body.appendChild(pageWrapper);
-
-                const canvas = await html2canvas(pageWrapper, {
-                    backgroundColor: "#ffffff",
-                    scale: 2,
-                    useCORS: true,
-                    width: 820,
-                    height: Math.ceil(pageWrapper.scrollHeight)
-                });
-
-                document.body.removeChild(pageWrapper);
-                currentGeneratedImages.push(canvas.toDataURL('image/png'));
-            }
-
-            showPreviewModal(currentGeneratedImages);
-
-            if (navigator.clipboard && navigator.clipboard.write && currentGeneratedImages.length > 0) {
-                fetch(currentGeneratedImages[0])
-                    .then(res => res.blob())
-                    .then(blob => {
-                        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-                        showNotification(`Đã xuất ${totalPages} trang ảnh & copy trang 1 vào Clipboard!`, "success");
-                    }).catch(() => {});
+            if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
+                const blobPromise = new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                await navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise })]);
+                showNotification('✅ Đã copy ảnh Bảng Tổng Hợp! Dán (Ctrl+V) vào Zalo ngay.', 'success');
             } else {
-                showNotification(`Đã xuất ${totalPages} trang ảnh thành công!`, "success");
+                showPreviewModal([canvas.toDataURL('image/png')]);
             }
-        } catch(e) {
+        } catch (e) {
             console.error(e);
-            showNotification("Lỗi tạo ảnh chia trang: " + e.message, "error");
+            const canvas = await html2canvas(cloneSummaryWrapper, { backgroundColor: "#ffffff", scale: 2, useCORS: true });
+            showPreviewModal([canvas.toDataURL('image/png')]);
         } finally {
-            hideLoading();
+            if (cloneSummaryWrapper && cloneSummaryWrapper.parentNode) cloneSummaryWrapper.parentNode.removeChild(cloneSummaryWrapper);
             if (btn) btn.textContent = oldTxt;
         }
     }
@@ -1988,22 +2225,12 @@
     function showPreviewModal(imgList) {
         const previewHolder = document.getElementById('imagePreviewHolder');
         previewHolder.innerHTML = '';
-        imgList.forEach((src, idx) => {
+        imgList.forEach((src) => {
             const item = document.createElement('div');
             item.className = 'preview-image-item';
-            item.innerHTML = `
-                <div style="font-size: 12px; font-weight: bold; color: #555; margin-bottom: 4px;">Trang ${idx + 1}/${imgList.length}</div>
-                <img src="${src}">
-            `;
+            item.innerHTML = `<img src="${src}" alt="Báo cáo">`;
             previewHolder.appendChild(item);
         });
-
-        if (navigator.share && navigator.canShare) {
-            DOM.btnShareImage.style.display = 'inline-flex';
-        } else {
-            DOM.btnShareImage.style.display = 'none';
-        }
-
         DOM.imagePreviewModal.style.display = 'block';
     }
 
@@ -2012,41 +2239,12 @@
             DOM.imagePreviewModal.style.display = 'none';
         }
     };
-
-    DOM.btnSaveAllImages.onclick = () => {
-        if (!currentGeneratedImages.length) return;
-        currentGeneratedImages.forEach((src, idx) => {
-            const a = document.createElement('a');
-            a.href = src;
-            a.download = `Bao_Cao_Trang_${idx + 1}.png`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        });
-        showNotification(`Đã tải xuống ${currentGeneratedImages.length} ảnh!`, 'success');
-    };
-
-    DOM.btnShareImage.onclick = async () => {
-        if (!currentGeneratedImages.length || !navigator.share) return;
-        try {
-            const files = await Promise.all(currentGeneratedImages.map(async (dataUrl, idx) => {
-                const blob = await (await fetch(dataUrl)).blob();
-                return new File([blob], `Bao_Cao_Trang_${idx + 1}.png`, { type: 'image/png' });
-            }));
-            await navigator.share({
-                title: 'Báo cáo Thu Tiền - XSKT Nam Định',
-                files: files
-            });
-        } catch (err) {
-            if (err.name !== 'AbortError') showNotification('Lỗi chia sẻ ảnh: ' + err.message, 'error');
-        }
-    };
+    DOM.closePreviewModalBtn.onclick = () => DOM.imagePreviewModal.style.display = 'none';
 
     DOM.btnCopySummary.onclick = function() { copyElementAsImage('#summaryPrintContainer', 'Đã copy ảnh bảng Tổng Hợp!', this); };
     DOM.btnCopyReport.onclick = function() { copyElementAsImage('#reportContainer', 'Đã copy ảnh Công nợ!', this); };
-    DOM.closePreviewModalBtn.onclick = () => DOM.imagePreviewModal.style.display = 'none';
 
-    // ==================== XUẤT FILE EXCEL ĐẦY ĐỦ MÀU SẮC ====================
+    // ==================== XUẤT EXCEL ====================
     DOM.btnExportExcel.onclick = function() {
         const table = document.querySelector('#summaryTableContainer table');
         if (!table) return showNotification("Chưa có dữ liệu để xuất Excel!", "warning");
@@ -2179,24 +2377,12 @@
             ];
 
             ws['!cols'] = [
-                { wch: 6 },  // STT
-                { wch: 11 }, // ĐL
-                { wch: 13 }, // LTô
-                { wch: 13 }, // LCặp
-                { wch: 13 }, // Lô 3/23
-                { wch: 13 }, // Lô 2/27
-                { wch: 14 }, // XSKT
-                { wch: 15 }, // Dsố
-                { wch: 14 }, // Thưởng
-                { wch: 16 }  // Tiền nộp
+                { wch: 6 },  { wch: 11 }, { wch: 13 }, { wch: 13 }, { wch: 13 }, 
+                { wch: 13 }, { wch: 14 }, { wch: 15 }, { wch: 14 }, { wch: 16 }
             ];
 
             ws['!rows'] = [
-                { hpt: 26 }, // Title 1
-                { hpt: 18 }, // Subtitle
-                { hpt: 18 }, // Stats
-                { hpt: 8 },  // Blank
-                { hpt: 24 }  // Header table
+                { hpt: 26 }, { hpt: 18 }, { hpt: 18 }, { hpt: 8 }, { hpt: 24 }
             ];
 
             ws['!ref'] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: curRow - 1, c: 9 } });
@@ -2243,7 +2429,7 @@
         fill(DOM.selFromMonthMain, curM); fill(DOM.selToMonthMain, curM);
     }
 
-    // ==================== QUẢN LÝ CẤU HÌNH TRỰC TIẾP SUPABASE ====================
+    // ==================== QUẢN LÝ CẤU HÌNH (TRẢI DÀI, SWIPE, NÚT SỬA) ====================
     let configData = [];
 
     window.loadSupabaseConfigTable = async () => {
@@ -2276,40 +2462,219 @@
         }
     };
 
-    function renderConfigRows() {
+    function renderConfigRows(activeTargetIdx = null, activeBtnType = null) {
         DOM.cfgEditorList.innerHTML = '';
+        
+        // CHỈ CUỘN KHI CÓ TRÊN 20 MỤC
+        if (configData.length > 20) {
+            DOM.cfgEditorList.classList.add('scrollable-mode');
+        } else {
+            DOM.cfgEditorList.classList.remove('scrollable-mode');
+        }
+
         if (configData.length === 0) {
-            DOM.cfgEditorList.innerHTML = `<div style="text-align:center; padding: 20px; color: #888;">Chưa có mục nào. Nhấn "+ Thêm mới".</div>`;
+            DOM.cfgEditorList.innerHTML = `<div style="text-align:center; padding: 25px; color: #94a3b8; font-weight: 500;">Chưa có mục nào. Nhấn "+ Thêm mới".</div>`;
             return;
         }
 
         const table = DOM.cfgTableSelect.value;
-        const keyPlaceholder = table === 'config_donvi' ? 'Tên tổ / chi nhánh / huyện...' : 'Tên chế độ xem...';
+        const keyPlaceholder = table === 'config_donvi' ? 'Tên tổ / chi nhánh...' : 'Tên chế độ xem...';
         const valPlaceholder = table === 'config_donvi' ? 'Dải số (vd: 108+222 hoặc 800_849)...' : 'Tiền tố (vd: BV, P, U)...';
 
         configData.forEach((it, idx) => {
-            const div = document.createElement('div');
-            div.className = 'cfg-item-row';
-            div.innerHTML = `
-                <div style="font-weight: bold; width: 24px; text-align: center; color: #7f8c8d; font-size: 13px;">${idx + 1}</div>
-                <input type="text" value="${it.key.replace(/"/g, '&quot;')}" style="flex: 1.2; min-width: 140px; font-weight: bold;" placeholder="${keyPlaceholder}" oninput="updateConfigKey(${idx}, this.value)">
-                <input type="text" value="${it.val}" style="flex: 2.8; min-width: 180px;" placeholder="${valPlaceholder}" oninput="updateConfigVal(${idx}, this.value)">
-                <button class="danger" style="padding: 6px 12px; height: 36px; min-width: 38px;" onclick="deleteConfigRow(${idx})" title="Xóa">✕</button>
+            const isFirst = (idx === 0);
+            const isLast = (idx === configData.length - 1);
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'cfg-swipe-wrapper';
+            wrapper.id = `cfgSwipeWrap_${idx}`;
+
+            wrapper.innerHTML = `
+                <div class="cfg-swipe-actions-bg">
+                    <button type="button" class="cfg-btn-edit-trigger" onclick="toggleConfigEditDrawer(${idx})">✏️ Sửa</button>
+                </div>
+                <div class="cfg-item-card" id="cfgCardItem_${idx}">
+                    <div class="cfg-card-header">
+                        <div class="cfg-badge-idx">${idx + 1}</div>
+                        <input type="text" id="cfgKeyInput_${idx}" value="${it.key.replace(/"/g, '&quot;')}" 
+                               style="flex: 1; font-weight: bold; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 8px 10px; background-color: #f8fafc; cursor: default;" 
+                               placeholder="${keyPlaceholder}" readonly oninput="updateConfigKey(${idx}, this.value)">
+                    </div>
+                    <div class="cfg-card-body">
+                        <textarea class="cfg-auto-expand" id="cfgValInput_${idx}" rows="1" 
+                                  style="background-color: #f8fafc; cursor: default;"
+                                  placeholder="${valPlaceholder}" readonly oninput="handleAutoExpandTextarea(this, ${idx})">${it.val}</textarea>
+                    </div>
+                    <div class="cfg-actions-drawer" id="cfgDrawer_${idx}">
+                        <div style="display: flex; gap: 6px;">
+                            <button class="cfg-btn-move" id="btnMoveUp_${idx}" onclick="moveConfigRow(${idx}, -1)" ${isFirst ? 'disabled' : ''} title="Di chuyển lên">⬆ Lên</button>
+                            <button class="cfg-btn-move" id="btnMoveDown_${idx}" onclick="moveConfigRow(${idx}, 1)" ${isLast ? 'disabled' : ''} title="Di chuyển xuống">⬇ Xuống</button>
+                        </div>
+                        <div style="display: flex; gap: 6px;">
+                            <button class="danger" style="padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: bold;" onclick="deleteConfigRow(${idx})" title="Xóa">✕ Xóa</button>
+                            <button class="secondary" style="padding: 6px 10px; border-radius: 6px; font-size: 12px;" onclick="toggleConfigEditDrawer(${idx})">Đóng</button>
+                        </div>
+                    </div>
+                </div>
             `;
-            DOM.cfgEditorList.appendChild(div);
+            DOM.cfgEditorList.appendChild(wrapper);
+            
+            const ta = wrapper.querySelector('textarea');
+            if (ta && ta.value.length > 25) {
+                ta.style.height = 'auto';
+                ta.style.height = Math.min(ta.scrollHeight, 140) + 'px';
+            }
+
+            const cardEl = wrapper.querySelector('.cfg-item-card');
+            attachSwipeEvents(cardEl, idx);
+        });
+
+        if (activeTargetIdx !== null) {
+            const targetCard = document.getElementById(`cfgCardItem_${activeTargetIdx}`);
+            if (targetCard) {
+                targetCard.scrollIntoView({ behavior: 'auto', block: 'nearest' });
+                toggleConfigEditDrawer(activeTargetIdx, true);
+            }
+        }
+    }
+
+    // BẬT / TẮT THANH SỬA & MỞ KHÓA Ô INPUT
+    window.toggleConfigEditDrawer = function(idx, forceOpen = false) {
+        const drawer = document.getElementById(`cfgDrawer_${idx}`);
+        const card = document.getElementById(`cfgCardItem_${idx}`);
+        const inpKey = document.getElementById(`cfgKeyInput_${idx}`);
+        const inpVal = document.getElementById(`cfgValInput_${idx}`);
+        if (!drawer) return;
+
+        const isOpen = forceOpen ? false : drawer.classList.contains('open');
+        if (card) card.style.transform = 'translateX(0px)';
+
+        if (isOpen) {
+            // Đóng: Khóa lại
+            drawer.classList.remove('open');
+            if (inpKey) {
+                inpKey.readOnly = true;
+                inpKey.style.backgroundColor = '#f8fafc';
+                inpKey.style.cursor = 'default';
+            }
+            if (inpVal) {
+                inpVal.readOnly = true;
+                inpVal.style.backgroundColor = '#f8fafc';
+                inpVal.style.cursor = 'default';
+            }
+        } else {
+            // Mở: Cho phép sửa
+            drawer.classList.add('open');
+            if (inpKey) {
+                inpKey.readOnly = false;
+                inpKey.style.backgroundColor = '#ffffff';
+                inpKey.style.cursor = 'text';
+            }
+            if (inpVal) {
+                inpVal.readOnly = false;
+                inpVal.style.backgroundColor = '#ffffff';
+                inpVal.style.cursor = 'text';
+            }
+        }
+    };
+
+    // BẮT CỬ CHỈ TOUCH SWIPE & MOUSE DRAG SANG TRÁI
+    function attachSwipeEvents(el, idx) {
+        let startX = 0, currentX = 0, isTouching = false;
+
+        // DI ĐỘNG (TOUCH)
+        el.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isTouching = true;
+        }, { passive: true });
+
+        el.addEventListener('touchmove', (e) => {
+            if (!isTouching) return;
+            currentX = e.touches[0].clientX;
+            const diffX = currentX - startX;
+            if (diffX < 0 && diffX > -100) {
+                el.style.transform = `translateX(${diffX}px)`;
+            }
+        }, { passive: true });
+
+        el.addEventListener('touchend', () => {
+            if (!isTouching) return;
+            isTouching = false;
+            const diffX = currentX - startX;
+            if (diffX < -40) {
+                el.style.transform = 'translateX(-80px)';
+            } else {
+                el.style.transform = 'translateX(0px)';
+            }
+        });
+
+        // MÁY TÍNH (MOUSE)
+        let isMouseDown = false;
+        el.addEventListener('mousedown', (e) => {
+            if (['INPUT', 'TEXTAREA', 'BUTTON'].includes(e.target.tagName)) return;
+            startX = e.clientX;
+            isMouseDown = true;
+            el.style.cursor = 'grab';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isMouseDown) return;
+            currentX = e.clientX;
+            const diffX = currentX - startX;
+            if (diffX < 0 && diffX > -100) {
+                el.style.transform = `translateX(${diffX}px)`;
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            if (!isMouseDown) return;
+            isMouseDown = false;
+            el.style.cursor = 'default';
+            const diffX = currentX - startX;
+            if (diffX < -40) {
+                el.style.transform = 'translateX(-80px)';
+            } else {
+                el.style.transform = 'translateX(0px)';
+            }
         });
     }
 
+    window.handleAutoExpandTextarea = function(el, idx) {
+        updateConfigVal(idx, el.value);
+        el.style.height = 'auto';
+        el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+        if (el.scrollHeight > 140) {
+            el.style.overflowY = 'auto';
+        } else {
+            el.style.overflowY = 'hidden';
+        }
+    };
+
     window.updateConfigKey = (idx, value) => { if (configData[idx]) configData[idx].key = value; };
     window.updateConfigVal = (idx, value) => { if (configData[idx]) configData[idx].val = value; };
+    
+    window.moveConfigRow = (idx, direction) => {
+        const targetIdx = idx + direction;
+        if (targetIdx < 0 || targetIdx >= configData.length) return;
+        const temp = configData[idx];
+        configData[idx] = configData[targetIdx];
+        configData[targetIdx] = temp;
+        renderConfigRows(targetIdx, direction === -1 ? 'up' : 'down');
+    };
+
     window.addNewConfigRow = () => {
         configData.push({ key: '', val: '' });
-        renderConfigRows();
-        DOM.cfgEditorList.scrollTop = DOM.cfgEditorList.scrollHeight;
+        renderConfigRows(configData.length - 1);
+        if (configData.length > 20) {
+            DOM.cfgEditorList.scrollTop = DOM.cfgEditorList.scrollHeight;
+        }
     };
+    
     window.deleteConfigRow = (idx) => {
-        configData.splice(idx, 1);
-        renderConfigRows();
+        if (confirm(`Bạn có chắc muốn xóa: "${configData[idx].key || 'Mục này'}"?`)) {
+            configData.splice(idx, 1);
+            renderConfigRows();
+        }
     };
 
     window.saveConfigToSupabase = async () => {
@@ -2427,9 +2792,7 @@
 
     // ==================== BẢO VỆ MÃ NGUỒN ====================
     document.addEventListener('contextmenu', function(e) {
-        if (!e.target.closest('#imagePreviewModal')) {
-            e.preventDefault();
-        }
+        e.preventDefault();
     });
 
     document.addEventListener('keydown', function(e) {
