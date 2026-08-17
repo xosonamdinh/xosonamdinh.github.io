@@ -454,6 +454,25 @@
         .preview-image-item { width: 100%; background: #fff; padding: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border-radius: 6px; }
         .preview-image-item img { width: 100%; display: block; border-radius: 4px; }
 
+        @media (max-width: 768px) {
+            body { padding: 0 !important; background-color: #ffffff; }
+            #mainPage, #homePage { border: none !important; border-radius: 0 !important; box-shadow: none !important; padding: 10px 8px !important; width: 100% !important; max-width: 100% !important; }
+            .controls-panel { padding: 12px 10px; margin-bottom: 12px; }
+            .home-menu-grid { margin-top: 10px; margin-bottom: 14px; gap: 8px; }
+            .home-menu-btn { padding: 10px 6px; font-size: 13px; }
+            #summaryTableContainer { max-height: calc(100vh - 270px); border-left: none; border-right: none; }
+            #reportContainer { max-width: 100% !important; }
+            th, td { padding: 8px 3px !important; font-size: 13px !important; }
+            .report-table th, .report-table td { padding: 7px 2px !important; font-size: 13.5px !important; }
+            .summary-actions-bottom { margin-top: 12px; gap: 6px; }
+            .summary-actions-bottom button { font-size: 13.5px; padding: 10px 2px; }
+            
+            .cfg-item-row { flex-wrap: wrap; gap: 6px; padding: 8px; }
+            .cfg-badge-idx { width: 24px; height: 24px; font-size: 11px; }
+            .cfg-input-name { width: 100% !important; flex: 1 1 100% !important; }
+            .cfg-input-val { width: calc(100% - 150px) !important; flex: 1 !important; }
+        }
+
         @media print {
             @page { size: A4; margin: 10mm; }
             body { padding: 0 !important; margin: 0 !important; background: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-size: 11pt; }
@@ -509,14 +528,15 @@
 
             <div style="margin-top: 5px;">
                 <label>Chọn Khoảng Thời Gian:</label>
-                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 4px; flex: 1; min-width: 140px;">
-                        <span style="font-size: 13px; font-weight: bold; color: #2c3e50; white-space: nowrap;">Từ:</span>
-                        <select id="selFromMonthHome" style="font-weight: bold; border: 1.5px solid var(--primary-color);"></select>
+                <!-- CĂN CHUẨN ĐỀU 2 Ô XỔ RA TRÊN TRANG CHỦ -->
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 13.5px; font-weight: bold; color: #2c3e50; width: 42px; flex-shrink: 0;">Từ:</span>
+                        <select id="selFromMonthHome" style="flex: 1; font-weight: bold; border: 1.5px solid var(--primary-color); padding: 8px 10px;"></select>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 4px; flex: 1; min-width: 140px;">
-                        <span style="font-size: 13px; font-weight: bold; color: #2c3e50; white-space: nowrap;">Đến:</span>
-                        <select id="selToMonthHome" style="font-weight: bold; border: 1.5px solid var(--primary-color);"></select>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 13.5px; font-weight: bold; color: #2c3e50; width: 42px; flex-shrink: 0;">Đến:</span>
+                        <select id="selToMonthHome" style="flex: 1; font-weight: bold; border: 1.5px solid var(--primary-color); padding: 8px 10px;"></select>
                     </div>
                 </div>
 
@@ -666,7 +686,7 @@
                     <button id="btnCreateSummaryReport" class="danger" style="flex: 1; padding: 10px 4px;">Công nợ</button>
                 </div>
 
-                <!-- LỊCH TRA CỨU ĐẠI LÝ -->
+                <!-- LỊCH TRA CỨU ĐẠI LÝ (TỰ ĐẨY BẢNG KHÔNG CHE CHỮ) -->
                 <div id="detailedDatePickerContainer" style="display: none; border-top: 1px dashed #dcdde1; padding-top: 8px; margin-top: 6px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <label id="lblDetailedWinCalToggle" style="font-size: 12.5px; color: #0078d4; margin: 0; font-weight: bold; cursor: pointer;" onclick="toggleWinCalendar('detailedWinCalBox', event)">
@@ -756,7 +776,7 @@
             </div>
         </div>
 
-        <!-- 4. PHÂN HỆ QUẢN LÝ CẤU HÌNH -->
+        <!-- 4. PHÂN HỆ QUẢN LÝ CẤU HÌNH NÂNG CẤP VỚI NÚT LÊN/XUỐNG -->
         <div id="configSection" class="main-section" style="display: none;">
             <div class="nav-header">
                 <button class="back-btn" onclick="showSection('homePage')">⬅ Về Trang Chủ</button>
@@ -1942,7 +1962,7 @@
     DOM.btnCreateSummaryReport.onclick = () => { currentReportType = 'summary'; createReport(); };
     DOM.btnPrintReport.onclick = () => window.print();
 
-    // ==================== SAO CHÉP ẢNH TỰ ĐỘNG CHUẨN XÁC VÀO CLIPBOARD ====================
+    // ==================== SAO CHÉP ẢNH TỰ ĐỘNG CHUẨN XÁC VÀO CLIPBOARD (FIX LẸM VIỀN) ====================
     async function copyElementAsImage(sel, msg, btn) {
         const oldTxt = btn ? btn.textContent : ''; 
         if (btn) btn.textContent = 'Đang copy...';
@@ -1969,14 +1989,17 @@
                 }
             });
 
+            // TÍNH TOÁN CHIỀU RỘNG CHUẨN ĐỦ CHỨA TOÀN BỘ BẢNG (TRÁNH LẸM CỘT BÊN PHẢI)
+            const exactTableWidth = Math.max(reportTable.scrollWidth, 420);
+
             const cloneWrapper = document.createElement('div');
             cloneWrapper.style.position = 'fixed';
             cloneWrapper.style.left = '-9999px';
             cloneWrapper.style.top = '0';
-            cloneWrapper.style.width = '360px';
-            cloneWrapper.style.height = 'auto';
+            cloneWrapper.style.width = exactTableWidth + 'px';
+            cloneWrapper.style.minWidth = exactTableWidth + 'px';
             cloneWrapper.style.background = '#ffffff';
-            cloneWrapper.style.padding = '12px 8px 8px 8px';
+            cloneWrapper.style.padding = '12px 10px 10px 10px';
             cloneWrapper.style.margin = '0';
             cloneWrapper.style.boxSizing = 'border-box';
             cloneWrapper.style.display = 'block';
@@ -1991,8 +2014,8 @@
             footer.innerText = "© 2026 ZENG FINANCE";
             footer.style.width = "100%"; 
             footer.style.textAlign = "center"; 
-            footer.style.margin = "6px 0 0 0"; 
-            footer.style.fontSize = "8.5px"; 
+            footer.style.margin = "8px 0 0 0"; 
+            footer.style.fontSize = "9px"; 
             footer.style.fontWeight = "700"; 
             footer.style.color = "#aaaaaa"; 
             footer.style.backgroundColor = "#ffffff";
@@ -2000,12 +2023,11 @@
 
             document.body.appendChild(cloneWrapper);
 
-            // BẮT ĐẦU RENDER VÀ COPY
             try {
                 if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
                     const blobPromise = new Promise(async (resolve, reject) => {
                         try {
-                            const targetW = 360;
+                            const targetW = exactTableWidth;
                             const targetH = Math.ceil(cloneWrapper.scrollHeight);
 
                             const rawCanvas = await html2canvas(cloneWrapper, { 
@@ -2034,15 +2056,15 @@
                     await navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise })]);
                     showNotification('✅ Đã copy ảnh! Dán (Ctrl+V) vào Zalo ngay.', 'success');
                 } else {
-                    const targetW = 360;
+                    const targetW = exactTableWidth;
                     const targetH = Math.ceil(cloneWrapper.scrollHeight);
-                    const rawCanvas = await html2canvas(cloneWrapper, { backgroundColor: "#ffffff", scale: 2, useCORS: true, width: targetW, height: targetH });
+                    const rawCanvas = await html2canvas(cloneWrapper, { backgroundColor: "#ffffff", scale: 2, useCORS: true, width: targetW, height: targetH, windowWidth: targetW });
                     showPreviewModal([rawCanvas.toDataURL('image/png')]);
                 }
             } catch (err) {
-                const targetW = 360;
+                const targetW = exactTableWidth;
                 const targetH = Math.ceil(cloneWrapper.scrollHeight);
-                const rawCanvas = await html2canvas(cloneWrapper, { backgroundColor: "#ffffff", scale: 2, useCORS: true, width: targetW, height: targetH });
+                const rawCanvas = await html2canvas(cloneWrapper, { backgroundColor: "#ffffff", scale: 2, useCORS: true, width: targetW, height: targetH, windowWidth: targetW });
                 showPreviewModal([rawCanvas.toDataURL('image/png')]);
             } finally {
                 if (cloneWrapper && cloneWrapper.parentNode) cloneWrapper.parentNode.removeChild(cloneWrapper);
@@ -2051,14 +2073,24 @@
             return;
         }
 
-        // BẢNG TỔNG HỢP
+        // BẢNG TỔNG HỢP (RENDER CHUẨN KHÔNG CẮT CỘT)
         const summaryElem = document.querySelector('#summaryPrintContainer');
         if (!summaryElem) return;
+
+        const tableInside = summaryElem.querySelector('table');
+        const exactSummaryWidth = Math.max(tableInside ? tableInside.scrollWidth : 820, 820);
+
         try {
             if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
                 const blobPromise = new Promise(async (resolve, reject) => {
                     try {
-                        const canvas = await html2canvas(summaryElem, { backgroundColor: "#ffffff", scale: 2, useCORS: true });
+                        const canvas = await html2canvas(summaryElem, { 
+                            backgroundColor: "#ffffff", 
+                            scale: 2, 
+                            useCORS: true,
+                            width: exactSummaryWidth,
+                            windowWidth: exactSummaryWidth
+                        });
                         canvas.toBlob(b => b ? resolve(b) : reject(new Error("Blob error")), 'image/png');
                     } catch (e) {
                         reject(e);
@@ -2068,11 +2100,11 @@
                 await navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise })]);
                 showNotification('✅ Đã copy ảnh Bảng Tổng Hợp! Dán (Ctrl+V) vào Zalo ngay.', 'success');
             } else {
-                const canvas = await html2canvas(summaryElem, { backgroundColor: "#ffffff", scale: 2, useCORS: true });
+                const canvas = await html2canvas(summaryElem, { backgroundColor: "#ffffff", scale: 2, useCORS: true, width: exactSummaryWidth, windowWidth: exactSummaryWidth });
                 showPreviewModal([canvas.toDataURL('image/png')]);
             }
         } catch (e) {
-            const canvas = await html2canvas(summaryElem, { backgroundColor: "#ffffff", scale: 2, useCORS: true });
+            const canvas = await html2canvas(summaryElem, { backgroundColor: "#ffffff", scale: 2, useCORS: true, width: exactSummaryWidth, windowWidth: exactSummaryWidth });
             showPreviewModal([canvas.toDataURL('image/png')]);
         } finally {
             if (btn) btn.textContent = oldTxt;
@@ -2365,7 +2397,6 @@
             `;
             DOM.cfgEditorList.appendChild(card);
             
-            // Khởi tạo chiều cao nếu nội dung dài
             const ta = card.querySelector('textarea');
             if (ta && ta.value.length > 25) {
                 ta.style.height = 'auto';
