@@ -161,24 +161,47 @@
         .clickable-agent-code { cursor: pointer !important; }
         .clickable-agent-code:hover { text-decoration: underline !important; }
         
-        .so-so { font-size: 34px !important; font-weight: 900 !important; color: #c42b1c !important; text-align: center; letter-spacing: 0.5px; padding: 6px 4px !important; }
+        /* ĐẠI LÝ / SỐ SỔ TRONG BÁO CÁO TO RÕ NÉT */
+        .so-so { 
+            font-size: 26px !important; 
+            font-weight: 900 !important; 
+            color: #c42b1c !important; 
+            text-align: center; 
+            letter-spacing: 0.5px; 
+            padding: 7px 4px !important; 
+            line-height: 1.25 !important;
+        }
         
-        #tongCongRow { background-color: #eaeaea; color: var(--text-color); font-weight: 800 !important; font-size: 16px !important; }
+        #tongCongRow { background-color: #eaeaea; color: var(--text-color); font-weight: 800 !important; font-size: 14.5px !important; }
         .negative-value { color: var(--danger-color); }
         .final-amount-positive { background-color: var(--danger-color) !important; color: #ffffff !important; }
         .final-amount-negative { background-color: var(--success-color) !important; color: #ffffff !important; }
-        tr.final-amount-positive td, tr.final-amount-negative td { font-size: 28px !important; font-weight: 900; padding: 8px 4px !important; }
+        tr.final-amount-positive td, tr.final-amount-negative td { font-size: 26px !important; font-weight: 900; padding: 8px 4px !important; }
 
-        .report-table { width: 100%; max-width: 100%; table-layout: auto; font-size: 15.5px !important; }
-        .report-table th { padding: 7px 4px !important; font-size: 15.5px !important; font-weight: 800; }
-        .report-table td { padding: 6px 4px !important; font-size: 15.5px !important; font-weight: 600; }
+        /* BẢNG BÁO CÁO CĂN CHỈNH KHÔNG LẸM CỘT */
+        .report-table { 
+            width: 100%; 
+            max-width: 100%; 
+            table-layout: fixed; 
+            font-size: 13.5px !important; 
+        }
+        .report-table th { 
+            padding: 7px 2px !important; 
+            font-size: 13px !important; 
+            font-weight: 800; 
+        }
+        .report-table td { 
+            padding: 6px 2px !important; 
+            font-size: 13.5px !important; 
+            font-weight: 600; 
+        }
 
         .report-dot-cell {
             white-space: normal !important;
             word-break: break-word !important;
             line-height: 1.35 !important;
             font-weight: 700 !important;
-            font-size: 14px !important;
+            font-size: 13px !important;
             padding: 6px 4px !important;
             text-align: center !important;
         }
@@ -186,7 +209,7 @@
         .dynamic-input { width: 100%; border: none !important; background: transparent !important; font-family: inherit; font-size: inherit; font-weight: bold; text-align: center; padding: 4px; outline: none !important; color: inherit; box-shadow: none !important; }
         #actionButtonContainer { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; max-width: 750px; margin-left: auto; margin-right: auto; }
         #actionChoices { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; grid-column: 1 / -1; }
-        .bang-chu-cell { text-align: center !important; font-style: italic; padding: 6px 4px !important; font-size: 14px !important; color: #444; background: #fff !important; white-space: normal !important; line-height: 1.3; }
+        .bang-chu-cell { text-align: center !important; font-style: italic; padding: 6px 4px !important; font-size: 13.5px !important; color: #444; background: #fff !important; white-space: normal !important; line-height: 1.3; }
 
         .sell-row-container { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
         .sell-row-container > label { min-width: 80px; margin: 0; }
@@ -471,8 +494,8 @@
             .home-menu-btn { padding: 10px 6px; font-size: 13px; }
             #summaryTableContainer { max-height: calc(100vh - 270px); border-left: none; border-right: none; }
             #reportContainer { max-width: 100% !important; }
-            th, td { padding: 8px 3px !important; font-size: 13px !important; }
-            .report-table th, .report-table td { padding: 6px 2px !important; font-size: 14.5px !important; }
+            th, td { padding: 7px 2px !important; font-size: 12.5px !important; }
+            .report-table th, .report-table td { padding: 6px 1.5px !important; font-size: 12.5px !important; }
             .summary-actions-bottom { margin-top: 12px; gap: 6px; }
             .summary-actions-bottom button { font-size: 13.5px; padding: 10px 2px; }
             
@@ -692,12 +715,13 @@
 
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <label for="soSoInput" style="margin: 0; white-space: nowrap;">Số sổ:</label>
-                    <input type="text" id="soSoInput" inputmode="numeric" placeholder="919" style="width: 85px; text-align: center; font-weight: 800; font-size: 16px;">
+                    <!-- Ô NHẬP SỐ SỔ TO RÕ RÀNG -->
+                    <input type="text" id="soSoInput" inputmode="numeric" placeholder="919" style="width: 95px; text-align: center; font-weight: 900; font-size: 20px; color: #c42b1c; border: 2px solid var(--primary-color);">
                     <button id="btnCreateDailyReport" class="success" style="flex: 1; padding: 10px 4px;">Chi tiết</button>
                     <button id="btnCreateSummaryReport" class="danger" style="flex: 1; padding: 10px 4px;">Công nợ</button>
                 </div>
 
-                <!-- LỊCH TRA CỨU ĐẠI LÝ -->
+                <!-- LỊCH TRA CỨU ĐẠI LÝ (TỰ ĐẨY BẢNG KHÔNG CHE CHỮ) -->
                 <div id="detailedDatePickerContainer" style="display: none; border-top: 1px dashed #dcdde1; padding-top: 8px; margin-top: 6px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <label id="lblDetailedWinCalToggle" style="font-size: 12.5px; color: #0078d4; margin: 0; font-weight: bold; cursor: pointer;" onclick="toggleWinCalendar('detailedWinCalBox', event)">
@@ -1839,14 +1863,14 @@
                     <tr id="tongCongRow"><td>Tổng</td><td id="tongDT"></td><td id="tongHH"></td></tr>
                     <tr id="mainBonusRow" style="background-color: var(--success-color); color: white; font-weight: bold;"><td>Thưởng</td><td colspan="2">${formatNumberHiddenK(state.baseThuong)}</td></tr>
                     <tr id="finalResultRow"><td id="ketQuaLabel"></td><td colspan="2" id="ketQuaValue"></td></tr>
-                    <tr id="bangChuRow"><td class="header" style="font-size:13.5px;">Bằng chữ</td><td colspan="2" id="ketQuaBangChu" class="bang-chu-cell"></td></tr>
+                    <tr id="bangChuRow"><td class="header" style="font-size:13px;">Bằng chữ</td><td colspan="2" id="ketQuaBangChu" class="bang-chu-cell"></td></tr>
                 </tbody>
             </table>`;
         } else {
             let rowsHtml = '';
             d.detailedItems.forEach(it => {
                 rowsHtml += `<tr>
-                    <td style="text-align:left; padding-left:6px; white-space: nowrap;">${it.date} - <b>${it.type}</b></td>
+                    <td style="text-align:left; padding-left:5px; white-space: nowrap;">${it.date} - <b>${it.type}</b></td>
                     <td>${formatNumberHiddenK(it.rev)}</td>
                     <td>${formatNumberHiddenK(it.com)}</td>
                     <td>${it.bonus > 0 ? formatNumberHiddenK(it.bonus) : '-'}</td>
@@ -1855,7 +1879,7 @@
             });
             tableContentHtml = `
             <table class="report-table" style="border: 1px solid var(--border-color); width: 100%;">
-                <colgroup><col style="width: 38%;"><col style="width: 16%;"><col style="width: 15%;"><col style="width: 14%;"><col style="width: 17%;"></colgroup>
+                <colgroup><col style="width: 33%;"><col style="width: 16%;"><col style="width: 16%;"><col style="width: 16%;"><col style="width: 19%;"></colgroup>
                 <tbody>
                     <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đại Lý:</td><td colspan="4" class="so-so">${agentName}</td></tr>
                     <tr><td class="header" style="font-weight:bold; background:#fafafa;">Đợt:</td><td colspan="4" class="report-dot-cell">${reportDate}</td></tr>
@@ -1864,7 +1888,7 @@
                     <tr id="tongCongRow" style="font-weight:bold; background:#eaeaea;"><td>Tổng</td><td id="tongDT"></td><td id="tongHH"></td><td></td><td></td></tr>
                     <tr id="mainBonusRow" style="background-color: var(--success-color); color: white; font-weight: bold;"><td>Thưởng</td><td colspan="4">${formatNumberHiddenK(state.baseThuong)}</td></tr>
                     <tr id="finalResultRow"><td id="ketQuaLabel"></td><td colspan="4" id="ketQuaValue"></td></tr>
-                    <tr id="bangChuRow"><td class="header" style="font-size:13.5px;">Bằng chữ</td><td colspan="4" id="ketQuaBangChu" class="bang-chu-cell"></td></tr>
+                    <tr id="bangChuRow"><td class="header" style="font-size:13px;">Bằng chữ</td><td colspan="4" id="ketQuaBangChu" class="bang-chu-cell"></td></tr>
                 </tbody>
             </table>`;
         }
