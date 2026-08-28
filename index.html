@@ -600,8 +600,8 @@
     <div id="authConfigModal" class="modal-overlay">
         <div class="auth-modal-card" onclick="event.stopPropagation()">
             <div style="font-size: 32px; margin-bottom: 8px;">🔐</div>
-            <h3 style="margin: 0 0 6px 0; font-size: 17px; color: #1e293b;">Quản Trị Cấu Hình</h3>
-            <p style="margin: 0 0 14px 0; font-size: 13px; color: #64748b;">Nhập mật khẩu để truy cập trang cấu hình</p>
+            <h3 id="authModalTitle" style="margin: 0 0 6px 0; font-size: 17px; color: #1e293b;">Quản Trị Cấu Hình</h3>
+            <p id="authModalSubTitle" style="margin: 0 0 14px 0; font-size: 13px; color: #64748b;">Nhập mật khẩu để truy cập trang cấu hình</p>
             <input type="text" id="txtAdminPassword" placeholder="Nhập mật khẩu..." 
                    style="-webkit-text-security: disc; text-align: center; font-size: 16px; font-weight: bold; border: 1.5px solid #cbd5e1; margin-bottom: 14px; border-radius: 6px; padding: 10px;" 
                    autocapitalize="sentences" autocomplete="off" autocorrect="off" spellcheck="false">
@@ -922,7 +922,7 @@
                 </div>
             </div>
 
-            <!-- TAB 2: QUẢN LÝ BASE (BACKUP, RESTORE, DELETE) -->
+            <!-- TAB 2: QUẢN LÝ CSDL SUPABASE (BACKUP, RESTORE, DELETE) -->
             <div id="configTabDbContent" style="display: none;">
                 <!-- 1. THỐNG KÊ CSDL -->
                 <div class="cfg-card" style="background: #f8fafc; border: 1.5px solid #cbd5e1;">
@@ -1115,6 +1115,7 @@
     let currentSearchSelectedDates = [];
     let currentSearchAgentCode = null;
 
+    let pendingAuthCallback = null;
     let summaryCalView = { month: 8, year: 2026 };
     let detailedCalView = { month: 8, year: 2026 };
 
@@ -1206,6 +1207,14 @@
     // ==================== XỬ LÝ MẬT KHẨU CẤU HÌNH ====================
     window.openConfigWithAuth = function() {
         DOM.txtAdminPassword.value = '';
+        const t = document.getElementById('authModalTitle');
+        const st = document.getElementById('authModalSubTitle');
+        if (t) t.textContent = 'Quản Trị Cấu Hình';
+        if (st) st.textContent = 'Nhập mật khẩu để truy cập trang cấu hình';
+        pendingAuthCallback = () => {
+            showSection('configSection');
+            loadSupabaseConfigTable();
+        };
         DOM.authConfigModal.style.display = 'block';
         setTimeout(() => DOM.txtAdminPassword.focus(), 100);
     };
@@ -1223,8 +1232,11 @@
             const isEncMatch = (typeof btoa === 'function') && (btoa(inputVal) === CONFIG_PASS_ENC);
             if (inputHash === CONFIG_PASS_HASH || isEncMatch) {
                 closeAdminAuthModal();
-                showSection('configSection');
-                loadSupabaseConfigTable();
+                if (typeof pendingAuthCallback === 'function') {
+                    const cb = pendingAuthCallback;
+                    pendingAuthCallback = null;
+                    cb();
+                }
                 return;
             }
         } catch (err) {
@@ -1570,7 +1582,7 @@
         showNotification(`Đã nạp ${files.length} file Biểu 35! (${excelData2.length} bản ghi)`, 'success');
     });
 
-        DOM.btnLoadData.onclick = async () => {
+            async function executeDirectWebUpload() {
         if (!excelData1.length && !excelData2.length) return showNotification("Hãy chọn file Excel Biểu 31 hoặc Biểu 35 trước!", 'error');
         
         showLoading();
@@ -1720,7 +1732,23 @@
         DOM.homePage.style.display = 'none';
         DOM.mainPage.style.display = 'block';
         showSection('summarySection');
-    };
+    
+    }
+
+    DOM.btnLoadData.onclick = () => {
+        if (!excelData1.length && !excelData2.length) return showNotification("Hãy chọn file Excel Biểu 31 hoặc Biểu 35 trước!", 'error');
+        
+        DOM.txtAdminPassword.value = '';
+        const t = document.getElementById('authModalTitle');
+        const st = document.getElementById('authModalSubTitle');
+        if (t) t.textContent = '🔐 Xác Nhận Nạp CSDL';
+        if (st) st.textContent = 'Nhập mật khẩu quản trị để nạp dữ liệu lên Supabase';
+        pendingAuthCallback = async () => {
+            await executeDirectWebUpload();
+        };
+        DOM.authConfigModal.style.display = 'block';
+        setTimeout(() => DOM.txtAdminPassword.focus(), 100);
+    };;
 
     window.toggleWinCalendar = function(boxId, event) {
         if (event) event.stopPropagation();
