@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Báo Cáo - XSKT Nam Định v1.0</title>
+    <title>Báo Cáo - XSKT NAM ĐỊNH v1.0</title>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -615,7 +615,7 @@
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
         <div class="simple-animated-logo" onclick="window.location.href = window.location.pathname; return false;">
-            <img src="logoXSND.gif" alt="Logo XSKT Nam Định" style="width: 100px; height: 100px; object-fit: contain;">
+            <img src="logoXSND.gif" alt="Logo XSKT Trực Ninh" style="width: 100px; height: 100px; object-fit: contain;">
         </div>
         <h2>Báo cáo Thu Tiền</h2>
 
@@ -651,7 +651,7 @@
                 <div style="height: 6px;"></div>
                 <label for="excelFile2" style="font-size: 12px;">Biểu 35 (XSKT):</label>
                 <input type="file" id="excelFile2" accept=".xls,.xlsx" multiple>
-                <button id="btnLoadData" class="primary" style="width: 100%; margin-top: 8px; padding: 10px; font-weight: bold; font-size: 14px; background: #107c41; color: white; border: none; border-radius: 4px; cursor: pointer;">🚀 Nạp Lên CƠ SỞ DỮ LIỆU</button>
+                <button id="btnLoadData" class="primary" style="width: 100%; margin-top: 8px; padding: 10px; font-weight: bold; font-size: 14px; background: #107c41; color: white; border: none; border-radius: 4px; cursor: pointer;">🚀 Nạp Lên CSDL Supabase</button>
             </div>
         </div>
         <div style="text-align: center; font-size: 11px; color: #888; font-weight: 600;">© 2026 ZENG FINANCE</div>
@@ -661,7 +661,7 @@
     <div id="mainPage" class="page" style="display: none;">
         
         <div class="simple-animated-logo main-page-logo" onclick="window.location.href = window.location.pathname; return false;">
-            <img src="logoXSND.gif" alt="Logo XSKT Nam Định" style="width: 100px; height: 100px; object-fit: contain;">
+            <img src="logoXSND.gif" alt="Logo XSKT Trực Ninh" style="width: 100px; height: 100px; object-fit: contain;">
         </div>
 
         <!-- 1. PHÂN HỆ TỔNG HỢP -->
@@ -1398,7 +1398,11 @@
                     }
                 });
 
-                if (!res.ok) throw new Error("Lỗi kết nối Supabase: " + res.statusText);
+                if (!res.ok) {
+                    const errBody = await res.text().catch(() => '');
+                    console.error("Supabase Error:", res.status, errBody);
+                    throw new Error(`Lỗi kết nối Supabase (HTTP ${res.status}): ${errBody || res.statusText || 'Không thể truy cập API'}`);
+                }
                 const data = await res.json();
                 
                 if (data && data.length > 0) {
@@ -1582,7 +1586,7 @@
         showNotification(`Đã nạp ${files.length} file Biểu 35! (${excelData2.length} bản ghi)`, 'success');
     });
 
-            async function executeDirectWebUpload() {
+        async function executeDirectWebUpload() {
         if (!excelData1.length && !excelData2.length) return showNotification("Hãy chọn file Excel Biểu 31 hoặc Biểu 35 trước!", 'error');
         
         showLoading();
