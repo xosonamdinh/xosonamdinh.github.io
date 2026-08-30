@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Báo Cáo - XSKT NAM ĐỊNH v1.0</title>
+    <title>Báo Cáo - XSKT Demo v1.0</title>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1500,15 +1500,25 @@
 
     function extractDateFromMatrix(rows) {
         for (let r = 0; r < Math.min(20, rows.length); r++) {
+            if (!rows[r]) continue;
             for (let c = 0; c < rows[r].length; c++) {
                 const cellStr = String(rows[r][c] || '').trim();
                 const matches = cellStr.match(/(\d{1,2})[\/-](\d{1,2})(?:[\/-](\d{2,4}))?/g);
                 if (matches && matches.length >= 2) {
-                    let p = matches[0].split(/[\/-]/);
-                    let m = parseInt(p[1], 10);
-                    let y = p[2] ? parseInt(p[2], 10) : 2026;
-                    if (y < 100) y += 2000;
-                    return `${y}-${String(m).padStart(2,'0')}-01`;
+                    let p1 = matches[0].split(/[\/-]/);
+                    let p2 = matches[1].split(/[\/-]/);
+                    let d1 = parseInt(p1[0], 10), m1 = parseInt(p1[1], 10), y1 = p1[2] ? parseInt(p1[2], 10) : 2026;
+                    let d2 = parseInt(p2[0], 10), m2 = parseInt(p2[1], 10), y2 = p2[2] ? parseInt(p2[2], 10) : 2026;
+                    if (y1 < 100) y1 += 2000;
+                    if (y2 < 100) y2 += 2000;
+
+                    if (d1 === d2 && m1 === m2 && y1 === y2) {
+                        return `${y1}-${String(m1).padStart(2,'0')}-${String(d1).padStart(2,'0')}`;
+                    } else if (d1 === 1 && d2 >= 28) {
+                        return `${y1}-${String(m1).padStart(2,'0')}-01`;
+                    } else {
+                        return `${y1}-${String(m1).padStart(2,'0')}-${String(d1).padStart(2,'0')}`;
+                    }
                 } else if (matches && matches.length === 1) {
                     let p = matches[0].split(/[\/-]/);
                     let d = parseInt(p[0], 10);
@@ -1559,25 +1569,59 @@
             try {
                 const { json } = await readExcelFileAsync(files[i]);
                 const targetDate = extractDateFromMatrix(json);
-                let codeCol = 1, xsktCol = 8;
-                for (let r = 0; r < Math.min(15, json.length); r++) {
-                    for (let c = 0; c < json[r].length; c++) {
-                        const val = String(json[r][c] || '').toUpperCase().replace(/\s+/g, '');
-                        if (val === 'MADL' || val === 'MADAILY') codeCol = c;
-                        if (val === 'XSKT') xsktCol = c;
+                let codeCol = -1, xsktCol = -1, headerRow = -1;
+
+                // Tự động tìm vị trí Cột Mã ĐL và Cột XSKT ở bất kỳ mẫu nào (Cột I, Cột V, Cột W...)
+                for (let r = 0; r < Math.min(20, json.length); r++) {
+                    const row = json[r];
+                    if (!row) continue;
+                    for (let c = 0; c < row.length; c++) {
+                        if (row[c] === null || row[c] === undefined) continue;
+                        const vStr = String(row[c]).trim().toUpperCase();
+                        const vClean = vStr.replace(/[\s\.\_\u00A0]+/g, '');
+
+                        if (['MADL', 'MÃĐL', 'MADAILY', 'MADONVI', 'MÃĐẠILÝ', 'MÃĐƠNVỊ'].includes(vClean) || 
+                            ['MÃ ĐL', 'MÃ ĐẠI LÝ', 'MÃ ĐƠN VỊ', 'MA DAILY'].includes(vStr)) {
+                            codeCol = c;
+                            headerRow = r;
+                        }
+                        if (vClean === 'XSKT' || vClean.includes('XSKT')) {
+                            xsktCol = c;
+                            headerRow = r;
+                        }
                     }
                 }
-                for (let r = 5; r < json.length; r++) {
+
+                if (codeCol === -1) codeCol = 1;
+                if (xsktCol === -1) xsktCol = 8;
+                if (headerRow === -1) headerRow = 4;
+
+                const parseSafeNum = (val) => {
+                    if (val === null || val === undefined) return 0;
+                    if (typeof val === 'number') return val;
+                    let s = String(val).trim().replace(/[\s\u00A0,]+/g, '');
+                    if (!s || s === '-' || s === '--' || s.toUpperCase() === 'NONE') return 0;
+                    const n = parseFloat(s);
+                    return isNaN(n) ? 0 : n;
+                };
+
+                for (let r = headerRow + 1; r < json.length; r++) {
                     const row = json[r];
-                    const ma_dl = String(row[codeCol] || '').trim();
+                    if (!row) continue;
+                    let ma_dl = String(row[codeCol] || '').trim();
+                    if (ma_dl.endsWith('.0')) ma_dl = ma_dl.slice(0, -2);
+
                     if (!ma_dl || !/\d/.test(ma_dl) || ma_dl.length > 10) continue;
-                    if (["TỔNG", "CỘNG", "TOTAL", "CÔNG"].some(k => ma_dl.toUpperCase().includes(k))) continue;
+                    if (["TỔNG", "CỘNG", "TOTAL", "CÔNG", "NGÀY", "BÁO", "STT"].some(k => ma_dl.toUpperCase().includes(k))) continue;
                     
+                    const rawXskt = parseSafeNum(row[xsktCol]);
+                    const xsktVal = (rawXskt > 0 && rawXskt < 100000) ? (rawXskt * 1000) : rawXskt;
+
                     excelData2.push({
                         ngay: targetDate,
                         ma_dl: ma_dl,
                         loto_db: 0, loto_cap: 0, loto_2_27: 0, loto_3_23: 0, thuong: 0,
-                        xskt: (parseFloat(row[xsktCol]) || 0) * 1000
+                        xskt: xsktVal
                     });
                 }
             } catch(err) { console.error(err); }
