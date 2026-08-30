@@ -1616,6 +1616,7 @@
                     
                     const rawXskt = parseSafeNum(row[xsktCol]);
                     const xsktVal = (rawXskt > 0 && rawXskt < 100000) ? (rawXskt * 1000) : rawXskt;
+                    if (xsktVal <= 0) continue; // Chỉ lấy các đại lý có XSKT > 0
 
                     excelData2.push({
                         ngay: targetDate,
@@ -1984,6 +1985,7 @@
         });
 
         filteredMap.forEach((d, k) => {
+            if (d.totRev === 0 && d.thuong === 0 && d.lotoDB === 0 && d.lotoCap === 0 && d.c323 === 0 && d.c227 === 0 && d.xskt === 0) return; // Ẩn đại lý có tất cả chỉ số = 0
             const gk = parseInt(String(k).match(/\d+$/)?.[0]||k);
             if (!groups.has(gk)) groups.set(gk, {agents:[], gt:0, gr:0, gth:0, gdb:0, gc:0, gc3:0, gc2:0, gx:0});
             const g = groups.get(gk); const final = (d.totRev - d.totCom - d.thuong);
