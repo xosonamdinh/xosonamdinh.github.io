@@ -1428,12 +1428,6 @@
             });
 
             periodMonths.clear();
-            Object.keys(monthDayCount).forEach(mKey => {
-                const days = Array.from(monthDayCount[mKey]);
-                if (days.length === 1 && days[0].endsWith('-01')) {
-                    periodMonths.add(mKey);
-                }
-            });
 
             globalAllDates = Array.from(dateSet).sort();
             globalSelectedDates = [...globalAllDates];
@@ -1757,9 +1751,16 @@
 
             if (successCount > 0) {
                 showNotification(`🚀 Đã cập nhật thành công ${recordsToPush.length} bản ghi lên CSDL Supabase!`, 'success');
-                const fromM = DOM.fromMonth ? DOM.fromMonth.value : 8;
-                const toM = DOM.toMonth ? DOM.toMonth.value : 8;
-                await loadDataFromSupabase(fromM, toM);
+                let targetM = 8;
+                if (targetDates.length > 0) {
+                    const p = targetDates[0].split('-');
+                    targetM = parseInt(p[1], 10) || 8;
+                }
+                if (DOM.selFromMonthHome) DOM.selFromMonthHome.value = targetM;
+                if (DOM.selToMonthHome) DOM.selToMonthHome.value = targetM;
+                if (DOM.selFromMonthMain) DOM.selFromMonthMain.value = targetM;
+                if (DOM.selToMonthMain) DOM.selToMonthMain.value = targetM;
+                await loadDataFromSupabase(targetM, targetM);
             } else {
                 showNotification("❌ Lỗi nạp Supabase: " + (firstErr || "Bị chặn bởi quyền RLS"), "error");
             }
@@ -2256,11 +2257,11 @@
                 dayBonus += th;
             });
 
-            if (dayItemsRaw.length > 1) {
-                // Có nhiều dòng loại hình trong ngày -> Đánh dấu viền phân tách trên/dưới
+            if (dayItemsRaw.length > 1 && dayBonus > 0) {
+                // Có nhiều dòng loại hình VÀ CÓ THƯỞNG -> Kích hoạt chế độ Tổng Ngày, chữ nghiêng & nhạt màu
                 dayItemsRaw.forEach((it, idx) => {
                     it.net = it.rev - it.com;
-                    it.isMultiLineDay = true;
+                    it.isMultiWithBonus = true;
                     it.isFirstOfDay = (idx === 0);
                     detailedItems.push(it);
                 });
@@ -2273,15 +2274,22 @@
                     bonus: dayBonus,
                     net: dayRev - dayCom - dayBonus,
                     isDailySummary: true,
-                    isMultiLineDay: true,
+                    isMultiWithBonus: true,
                     isLastOfDay: true
                 });
-            } else if (dayItemsRaw.length === 1) {
-                const it = dayItemsRaw[0];
-                it.bonus = dayBonus;
-                it.net = it.rev - it.com - dayBonus;
-                it.isMultiLineDay = false;
-                detailedItems.push(it);
+            } else {
+                // Không có thưởng hoặc chỉ có 1 loại hình -> Hiển thị phẳng bình thường
+                dayItemsRaw.forEach(it => {
+                    if (dayItemsRaw.length === 1) {
+                        it.bonus = dayBonus;
+                        it.net = it.rev - it.com - dayBonus;
+                    } else {
+                        it.bonus = 0;
+                        it.net = it.rev - it.com;
+                    }
+                    it.isMultiWithBonus = false;
+                    detailedItems.push(it);
+                });
             }
         });
 
@@ -2365,8 +2373,8 @@
         } else {
             let rowsHtml = '';
             d.detailedItems.forEach((it) => {
-                const topBorder = (it.isMultiLineDay && it.isFirstOfDay) ? 'border-top: 3px solid #107c41;' : '';
-                const botBorder = (it.isMultiLineDay && it.isLastOfDay) ? 'border-bottom: 3px solid #107c41;' : 'border-bottom: 1px solid #e2e8f0;';
+                const topBorder = (it.isMultiWithBonus && it.isFirstOfDay) ? 'border-top: 1.5px solid #107c41;' : '';
+                const botBorder = (it.isMultiWithBonus && it.isLastOfDay) ? 'border-bottom: 1.5px solid #107c41;' : 'border-bottom: 1px solid #e2e8f0;';
                 const rowStyle = `${topBorder} ${botBorder}`.trim();
 
                 if (it.isDailySummary) {
@@ -2376,6 +2384,14 @@
                         <td><b>${formatNumberHiddenK(it.com)}</b></td>
                         <td><b>${it.bonus > 0 ? formatNumberHiddenK(it.bonus) : '-'}</b></td>
                         <td style="font-weight:bold; color:${it.net>=0?'var(--danger-color)':'var(--success-color)'};"><b>${formatNumberHiddenK(it.net)}</b></td>
+                    </tr>`;
+                } else if (it.isMultiWithBonus) {
+                    rowsHtml += `<tr style="font-style: italic; color: #555555; ${rowStyle}">
+                        <td style="text-align:left; padding-left:5px; white-space: nowrap; font-style: italic; color: #555555;">${it.date} - <b>${escapeHTML(it.type)}</b></td>
+                        <td style="font-style: italic; color: #555555;">${formatNumberHiddenK(it.rev)}</td>
+                        <td style="font-style: italic; color: #555555;">${formatNumberHiddenK(it.com)}</td>
+                        <td style="font-style: italic; color: #555555;">-</td>
+                        <td style="font-weight:bold; font-style: italic; color:${it.net>=0?'var(--danger-color)':'var(--success-color)'};">${formatNumberHiddenK(it.net)}</td>
                     </tr>`;
                 } else {
                     rowsHtml += `<tr style="${rowStyle}">
