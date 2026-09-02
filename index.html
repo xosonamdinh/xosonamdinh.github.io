@@ -2379,7 +2379,7 @@
 
                 if (it.isDailySummary) {
                     rowsHtml += `<tr style="font-weight:bold; background-color: #f0f4f8; border-top: 1px solid #cbd5e1; ${rowStyle}">
-                        <td style="text-align:center; padding: 5px 2px; white-space: nowrap;"><b>${escapeHTML(it.type)}</b></td>
+                        <td style="text-align:left; padding-left:5px; white-space: nowrap;"><b>${escapeHTML(it.type)}</b></td>
                         <td><b>${formatNumberHiddenK(it.rev)}</b></td>
                         <td><b>${formatNumberHiddenK(it.com)}</b></td>
                         <td><b>${it.bonus > 0 ? formatNumberHiddenK(it.bonus) : '-'}</b></td>
