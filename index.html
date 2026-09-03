@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Báo cáo - XSKT Nam Định Demo</title>
+    <title>Doanh thu - XSKT Nam Định Demo</title>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -673,7 +673,14 @@
 
         <div class="controls-panel">
             <div style="display: flex; gap: 4px; background: #eee; padding: 2px; border-radius: 4px; margin-bottom: 5px;">
-                <button class="tab-btn active" style="flex:1;">⚡ Máy Chủ</button>
+                <button class="tab-btn active" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px;">
+                    <svg width="17" height="17" viewBox="120 40 1000 1210" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0; vertical-align: middle;">
+                        <path d="M472 1199.23C629.77 1251.96 774.171 1234.98 833 1191.19L627.096 966 472 1199.23Z" fill="#FDAF67" fill-rule="evenodd"/>
+                        <path d="M647.544 48C48.1671 708.284 710.816 1158.75 827.1 1199 1128.07 993.464 1095.58 813.62 1099 751.96 1051.12 429.954 798.029 282.653 647.544 48Z" fill="#DD6447" fill-rule="evenodd"/>
+                        <path d="M216.25 531.56C106.695 897.796 269.316 1089.47 473.02 1199 712.672 1046.69 705.824 832.763 652.759 726.658 568.881 569.21 423.377 493.91 216.25 531.56Z" fill="#FFD97F" fill-rule="evenodd"/>
+                    </svg>
+                    <span>DATA CENTER</span>
+                </button>
                 <button class="tab-btn secondary" style="flex:1;" onclick="openConfigWithAuth()">⚙️ Cấu hình</button>
             </div>
 
