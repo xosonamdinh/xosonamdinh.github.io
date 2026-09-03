@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Doanh thu - XSKT Nam Định Demo</title>
+    <title>Báo cáo - XSKT Nam Định Demo</title>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1216,10 +1216,11 @@
     const db = firebase.firestore();
 
     // ==========================================================
- // Mật khẩu đã mã hóa Hash SHA-256 (Tương đương "xxxxx")
+    // Mật khẩu đã mã hóa Hash SHA-256 (Tương đương "Zeng6986")
     const CONFIG_PASS_HASH = "59c82ad7d25a4c0ab0dc7f2e4f3ef99e163b17bf6ee06b772847b12ed054b941";
     const CONFIG_PASS_ENC = "WmVuZzY5ODY=";
-// ==========================================================
+    // ==========================================================
+
     async function sha256(str) {
         if (window.crypto && window.crypto.subtle && window.crypto.subtle.digest) {
             try {
@@ -1540,8 +1541,18 @@
                 .get();
 
             let allRows = [];
+            const monthlySummaryDocs = new Set();
             snapshot.forEach(doc => {
                 const data = doc.data();
+                const docDate = doc.id;
+                const mKey = docDate.substring(0, 7);
+                // Nhận diện tháng gộp: Có cờ is_monthly_summary === true HOẶC thuộc Tháng 1 đến Tháng 7 cố định
+                if (data && data.is_monthly_summary === true) {
+                    monthlySummaryDocs.add(mKey);
+                } else if (['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07'].includes(mKey) && docDate.endsWith('-01')) {
+                    monthlySummaryDocs.add(mKey);
+                }
+
                 if (data && Array.isArray(data.records)) {
                     allRows.push(...data.records);
                 } else if (data && data.ngay && data.ma_dl) {
@@ -1554,17 +1565,14 @@
             currentDbData = allRows;
 
             let dateSet = new Set();
-            let monthDayCount = {};
             allRows.forEach(r => { 
-                if (r.ngay) {
-                    dateSet.add(r.ngay);
-                    const mKey = r.ngay.substring(0, 7);
-                    if (!monthDayCount[mKey]) monthDayCount[mKey] = new Set();
-                    monthDayCount[mKey].add(r.ngay);
-                }
+                if (r.ngay) dateSet.add(r.ngay);
             });
 
             periodMonths.clear();
+            monthlySummaryDocs.forEach(mKey => {
+                periodMonths.add(mKey);
+            });
 
             globalAllDates = Array.from(dateSet).sort();
             globalSelectedDates = [...globalAllDates];
@@ -1628,7 +1636,9 @@
         });
     }
 
-    function extractDateFromMatrix(rows) {
+    let excelDateMeta = {};
+
+    function extractDateInfoFromMatrix(rows) {
         for (let r = 0; r < Math.min(20, rows.length); r++) {
             if (!rows[r]) continue;
             for (let c = 0; c < rows[r].length; c++) {
@@ -1642,12 +1652,10 @@
                     if (y1 < 100) y1 += 2000;
                     if (y2 < 100) y2 += 2000;
 
-                    if (d1 === d2 && m1 === m2 && y1 === y2) {
-                        return `${y1}-${String(m1).padStart(2,'0')}-${String(d1).padStart(2,'0')}`;
-                    } else if (d1 === 1 && d2 >= 28) {
-                        return `${y1}-${String(m1).padStart(2,'0')}-01`;
+                    if (d1 === 1 && d2 >= 28 && m1 === m2) {
+                        return { date: `${y1}-${String(m1).padStart(2,'0')}-01`, isMonthlySummary: true };
                     } else {
-                        return `${y1}-${String(m1).padStart(2,'0')}-${String(d1).padStart(2,'0')}`;
+                        return { date: `${y1}-${String(m1).padStart(2,'0')}-${String(d1).padStart(2,'0')}`, isMonthlySummary: false };
                     }
                 } else if (matches && matches.length === 1) {
                     let p = matches[0].split(/[\/-]/);
@@ -1655,11 +1663,15 @@
                     let m = parseInt(p[1], 10);
                     let y = p[2] ? parseInt(p[2], 10) : 2026;
                     if (y < 100) y += 2000;
-                    return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                    return { date: `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`, isMonthlySummary: false };
                 }
             }
         }
-        return '2026-08-01';
+        return { date: '2026-08-01', isMonthlySummary: false };
+    }
+
+    function extractDateFromMatrix(rows) {
+        return extractDateInfoFromMatrix(rows).date;
     }
 
     DOM.excelFile1.addEventListener('change', async function(e) {
@@ -1668,7 +1680,9 @@
         for (let i = 0; i < files.length; i++) {
             try {
                 const { json } = await readExcelFileAsync(files[i]);
-                const targetDate = extractDateFromMatrix(json);
+                const dateInfo = extractDateInfoFromMatrix(json);
+                const targetDate = dateInfo.date;
+                excelDateMeta[targetDate] = dateInfo.isMonthlySummary;
                 for (let r = 4; r < json.length; r++) {
                     const row = json[r];
                     const ma_dl = String(row[1] || '').trim();
@@ -1698,7 +1712,9 @@
         for (let i = 0; i < files.length; i++) {
             try {
                 const { json } = await readExcelFileAsync(files[i]);
-                const targetDate = extractDateFromMatrix(json);
+                const dateInfo = extractDateInfoFromMatrix(json);
+                const targetDate = dateInfo.date;
+                if (dateInfo.isMonthlySummary) excelDateMeta[targetDate] = true;
                 let codeCol = -1, xsktCol = -1, headerRow = -1;
 
                 // Tự động tìm vị trí Cột Mã ĐL và Cột XSKT ở bất kỳ mẫu nào (Cột I, Cột V, Cột W...)
@@ -1854,12 +1870,14 @@
             for (const d of targetDates) {
                 const dayRecords = recordsToPush.filter(r => r.ngay === d);
                 const docRef = db.collection("daily_records").doc(d);
+                const isMonthly = !!excelDateMeta[d];
                 batch.set(docRef, {
                     ngay: d,
                     count: dayRecords.length,
+                    is_monthly_summary: isMonthly,
                     records: dayRecords,
                     updated_at: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                }, { merge: true });
             }
             await batch.commit();
 
@@ -1878,6 +1896,7 @@
             // Xóa bộ nhớ tạm và làm mới CSDL
             excelData1 = [];
             excelData2 = [];
+            excelDateMeta = {};
             if (DOM.excelFile1) DOM.excelFile1.value = '';
             if (DOM.excelFile2) DOM.excelFile2.value = '';
 
@@ -3360,6 +3379,211 @@
     }
     window.switchSummaryTab = switchSummaryTab;
 
+    // ==================== TỔNG HỢP THEO NGÀY: MA TRẬN CHỈ XSKT (PIVOT THEO ĐẠI LÝ) ====================
+    function renderDailyXsktMatrixView() {
+        if (!currentDbData.length) {
+            DOM.dailySummaryContainer.innerHTML = '<p style="padding:20px; color:#64748b; text-align:center;">Chưa có dữ liệu. Vui lòng tải dữ liệu trước.</p>';
+            return;
+        }
+
+        const isExcludeNumeric   = DOM.cbExcludeNumeric.checked;
+        const selectedBranchMode = DOM.selBranchMode.value;
+        const branchPrefixes     = branchModes[selectedBranchMode]?.prefixes || [];
+        const regVal             = DOM.regionSelect.value;
+        const rules              = regVal !== 'all' ? regionDefinitions[regVal] : null;
+
+        // 1. Thu thập dữ liệu theo Ngày và Đại lý có XSKT > 0
+        const xsktDayAgentMap   = new Map(); // `${ngay}|${agentCode}` -> số tiền/vé
+        const xsktAgentTotalMap = new Map(); // agentCode -> tổng
+        const xsktDayTotalMap   = new Map(); // ngay -> tổng
+        const distinctDates     = new Set();
+        const distinctAgents    = new Set();
+
+        currentDbData.forEach(r => {
+            if (globalSelectedDates.length > 0 && !globalSelectedDates.includes(r.ngay)) return;
+            const c = String(r.ma_dl || '').trim().toUpperCase();
+            if (!c) return;
+            if (selectedBranchMode !== 'all' && !branchPrefixes.some(pref => c.startsWith(pref))) return;
+            if (rules) {
+                const numMatch = c.match(/\d+$/);
+                if (!numMatch) return;
+                const agentNum = parseInt(numMatch[0], 10);
+                if (!rules.some(rule => agentNum >= rule.min && agentNum <= rule.max)) return;
+            }
+            if (isExcludeNumeric && /^\d+$/.test(c)) return;
+
+            const x = parseFloat(r.xskt) || 0;
+            if (x <= 0) return; // Chỉ lấy đại lý có phát sinh XSKT
+
+            const ngay = r.ngay;
+            if (!ngay) return;
+
+            distinctDates.add(ngay);
+            distinctAgents.add(c);
+
+            const dayAgentKey = `${ngay}|${c}`;
+            xsktDayAgentMap.set(dayAgentKey, (xsktDayAgentMap.get(dayAgentKey) || 0) + x);
+            xsktAgentTotalMap.set(c, (xsktAgentTotalMap.get(c) || 0) + x);
+            xsktDayTotalMap.set(ngay, (xsktDayTotalMap.get(ngay) || 0) + x);
+        });
+
+        if (distinctAgents.size === 0) {
+            DOM.dailySummaryContainer.innerHTML = '<p style="padding:20px; color:#64748b; text-align:center;">Không có đại lý nào có số liệu XSKT phù hợp với bộ lọc hiện tại.</p>';
+            const titleTo = regVal !== 'all' ? ` — Tổ: ${regVal}` : '';
+            if (DOM.dailySummaryTitle) DOM.dailySummaryTitle.textContent = 'Tổng Hợp Theo Ngày — Chỉ XSKT (0 đại lý)' + titleTo;
+            if (DOM.dailySummarySubtitle) DOM.dailySummarySubtitle.textContent = dateRangeText;
+            return;
+        }
+
+        // Sắp xếp các đại lý theo thứ tự số sổ tăng dần
+        const sortedAgents = Array.from(distinctAgents).sort((a, b) => {
+            const numA = parseInt(a.replace(/\D/g, ''), 10) || 0;
+            const numB = parseInt(b.replace(/\D/g, ''), 10) || 0;
+            if (numA !== numB) return numA - numB;
+            return a.localeCompare(b, undefined, { numeric: true });
+        });
+
+        const sortedDays = Array.from(distinctDates).sort();
+
+        // Gom ngày theo tháng
+        const daysByMonth = new Map();
+        sortedDays.forEach(ngay => {
+            const dt = new Date(ngay + 'T00:00:00');
+            const mkey = `${dt.getFullYear()}|${dt.getMonth() + 1}`;
+            if (!daysByMonth.has(mkey)) daysByMonth.set(mkey, []);
+            daysByMonth.get(mkey).push(ngay);
+        });
+
+        const fmtK = v => (Math.round(v / 1000)).toLocaleString('vi-VN');
+
+        const isFewAgents = sortedAgents.length <= 8;
+
+        const tableStyle = isFewAgents
+            ? `margin: 0 auto; width: auto !important; max-width: 460px; border-collapse: separate; border-spacing: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.08); border-radius: 6px; background: #ffffff;`
+            : `margin: 0 auto; width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; background: #ffffff;`;
+
+        const thAgentStyle = isFewAgents
+            ? `padding: 7px 10px; text-align: center; white-space: nowrap; border-bottom: 2px solid #166534; border-right: 1px solid #166534; position: sticky; top: 0; z-index: 20; background-color: #107c41 !important; color: #ffffff !important; width: 80px; min-width: 70px; max-width: 95px; cursor: pointer; font-size: 13px; font-weight: 700;`
+            : `padding: 6px 6px; text-align: center; white-space: nowrap; border-bottom: 2px solid #166534; border-right: 1px solid #166534; position: sticky; top: 0; z-index: 20; background-color: #107c41 !important; color: #ffffff !important; min-width: 55px; cursor: pointer; font-size: 12px;`;
+
+        const tdAgentStyle = isFewAgents
+            ? `padding: 5px 10px; text-align: center; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; white-space: nowrap; width: 80px; min-width: 70px; max-width: 95px; font-size: 13px;`
+            : `padding: 4px 6px; text-align: center; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; white-space: nowrap; min-width: 55px; font-size: 12px;`;
+
+        const tdMonthAgentStyle = isFewAgents
+            ? `padding: 6px 10px; text-align: center; border-bottom: 1px solid #166534; border-right: 1px solid #166534; color: #ffffff; white-space: nowrap; width: 80px; min-width: 70px; max-width: 95px; font-size: 13px; font-weight: 700;`
+            : `padding: 6px 6px; text-align: center; border-bottom: 1px solid #166534; border-right: 1px solid #166534; color: #ffffff; white-space: nowrap; min-width: 55px; font-size: 12px; font-weight: 700;`;
+
+        const thTotalStyle = isFewAgents
+            ? `padding: 7px 12px; text-align: center; white-space: nowrap; border-bottom: 2px solid #166534; position: sticky; top: 0; z-index: 20; background-color: #1a5c28 !important; color: #ffffff !important; width: 85px; min-width: 75px; max-width: 100px; font-weight: 700; font-size: 13px;`
+            : `padding: 6px 8px; text-align: center; white-space: nowrap; border-bottom: 2px solid #166534; position: sticky; top: 0; z-index: 20; background-color: #1a5c28 !important; color: #ffffff !important; min-width: 75px; font-weight: 700; font-size: 12px;`;
+
+        const tdTotalStyle = isFewAgents
+            ? `padding: 5px 12px; text-align: center; border-bottom: 1px solid #e2e8f0; font-weight: 700; color: #15803d; white-space: nowrap; width: 85px; min-width: 75px; max-width: 100px; font-size: 13px;`
+            : `padding: 4px 8px; text-align: center; border-bottom: 1px solid #e2e8f0; font-weight: 700; color: #15803d; white-space: nowrap; min-width: 75px; font-size: 12px;`;
+
+        const tdMonthTotalStyle = isFewAgents
+            ? `padding: 6px 12px; text-align: center; border-bottom: 1px solid #166534; color: #86efac; font-size: 13.5px; font-weight: 700; white-space: nowrap; width: 85px; min-width: 75px; max-width: 100px;`
+            : `padding: 6px 8px; text-align: center; border-bottom: 1px solid #166534; color: #86efac; font-size: 13px; font-weight: 700; white-space: nowrap; min-width: 75px;`;
+
+        const thDateStyle = isFewAgents
+            ? `padding: 7px 6px; text-align: center; white-space: nowrap; border-bottom: 2px solid #166534; border-right: 1px solid #166534; position: sticky; left: 0; top: 0; z-index: 30; background-color: #107c41 !important; color: #ffffff !important; width: 68px; min-width: 68px; max-width: 68px; font-size: 13px; font-weight: 700; box-shadow: 2px 0 4px rgba(0,0,0,0.12);`
+            : `padding: 6px 4px; text-align: center; white-space: nowrap; border-bottom: 2px solid #166534; border-right: 1px solid #166534; position: sticky; left: 0; top: 0; z-index: 30; background-color: #107c41 !important; color: #ffffff !important; width: 62px; min-width: 62px; max-width: 62px; font-size: 12px; font-weight: 700; box-shadow: 2px 0 4px rgba(0,0,0,0.15);`;
+
+        const tdDateStyle = (bg) => isFewAgents
+            ? `padding: 5px 6px; text-align: center; white-space: nowrap; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; font-weight: 600; position: sticky; left: 0; z-index: 10; background-color: ${bg} !important; width: 68px; min-width: 68px; max-width: 68px; font-size: 13px; box-shadow: 2px 0 4px rgba(0,0,0,0.08);`
+            : `padding: 4px 4px; text-align: center; white-space: nowrap; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; font-weight: 600; position: sticky; left: 0; z-index: 10; background-color: ${bg} !important; width: 62px; min-width: 62px; max-width: 62px; font-size: 12px; box-shadow: 2px 0 4px rgba(0,0,0,0.10);`;
+
+        const tdMonthDateStyle = isFewAgents
+            ? `padding: 6px 6px; text-align: center; border-bottom: 1px solid #166534; border-right: 1px solid #166534; white-space: nowrap; position: sticky; left: 0; z-index: 12; background-color: #0b592e !important; color: #ffffff !important; width: 68px; min-width: 68px; max-width: 68px; font-size: 13px; font-weight: 700; box-shadow: 2px 0 4px rgba(0,0,0,0.12);`
+            : `padding: 6px 4px; text-align: center; border-bottom: 1px solid #166534; border-right: 1px solid #166534; white-space: nowrap; position: sticky; left: 0; z-index: 12; background-color: #0b592e !important; color: #ffffff !important; width: 62px; min-width: 62px; max-width: 62px; font-size: 12px; font-weight: 700; box-shadow: 2px 0 4px rgba(0,0,0,0.15);`;
+
+        let html = `<table id="dailySummaryTable" class="daily-summary-table" style="${tableStyle}">
+            <thead>
+                <tr style="background:#107c41; color:#fff;">
+                    <th class="col-ngay" style="${thDateStyle}">Ngày</th>
+                    ${sortedAgents.map(ag => `
+                        <th style="${thAgentStyle}" onclick="window.viewAgentDetail('${escapeHTML(ag)}')" title="Xem chi tiết đại lý ${escapeHTML(ag)}">${escapeHTML(ag)}</th>
+                    `).join('')}
+                    <th style="${thTotalStyle}">Tổng</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+        let monthIdx = 0;
+
+        daysByMonth.forEach((days, mkey) => {
+            const [yStr, mStr] = mkey.split('|');
+            const nam = parseInt(yStr, 10), thang = parseInt(mStr, 10);
+            const isoMKey = `${nam}-${String(thang).padStart(2,'0')}`;
+            const isMonthlySummary = periodMonths.has(isoMKey) || (days.length === 1);
+
+            if (monthIdx > 0) {
+                html += `<tr style="background:#e2e8f0; height:6px;">
+                    <td colspan="${sortedAgents.length + 2}" style="padding:0; border:1px solid #cbd5e1; height:6px; background:#e2e8f0;"></td>
+                </tr>`;
+            }
+            monthIdx++;
+
+            if (isMonthlySummary) {
+                // Tháng gộp cả tháng: Chỉ hiển thị 1 dòng duy nhất cho tháng đó!
+                const singleDay = days[0];
+                const monthTotal = xsktDayTotalMap.get(singleDay) || 0;
+
+                html += `<tr style="background:#0b592e; color:#ffffff; font-weight:700;">
+                    <td class="col-ngay" style="${tdMonthDateStyle}">Tháng ${thang}</td>
+                    ${sortedAgents.map(ag => {
+                        const val = xsktDayAgentMap.get(`${singleDay}|${ag}`) || 0;
+                        return `<td style="${tdMonthAgentStyle}">${val > 0 ? fmtK(val) : '—'}</td>`;
+                    }).join('')}
+                    <td style="${tdMonthTotalStyle}">${fmtK(monthTotal)}</td>
+                </tr>`;
+            } else {
+                // Tháng chi tiết từng ngày
+                let monthTotal = 0;
+                const monthAgentTotals = new Map();
+
+                days.forEach((ngay, idx) => {
+                    const dt = new Date(ngay + 'T00:00:00');
+                    const day = dt.getDate();
+                    const dayTotal = xsktDayTotalMap.get(ngay) || 0;
+                    monthTotal += dayTotal;
+
+                    const rowBg = idx % 2 === 0 ? '#ffffff' : '#f8fafc';
+                    html += `<tr style="background:${rowBg};">
+                        <td class="col-ngay" style="${tdDateStyle(rowBg)}">${day.toString().padStart(2,'0')}/${thang.toString().padStart(2,'0')}</td>
+                        ${sortedAgents.map(ag => {
+                            const val = xsktDayAgentMap.get(`${ngay}|${ag}`) || 0;
+                            monthAgentTotals.set(ag, (monthAgentTotals.get(ag) || 0) + val);
+                            return `<td style="${tdAgentStyle}">${val > 0 ? fmtK(val) : '—'}</td>`;
+                        }).join('')}
+                        <td style="${tdTotalStyle}">${fmtK(dayTotal)}</td>
+                    </tr>`;
+                });
+
+                // Nếu tháng có từ 2 ngày trở lên: in dòng subtotal Tháng (giữ lại dòng Tháng 8 theo đúng yêu cầu)
+                if (days.length > 1) {
+                    html += `<tr style="background:#0b592e; color:#ffffff; font-weight:700;">
+                        <td class="col-ngay" style="${tdMonthDateStyle}">Tháng ${thang}</td>
+                        ${sortedAgents.map(ag => {
+                            const val = monthAgentTotals.get(ag) || 0;
+                            return `<td style="${tdMonthAgentStyle}">${val > 0 ? fmtK(val) : '—'}</td>`;
+                        }).join('')}
+                        <td style="${tdMonthTotalStyle}">${fmtK(monthTotal)}</td>
+                    </tr>`;
+                }
+            }
+        });
+
+        html += `</tbody></table>`;
+
+        const titleTo = regVal !== 'all' ? ` — Tổ: ${regVal}` : '';
+        if (DOM.dailySummaryTitle) DOM.dailySummaryTitle.textContent = `Tổng Hợp Theo Ngày — Chỉ XSKT (${sortedAgents.length} đại lý bán)` + titleTo;
+        if (DOM.dailySummarySubtitle) DOM.dailySummarySubtitle.textContent = dateRangeText;
+
+        DOM.dailySummaryContainer.innerHTML = html;
+    }
+
     // ==================== TỔNG HỢP THEO NGÀY ====================
     function generateDailySummaryView() {
         if (!currentDbData.length) {
@@ -3367,9 +3591,19 @@
             return;
         }
 
+        const isOnlyXSKT = DOM.cbOnlyXSKT ? DOM.cbOnlyXSKT.checked : false;
+        // Nếu chọn "Chỉ XSKT": Chuyển sang giao diện Ma trận XSKT theo từng đại lý
+        if (isOnlyXSKT) {
+            try {
+                renderDailyXsktMatrixView();
+                return;
+            } catch(e) {
+                console.error("Lỗi khi render ma trận XSKT:", e);
+            }
+        }
+
         const isExcludeNumeric  = DOM.cbExcludeNumeric.checked;
         const isExcludeXSKT    = DOM.cbExcludeXSKT.checked;
-        const isOnlyXSKT       = DOM.cbOnlyXSKT ? DOM.cbOnlyXSKT.checked : false;
         const selectedBranchMode = DOM.selBranchMode.value;
         const branchPrefixes = branchModes[selectedBranchMode]?.prefixes || [];
         const regVal = DOM.regionSelect.value;
@@ -3401,9 +3635,7 @@
                   x   = parseFloat(r.xskt)||0, th = parseFloat(r.thuong)||0;
             d.lotoDB += ldb; d.lotoCap += lc; d.c323 += c3; d.c227 += c2;
             d.xskt  += x;   d.thuong  += th;
-            if (isOnlyXSKT) {
-                d.totRev += x;
-            } else if (isExcludeXSKT) {
+            if (isExcludeXSKT) {
                 d.totRev += ldb + lc + c3 + c2;
             } else {
                 d.totRev += ldb + lc + c3 + c2 + x;
@@ -3428,11 +3660,10 @@
         });
 
         // Xác định cột nào cần hiện (tổng > 0)
-        // Khi chỉ XSKT: chỉ giữ cột XSKT, ẩn hết lô
-        const showLotoDB  = !isOnlyXSKT && grandLotoDB  > 0;
-        const showLotoCap = !isOnlyXSKT && grandLotoCap > 0;
-        const showC323    = !isOnlyXSKT && grandC323    > 0;
-        const showC227    = !isOnlyXSKT && grandC227    > 0;
+        const showLotoDB  = grandLotoDB  > 0;
+        const showLotoCap = grandLotoCap > 0;
+        const showC323    = grandC323    > 0;
+        const showC227    = grandC227    > 0;
         const showXSKT    = !isExcludeXSKT && grandXSKT > 0;
         const showThuong  = grandThuong > 0;
 
@@ -3496,6 +3727,8 @@
             const chiTieuThang = mt.chiTieu * 1000;
             const chiTieuNgay = mt.daysInMonth > 0 ? (chiTieuThang / mt.daysInMonth) : 0;
             const chiTieuNgayK = Math.round(chiTieuNgay / 1000);
+            const isoMKey = `${nam}-${String(thang).padStart(2,'0')}`;
+            const isMonthlySummary = periodMonths.has(isoMKey) || (days.length === 1);
 
             if (monthIdx > 0) {
                 html += `<tr style="background:#e2e8f0; height:8px;">
@@ -3506,45 +3739,57 @@
 
             let mLotoDB = 0, mLotoCap = 0, mC323 = 0, mC227 = 0, mXSKT = 0, mTotRev = 0, mThuong = 0;
 
-            days.forEach((ngay, idx) => {
-                const d = dayMap.get(ngay);
-                const dt = new Date(ngay + 'T00:00:00');
-                const day = dt.getDate();
-
-                mLotoDB  += d.lotoDB;  mLotoCap += d.lotoCap;
-                mC323    += d.c323;    mC227    += d.c227;
-                mXSKT    += d.xskt;    mThuong  += d.thuong;
-                mTotRev  += d.totRev;
-
-                const diffNgay = d.totRev - chiTieuNgay;
-                const diffK = Math.round(diffNgay / 1000);
-                const chiTieuLuyKe = mt.daysInMonth > 0 ? chiTieuThang * (day / mt.daysInMonth) : 0;
-                const pct = chiTieuLuyKe > 0 ? (mTotRev / chiTieuLuyKe * 100) : null;
-                const pctColor = pct === null ? '' : (pct >= 100 ? '#15803d' : (pct >= 80 ? '#d97706' : '#dc2626'));
-                const pctText  = pct === null ? (mt.chiTieu > 0 ? '—' : 'Chưa có KH') : `${pct.toFixed(1)}%`;
-
-                let khCellHtml = '—';
-                if (mt.chiTieu > 0) {
-                    const diffBadge = diffK >= 0
-                        ? `<span style="color:#15803d; font-weight:700;">+${fmtNum(diffK)} (Thừa)</span>`
-                        : `<span style="color:#dc2626; font-weight:700;">${fmtNum(diffK)} (Thiếu)</span>`;
-                    khCellHtml = `<div style="font-size:11px; color:#475569;">KH: <b>${fmtNum(chiTieuNgayK)}</b></div><div style="font-size:11px;">${diffBadge}</div>`;
+            if (isMonthlySummary) {
+                // Tháng gộp cả tháng (tháng 1 đến tháng 7): Chỉ lấy tổng, KHÔNG in dòng ngày lẻ trùng lặp
+                const d = dayMap.get(days[0]);
+                if (d) {
+                    mLotoDB  = d.lotoDB;  mLotoCap = d.lotoCap;
+                    mC323    = d.c323;    mC227    = d.c227;
+                    mXSKT    = d.xskt;    mThuong  = d.thuong;
+                    mTotRev  = d.totRev;
                 }
+            } else {
+                // Tháng chi tiết: in từng ngày
+                days.forEach((ngay, idx) => {
+                    const d = dayMap.get(ngay);
+                    const dt = new Date(ngay + 'T00:00:00');
+                    const day = dt.getDate();
 
-                const rowBg = idx % 2 === 0 ? '#fff' : '#f8fafc';
-                html += `<tr style="background:${rowBg};">
-                    <td class="col-ngay" style="padding:4px 4px; text-align:center; white-space:nowrap; border:1px solid #e2e8f0; font-weight:600; ${stickyDateTd(rowBg)}">${day.toString().padStart(2,'0')}/${thang.toString().padStart(2,'0')}</td>
-                    ${showLotoDB  ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${d.lotoDB  > 0 ? fmtK(d.lotoDB)  : ''}</td>` : ''}
-                    ${showLotoCap ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${d.lotoCap > 0 ? fmtK(d.lotoCap) : ''}</td>` : ''}
-                    ${showC323    ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${d.c323    > 0 ? fmtK(d.c323)    : ''}</td>` : ''}
-                    ${showC227    ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${d.c227    > 0 ? fmtK(d.c227)    : ''}</td>` : ''}
-                    ${showXSKT   ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${d.xskt    > 0 ? fmtK(d.xskt)    : ''}</td>` : ''}
-                    <td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; font-weight:700; color:#15803d; white-space:nowrap;">${fmtK(d.totRev)}</td>
-                    ${showThuong  ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; color:#dc2626; white-space:nowrap;">${d.thuong > 0 ? fmtK(d.thuong) : ''}</td>` : ''}
-                    <td style="padding:3px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${khCellHtml}</td>
-                    <td style="padding:4px 6px; text-align:center; border:1px solid #e2e8f0; font-weight:700; color:${pctColor}; white-space:nowrap;">${pctText}</td>
-                </tr>`;
-            });
+                    mLotoDB  += d.lotoDB;  mLotoCap += d.lotoCap;
+                    mC323    += d.c323;    mC227    += d.c227;
+                    mXSKT    += d.xskt;    mThuong  += d.thuong;
+                    mTotRev  += d.totRev;
+
+                    const diffNgay = d.totRev - chiTieuNgay;
+                    const diffK = Math.round(diffNgay / 1000);
+                    const chiTieuLuyKe = mt.daysInMonth > 0 ? chiTieuThang * (day / mt.daysInMonth) : 0;
+                    const pct = chiTieuLuyKe > 0 ? (mTotRev / chiTieuLuyKe * 100) : null;
+                    const pctColor = pct === null ? '' : (pct >= 100 ? '#15803d' : (pct >= 80 ? '#d97706' : '#dc2626'));
+                    const pctText  = pct === null ? (mt.chiTieu > 0 ? '—' : 'Chưa có KH') : `${pct.toFixed(1)}%`;
+
+                    let khCellHtml = '—';
+                    if (mt.chiTieu > 0) {
+                        const diffBadge = diffK >= 0
+                            ? `<span style="color:#15803d; font-weight:700;">+${fmtNum(diffK)} (Thừa)</span>`
+                            : `<span style="color:#dc2626; font-weight:700;">${fmtNum(diffK)} (Thiếu)</span>`;
+                        khCellHtml = `<div style="font-size:11px; color:#475569;">KH: <b>${fmtNum(chiTieuNgayK)}</b></div><div style="font-size:11px;">${diffBadge}</div>`;
+                    }
+
+                    const rowBg = idx % 2 === 0 ? '#fff' : '#f8fafc';
+                    html += `<tr style="background:${rowBg};">
+                        <td class="col-ngay" style="padding:4px 4px; text-align:center; white-space:nowrap; border:1px solid #e2e8f0; font-weight:600; ${stickyDateTd(rowBg)}">${day.toString().padStart(2,'0')}/${thang.toString().padStart(2,'0')}</td>
+                        ${showLotoDB  ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${d.lotoDB  > 0 ? fmtK(d.lotoDB)  : ''}</td>` : ''}
+                        ${showLotoCap ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${d.lotoCap > 0 ? fmtK(d.lotoCap) : ''}</td>` : ''}
+                        ${showC323    ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${d.c323    > 0 ? fmtK(d.c323)    : ''}</td>` : ''}
+                        ${showC227    ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${d.c227    > 0 ? fmtK(d.c227)    : ''}</td>` : ''}
+                        ${showXSKT   ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${d.xskt    > 0 ? fmtK(d.xskt)    : ''}</td>` : ''}
+                        <td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; font-weight:700; color:#15803d; white-space:nowrap;">${fmtK(d.totRev)}</td>
+                        ${showThuong  ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; color:#dc2626; white-space:nowrap;">${d.thuong > 0 ? fmtK(d.thuong) : ''}</td>` : ''}
+                        <td style="padding:3px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${khCellHtml}</td>
+                        <td style="padding:4px 6px; text-align:center; border:1px solid #e2e8f0; font-weight:700; color:${pctColor}; white-space:nowrap;">${pctText}</td>
+                    </tr>`;
+                });
+            }
 
             const veBocVal = (state.veBocMonth && state.veBocMonth[mkey]) ? state.veBocMonth[mkey] : 0;
             const veBocVND = veBocVal * 1000;
@@ -3565,7 +3810,7 @@
 
             const stickyMonthTd = `position:sticky; left:0; z-index:6; min-width:56px; width:56px; max-width:56px; background-color:#0b592e !important; color:#ffffff !important; box-shadow: 2px 0 4px rgba(0,0,0,0.15);`;
             html += `<tr style="background:#0b592e; color:#ffffff; font-weight:700;">
-                <td class="col-ngay" style="padding:6px 4px; text-align:center; border:1px solid #166534; white-space:nowrap; ${stickyMonthTd}">Tháng${thang}</td>
+                <td class="col-ngay" style="padding:6px 4px; text-align:center; border:1px solid #166534; white-space:nowrap; ${stickyMonthTd}">Tháng ${thang}</td>
                 ${showLotoDB  ? `<td style="padding:6px 6px; text-align:right; border:1px solid #166534; color:#ffffff; white-space:nowrap;">${fmtK(mLotoDB)}</td>` : ''}
                 ${showLotoCap ? `<td style="padding:6px 6px; text-align:right; border:1px solid #166534; color:#ffffff; white-space:nowrap;">${fmtK(mLotoCap)}</td>` : ''}
                 ${showC323    ? `<td style="padding:6px 6px; text-align:right; border:1px solid #166534; color:#ffffff; white-space:nowrap;">${fmtK(mC323)}</td>` : ''}
@@ -3601,34 +3846,54 @@
 
             if (mt.chiTieu > 0) {
                 const remain = chiTieuThang - mTotRevEffective;
-                const lastDayStr = days[days.length - 1];
-                const lastDay = lastDayStr ? new Date(lastDayStr + 'T00:00:00').getDate() : days.length;
-                const remainDays = mt.daysInMonth - lastDay;
-                const needed = remainDays > 0 && remain > 0 ? remain / remainDays : 0;
                 const pctDone = (mTotRevEffective / chiTieuThang * 100).toFixed(1);
                 const veBocExtraText = veBocVal > 0 ? ` (gồm ${fmtNum(veBocVal)} Vé bóc)` : '';
 
-                if (remain > 0 && remainDays > 0) {
-                    html += `<tr style="background:#fef9c3;">
-                        <td colspan="${totalCols}" style="padding:5px 8px; border:1px solid #fde68a; background:#fef9c3; font-weight:700; font-size:12px; color:#92400e; text-align:left; line-height:1.45;">
-                            ⚡ Tháng ${thang}/${nam}: Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong>
-                            — Còn lại <strong>${fmtK(remain)}</strong>
-                            (${remainDays} ngày còn lại, cần TB <strong>${fmtK(needed)}/ngày</strong>)
-                        </td>
-                    </tr>`;
-                } else if (remain > 0 && remainDays <= 0) {
-                    html += `<tr style="background:#fef9c3;">
-                        <td colspan="${totalCols}" style="padding:5px 8px; border:1px solid #fde68a; background:#fef9c3; font-weight:700; font-size:12px; color:#92400e; text-align:left; line-height:1.45;">
-                            ⚡ Tháng ${thang}/${nam}: Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong>
-                            — Chưa đạt chỉ tiêu (còn thiếu <strong>${fmtK(remain)}</strong>)
-                        </td>
-                    </tr>`;
+                if (isMonthlySummary) {
+                    // Đánh giá kế hoạch tháng gộp cả tháng: so sánh trọn vẹn cả tháng
+                    if (remain > 0) {
+                        html += `<tr style="background:#fef9c3;">
+                            <td colspan="${totalCols}" style="padding:5px 8px; border:1px solid #fde68a; background:#fef9c3; font-weight:700; font-size:12px; color:#92400e; text-align:left; line-height:1.45;">
+                                ⚡ Tháng ${thang}/${nam} (Dữ liệu gộp cả tháng): Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong>
+                                — Chưa đạt chỉ tiêu (còn thiếu <strong>${fmtK(remain)}</strong>)
+                            </td>
+                        </tr>`;
+                    } else {
+                        html += `<tr style="background:#dcfce7;">
+                            <td colspan="${totalCols}" style="padding:5px 8px; border:1px solid #86efac; background:#dcfce7; font-weight:700; font-size:12px; color:#15803d; text-align:left; line-height:1.45;">
+                                ✅ Tháng ${thang}/${nam} (Dữ liệu gộp cả tháng): Đã HOÀN THÀNH kế hoạch (${pctDone}%) — Vượt <strong>${fmtK(Math.abs(remain))}</strong>${veBocExtraText}
+                            </td>
+                        </tr>`;
+                    }
                 } else {
-                    html += `<tr style="background:#dcfce7;">
-                        <td colspan="${totalCols}" style="padding:5px 8px; border:1px solid #86efac; background:#dcfce7; font-weight:700; font-size:12px; color:#15803d; text-align:left; line-height:1.45;">
-                            ✅ Tháng ${thang}/${nam}: Đã HOÀN THÀNH kế hoạch (${pctDone}%) — Vượt <strong>${fmtK(Math.abs(remain))}</strong>${veBocExtraText}
-                        </td>
-                    </tr>`;
+                    // Đánh giá kế hoạch tháng chi tiết từng ngày
+                    const lastDayStr = days[days.length - 1];
+                    const lastDay = lastDayStr ? new Date(lastDayStr + 'T00:00:00').getDate() : days.length;
+                    const remainDays = mt.daysInMonth - lastDay;
+                    const needed = remainDays > 0 && remain > 0 ? remain / remainDays : 0;
+
+                    if (remain > 0 && remainDays > 0) {
+                        html += `<tr style="background:#fef9c3;">
+                            <td colspan="${totalCols}" style="padding:5px 8px; border:1px solid #fde68a; background:#fef9c3; font-weight:700; font-size:12px; color:#92400e; text-align:left; line-height:1.45;">
+                                ⚡ Tháng ${thang}/${nam}: Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong>
+                                — Còn lại <strong>${fmtK(remain)}</strong>
+                                (${remainDays} ngày còn lại, cần TB <strong>${fmtK(needed)}/ngày</strong>)
+                            </td>
+                        </tr>`;
+                    } else if (remain > 0 && remainDays <= 0) {
+                        html += `<tr style="background:#fef9c3;">
+                            <td colspan="${totalCols}" style="padding:5px 8px; border:1px solid #fde68a; background:#fef9c3; font-weight:700; font-size:12px; color:#92400e; text-align:left; line-height:1.45;">
+                                ⚡ Tháng ${thang}/${nam}: Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong>
+                                — Chưa đạt chỉ tiêu (còn thiếu <strong>${fmtK(remain)}</strong>)
+                            </td>
+                        </tr>`;
+                    } else {
+                        html += `<tr style="background:#dcfce7;">
+                            <td colspan="${totalCols}" style="padding:5px 8px; border:1px solid #86efac; background:#dcfce7; font-weight:700; font-size:12px; color:#15803d; text-align:left; line-height:1.45;">
+                                ✅ Tháng ${thang}/${nam}: Đã HOÀN THÀNH kế hoạch (${pctDone}%) — Vượt <strong>${fmtK(Math.abs(remain))}</strong>${veBocExtraText}
+                            </td>
+                        </tr>`;
+                    }
                 }
             }
         });
@@ -3636,7 +3901,7 @@
         html += '</tbody></table>';
 
         const titleTo = regVal !== 'all' ? ` — Tổ: ${regVal}` : '';
-        const modeLabel = isOnlyXSKT ? ' (Chỉ XSKT)' : (isExcludeXSKT ? ' (Không XSKT)' : '');
+        const modeLabel = isExcludeXSKT ? ' (Không XSKT)' : '';
         if (DOM.dailySummaryTitle) DOM.dailySummaryTitle.textContent = 'Tổng Hợp Theo Ngày' + titleTo + modeLabel;
         if (DOM.dailySummarySubtitle) DOM.dailySummarySubtitle.textContent = dateRangeText;
 
