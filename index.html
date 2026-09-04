@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Doanh thu - XSKT Nam Định Demo</title>
+    <title>Báo cáo - XSKT NAMDỊNH Demo</title>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -3770,9 +3770,13 @@
                     const diffNgay = d.totRev - chiTieuNgay;
                     const diffK = Math.round(diffNgay / 1000);
                     const chiTieuLuyKe = mt.daysInMonth > 0 ? chiTieuThang * (day / mt.daysInMonth) : 0;
-                    const pct = chiTieuLuyKe > 0 ? (mTotRev / chiTieuLuyKe * 100) : null;
+                    const pct = chiTieuNgay > 0 ? (d.totRev / chiTieuNgay * 100) : null;
                     const pctColor = pct === null ? '' : (pct >= 100 ? '#15803d' : (pct >= 80 ? '#d97706' : '#dc2626'));
                     const pctText  = pct === null ? (mt.chiTieu > 0 ? '—' : 'Chưa có KH') : `${pct.toFixed(1)}%`;
+                    const pctLk = chiTieuLuyKe > 0 ? (mTotRev / chiTieuLuyKe * 100) : null;
+                    const lkHtml = (pctLk !== null && day > 1)
+                        ? `<div style="font-size:10px; color:#64748b; font-weight:normal;" title="Tiến độ lũy kế từ đầu tháng đến ngày ${day}">(LK: ${pctLk.toFixed(1)}%)</div>`
+                        : '';
 
                     let khCellHtml = '—';
                     if (mt.chiTieu > 0) {
@@ -3793,7 +3797,7 @@
                         <td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; font-weight:700; color:#15803d; white-space:nowrap;">${fmtK(d.totRev)}</td>
                         ${showThuong  ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; color:#dc2626; white-space:nowrap;">${d.thuong > 0 ? fmtK(d.thuong) : ''}</td>` : ''}
                         <td style="padding:3px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${khCellHtml}</td>
-                        <td style="padding:4px 6px; text-align:center; border:1px solid #e2e8f0; font-weight:700; color:${pctColor}; white-space:nowrap;">${pctText}</td>
+                        <td style="padding:4px 6px; text-align:center; border:1px solid #e2e8f0; font-weight:700; color:${pctColor}; white-space:nowrap;">${pctText}${lkHtml}</td>
                     </tr>`;
                 });
             }
@@ -3833,8 +3837,8 @@
             const tbNgayDisp = mt.chiTieu > 0 ? fmtNum(Math.round(mt.chiTieu / mt.daysInMonth)) + '/ngày' : '—';
             const safeMKey = `${nam}_${thang}`;
             html += `<tr style="background:#dbeafe;">
-                <td colspan="${totalCols}" style="padding:4px 8px; border:1px solid #93c5fd; background:#dbeafe;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                <td colspan="${totalCols}" style="padding:6px 8px; border:1px solid #93c5fd; background:#dbeafe;">
+                    <div style="display:flex; flex-direction:column; gap:5px;">
                         <div style="font-weight:700; font-size:12px; color:#1d4ed8; text-align:left;">
                             📅 Tháng ${thang}/${nam} — Kế hoạch: <b>${chiTieuDisp}</b> (${mt.daysInMonth} ngày, TB: <b>${tbNgayDisp}</b>)
                         </div>
@@ -3860,15 +3864,16 @@
                     // Đánh giá kế hoạch tháng gộp cả tháng: so sánh trọn vẹn cả tháng
                     if (remain > 0) {
                         html += `<tr style="background:#fef9c3;">
-                            <td colspan="${totalCols}" style="padding:5px 8px; border:1px solid #fde68a; background:#fef9c3; font-weight:700; font-size:12px; color:#92400e; text-align:left; line-height:1.45;">
-                                ⚡ Tháng ${thang}/${nam} (Dữ liệu gộp cả tháng): Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong>
-                                — Chưa đạt chỉ tiêu (còn thiếu <strong>${fmtK(remain)}</strong>)
+                            <td colspan="${totalCols}" style="padding:6px 8px; border:1px solid #fde68a; background:#fef9c3; font-weight:700; font-size:12px; color:#92400e; text-align:left; line-height:1.5;">
+                                <div>⚡ Tháng ${thang}/${nam} (Dữ liệu gộp cả tháng): Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong></div>
+                                <div style="margin-top:3px;">Chưa đạt chỉ tiêu (còn thiếu <strong>${fmtK(remain)}</strong>)</div>
                             </td>
                         </tr>`;
                     } else {
                         html += `<tr style="background:#dcfce7;">
-                            <td colspan="${totalCols}" style="padding:5px 8px; border:1px solid #86efac; background:#dcfce7; font-weight:700; font-size:12px; color:#15803d; text-align:left; line-height:1.45;">
-                                ✅ Tháng ${thang}/${nam} (Dữ liệu gộp cả tháng): Đã HOÀN THÀNH kế hoạch (${pctDone}%) — Vượt <strong>${fmtK(Math.abs(remain))}</strong>${veBocExtraText}
+                            <td colspan="${totalCols}" style="padding:6px 8px; border:1px solid #86efac; background:#dcfce7; font-weight:700; font-size:12px; color:#15803d; text-align:left; line-height:1.5;">
+                                <div>✅ Tháng ${thang}/${nam} (Dữ liệu gộp cả tháng): Đã HOÀN THÀNH kế hoạch (${pctDone}%)</div>
+                                <div style="margin-top:3px;">Vượt <strong>${fmtK(Math.abs(remain))}</strong>${veBocExtraText}</div>
                             </td>
                         </tr>`;
                     }
@@ -3881,23 +3886,23 @@
 
                     if (remain > 0 && remainDays > 0) {
                         html += `<tr style="background:#fef9c3;">
-                            <td colspan="${totalCols}" style="padding:5px 8px; border:1px solid #fde68a; background:#fef9c3; font-weight:700; font-size:12px; color:#92400e; text-align:left; line-height:1.45;">
-                                ⚡ Tháng ${thang}/${nam}: Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong>
-                                — Còn lại <strong>${fmtK(remain)}</strong>
-                                (${remainDays} ngày còn lại, cần TB <strong>${fmtK(needed)}/ngày</strong>)
+                            <td colspan="${totalCols}" style="padding:6px 8px; border:1px solid #fde68a; background:#fef9c3; font-weight:700; font-size:12px; color:#92400e; text-align:left; line-height:1.5;">
+                                <div>⚡ Tháng ${thang}/${nam}: Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong></div>
+                                <div style="margin-top:3px;">Còn lại <strong>${fmtK(remain)}</strong> (${remainDays} ngày còn lại, cần TB <strong>${fmtK(needed)}/ngày</strong>)</div>
                             </td>
                         </tr>`;
                     } else if (remain > 0 && remainDays <= 0) {
                         html += `<tr style="background:#fef9c3;">
-                            <td colspan="${totalCols}" style="padding:5px 8px; border:1px solid #fde68a; background:#fef9c3; font-weight:700; font-size:12px; color:#92400e; text-align:left; line-height:1.45;">
-                                ⚡ Tháng ${thang}/${nam}: Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong>
-                                — Chưa đạt chỉ tiêu (còn thiếu <strong>${fmtK(remain)}</strong>)
+                            <td colspan="${totalCols}" style="padding:6px 8px; border:1px solid #fde68a; background:#fef9c3; font-weight:700; font-size:12px; color:#92400e; text-align:left; line-height:1.5;">
+                                <div>⚡ Tháng ${thang}/${nam}: Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong></div>
+                                <div style="margin-top:3px;">Chưa đạt chỉ tiêu (còn thiếu <strong>${fmtK(remain)}</strong>)</div>
                             </td>
                         </tr>`;
                     } else {
                         html += `<tr style="background:#dcfce7;">
-                            <td colspan="${totalCols}" style="padding:5px 8px; border:1px solid #86efac; background:#dcfce7; font-weight:700; font-size:12px; color:#15803d; text-align:left; line-height:1.45;">
-                                ✅ Tháng ${thang}/${nam}: Đã HOÀN THÀNH kế hoạch (${pctDone}%) — Vượt <strong>${fmtK(Math.abs(remain))}</strong>${veBocExtraText}
+                            <td colspan="${totalCols}" style="padding:6px 8px; border:1px solid #86efac; background:#dcfce7; font-weight:700; font-size:12px; color:#15803d; text-align:left; line-height:1.5;">
+                                <div>✅ Tháng ${thang}/${nam}: Đã HOÀN THÀNH kế hoạch (${pctDone}%)</div>
+                                <div style="margin-top:3px;">Vượt <strong>${fmtK(Math.abs(remain))}</strong>${veBocExtraText}</div>
                             </td>
                         </tr>`;
                     }
