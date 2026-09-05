@@ -2966,30 +2966,46 @@
         cloneSummaryWrapper.style.position = 'absolute';
         cloneSummaryWrapper.style.left = '-9999px';
         cloneSummaryWrapper.style.top = '0';
-        if (!isDayTab) {
-            cloneSummaryWrapper.style.width = TARGET_SUMMARY_WIDTH + 'px';
-            cloneSummaryWrapper.style.maxWidth = TARGET_SUMMARY_WIDTH + 'px';
-        } else {
-            cloneSummaryWrapper.style.width = 'max-content';
-            cloneSummaryWrapper.style.minWidth = '660px';
-        }
         cloneSummaryWrapper.style.background = '#ffffff';
-        cloneSummaryWrapper.style.padding = isDayTab ? '10px 14px 6px 14px' : '10px 8px 3px 8px';
+        cloneSummaryWrapper.style.padding = '4px 0px 4px 0px'; // Sát mép ảnh, không cần lề
+        cloneSummaryWrapper.style.margin = '0';
         cloneSummaryWrapper.style.boxSizing = 'border-box';
         cloneSummaryWrapper.style.display = 'block';
 
         const cloned = summaryElem.cloneNode(true);
         cloned.id = 'clonedSummaryElem';
-        cloned.style.setProperty('width', isDayTab ? 'max-content' : '100%', 'important');
-        cloned.style.setProperty('min-width', isDayTab ? '100%' : '100%', 'important');
+        cloned.style.setProperty('width', '100%', 'important');
+        cloned.style.setProperty('max-width', '100%', 'important');
+        cloned.style.setProperty('margin', '0', 'important');
+        cloned.style.setProperty('padding', '0', 'important');
         cloned.style.setProperty('display', 'block', 'important');
         cloned.style.setProperty('height', 'auto', 'important');
         cloned.style.setProperty('max-height', 'none', 'important');
         cloned.style.setProperty('overflow', 'visible', 'important');
 
+        // Định dạng cỡ chữ tiêu đề "Tổng Hợp Theo...." và "Từ ..." nhỏ đi bằng cỡ chữ 2 dòng dưới (~11-12px)
+        cloned.querySelectorAll('h1, h2, h3, #dailySummaryTitle, #summaryTitle').forEach(h => {
+            h.style.setProperty('font-size', '12px', 'important');
+            h.style.setProperty('font-weight', '700', 'important');
+            h.style.setProperty('margin', '2px 0 1px 0', 'important');
+            h.style.setProperty('line-height', '1.35', 'important');
+            h.style.setProperty('text-align', 'center', 'important');
+            h.style.setProperty('color', '#1e293b', 'important');
+        });
+        cloned.querySelectorAll('h4, h5, h6, #dailySummarySubtitle, #summaryDate').forEach(h => {
+            h.style.setProperty('font-size', '11px', 'important');
+            h.style.setProperty('font-weight', '600', 'important');
+            h.style.setProperty('margin', '1px 0 4px 0', 'important');
+            h.style.setProperty('line-height', '1.35', 'important');
+            h.style.setProperty('text-align', 'center', 'important');
+            h.style.setProperty('color', '#475569', 'important');
+        });
+
         cloned.querySelectorAll('div, #summaryTableContainer, #dailySummaryContainer').forEach(c => {
             if (c.id) c.id = 'cloned_' + c.id;
             c.style.setProperty('width', '100%', 'important');
+            c.style.setProperty('margin', '0', 'important');
+            c.style.setProperty('padding', '0', 'important');
             c.style.setProperty('height', 'auto', 'important');
             c.style.setProperty('min-height', '0', 'important');
             c.style.setProperty('max-height', 'none', 'important');
@@ -3002,8 +3018,10 @@
         const clonedTable = cloned.querySelector('table');
         if (clonedTable) {
             clonedTable.id = 'clonedTable';
-            clonedTable.style.setProperty('width', isDayTab ? 'max-content' : '100%', 'important');
+            clonedTable.style.setProperty('width', '100%', 'important');
             clonedTable.style.setProperty('min-width', '100%', 'important');
+            clonedTable.style.setProperty('max-width', '100%', 'important');
+            clonedTable.style.setProperty('margin', '0', 'important');
             clonedTable.style.setProperty('height', 'auto', 'important');
             clonedTable.style.setProperty('max-height', 'none', 'important');
             clonedTable.style.setProperty('overflow', 'visible', 'important');
@@ -3078,10 +3096,10 @@
                 span.style.fontWeight = 'bold';
                 span.style.color = '#1d4ed8';
                 span.style.background = '#ffffff';
-                span.style.padding = '2px 6px';
+                span.style.padding = '1px 5px';
                 span.style.border = '1px solid #2563eb';
                 span.style.borderRadius = '3px';
-                span.style.fontSize = '12px';
+                span.style.fontSize = '11px';
                 parent.replaceChild(span, input);
             }
         });
@@ -3092,10 +3110,10 @@
         const footer = document.createElement('div');
         footer.innerText = "© 2026 ZENG FINANCE - v1.0";
         footer.style.textAlign = "center";
-        footer.style.fontSize = "9.5px";
-        footer.style.fontWeight = "700";
+        footer.style.fontSize = "9px";
+        footer.style.fontWeight = "600";
         footer.style.color = "#aaaaaa";
-        footer.style.marginTop = "6px";
+        footer.style.marginTop = "3px";
         cloneSummaryWrapper.appendChild(footer);
 
         document.body.appendChild(cloneSummaryWrapper);
@@ -3103,19 +3121,21 @@
         await new Promise(resolve => setTimeout(resolve, 100));
 
         try {
-            const tableWidth = clonedTable ? Math.ceil(clonedTable.getBoundingClientRect().width || clonedTable.scrollWidth) : 0;
-            const containerWidth = Math.ceil(cloneSummaryWrapper.getBoundingClientRect().width || cloneSummaryWrapper.scrollWidth);
-            const targetW = isDayTab ? Math.max(containerWidth, tableWidth + 28, 680) : TARGET_SUMMARY_WIDTH;
+            const tableWidth = clonedTable ? Math.ceil(clonedTable.getBoundingClientRect().width || clonedTable.scrollWidth || clonedTable.offsetWidth) : 0;
+            const targetW = isDayTab ? (tableWidth > 0 ? tableWidth : 460) : TARGET_SUMMARY_WIDTH;
             
-            const fullTableHeight = clonedTable ? Math.ceil(clonedTable.offsetHeight || clonedTable.scrollHeight || clonedTable.getBoundingClientRect().height) : 0;
+            // Đặt chiều rộng khung bọc chính xác bằng chiều rộng bảng để căn sát mép ảnh, không dư lề
+            cloneSummaryWrapper.style.width = targetW + 'px';
+            cloneSummaryWrapper.style.minWidth = targetW + 'px';
+            cloneSummaryWrapper.style.maxWidth = targetW + 'px';
+
             const targetH = Math.ceil(Math.max(
                 cloneSummaryWrapper.scrollHeight, 
                 cloneSummaryWrapper.offsetHeight, 
-                cloneSummaryWrapper.getBoundingClientRect().height,
-                fullTableHeight + 120
-            ));
+                cloneSummaryWrapper.getBoundingClientRect().height
+            ) + 2);
 
-            let scaleVal = 2.2;
+            let scaleVal = 2.5;
             if (targetH * scaleVal > 4000) {
                 scaleVal = Math.max(1.2, 4000 / targetH);
             }
@@ -3573,7 +3593,7 @@
 
         if (distinctAgents.size === 0) {
             DOM.dailySummaryContainer.innerHTML = '<p style="padding:20px; color:#64748b; text-align:center;">Không có đại lý nào có số liệu XSKT phù hợp với bộ lọc hiện tại.</p>';
-            const titleTo = regVal !== 'all' ? ` — Tổ: ${regVal}` : '';
+            const titleTo = regVal !== 'all' ? `: ${regVal}` : '';
             if (DOM.dailySummaryTitle) DOM.dailySummaryTitle.textContent = 'Tổng Hợp Theo Ngày — Chỉ XSKT (0 đại lý)' + titleTo;
             if (DOM.dailySummarySubtitle) DOM.dailySummarySubtitle.textContent = dateRangeText;
             return;
@@ -3721,7 +3741,7 @@
 
         html += `</tbody></table>`;
 
-        const titleTo = regVal !== 'all' ? ` — Tổ: ${regVal}` : '';
+        const titleTo = regVal !== 'all' ? `: ${regVal}` : '';
         if (DOM.dailySummaryTitle) DOM.dailySummaryTitle.textContent = `Tổng Hợp Theo Ngày — Chỉ XSKT (${sortedAgents.length} đại lý bán)` + titleTo;
         if (DOM.dailySummarySubtitle) DOM.dailySummarySubtitle.textContent = dateRangeText;
 
@@ -4048,7 +4068,7 @@
 
         html += '</tbody></table>';
 
-        const titleTo = regVal !== 'all' ? ` — Tổ: ${regVal}` : '';
+        const titleTo = regVal !== 'all' ? `: ${regVal}` : '';
         const modeLabel = isExcludeXSKT ? ' (Không XSKT)' : '';
         if (DOM.dailySummaryTitle) DOM.dailySummaryTitle.textContent = 'Tổng Hợp Theo Ngày' + titleTo + modeLabel;
         if (DOM.dailySummarySubtitle) DOM.dailySummarySubtitle.textContent = dateRangeText;
