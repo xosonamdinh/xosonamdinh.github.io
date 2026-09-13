@@ -4131,9 +4131,10 @@
     // ==================== KẾ HOẠCH — TẢI TỪ FIREBASE ====================
     function getKeHoachTarget(tenTo, nam, thang) {
         if (!kehoachData) return { chiTieu: 0, veBoc: 0 };
-        const k1 = `${tenTo}|${nam}|${thang}`;
-        const k2 = `Tất Cả|${nam}|${thang}`;
-        const item = kehoachData[k1] || kehoachData[k2];
+        // Độc lập 100%: Mỗi đơn vị / tổ / 'Tất Cả' chỉ lấy duy nhất kế hoạch được nhập riêng cho chính nó
+        const targetKey = (tenTo === 'all' || !tenTo) ? 'Tất Cả' : tenTo;
+        const key = `${targetKey}|${nam}|${thang}`;
+        const item = kehoachData[key];
         if (!item) return { chiTieu: 0, veBoc: 0 };
         if (typeof item === 'number') return { chiTieu: item, veBoc: 0 };
         return { chiTieu: item.chiTieu || 0, veBoc: item.veBoc || 0 };
