@@ -1144,8 +1144,11 @@
                     <div id="cfgEditorList" class="cfg-list-container"></div>
                 </div>
 
-                <div class="cfg-card" style="display: flex; flex-direction: column; gap: 10px;">
-                    <button onclick="saveConfigToFirebase()" class="success" style="width: 100%; padding: 13px; font-size: 15px; font-weight: bold; box-shadow: 0 4px 6px rgba(16,124,65,0.2);">
+                <div class="cfg-card" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button onclick="addNewConfigRow()" class="secondary" style="flex: 1; min-width: 140px; padding: 12px; font-size: 14.5px; font-weight: bold; background: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 6px rgba(2,132,199,0.2);">
+                        ➕ Thêm mới
+                    </button>
+                    <button onclick="saveConfigToFirebase()" class="success" style="flex: 2; min-width: 200px; padding: 13px; font-size: 15px; font-weight: bold; box-shadow: 0 4px 6px rgba(16,124,65,0.2);">
                         🚀 LƯU VÀO CƠ SỞ DỮ LIỆU
                     </button>
                 </div>
@@ -3840,10 +3843,10 @@
             const mkey = `${nam}|${thang}`;
             if (!monthlyTotals.has(mkey)) {
                 const daysInMonth = new Date(nam, thang, 0).getDate();
-                const khKey1 = `${selectedToName}|${nam}|${thang}`;
-                const khKey2 = `Tất Cả|${nam}|${thang}`;
-                const chiTieu = kehoachData[khKey1] || kehoachData[khKey2] || 0;
-                monthlyTotals.set(mkey, { nam, thang, totRev:0, daysWithData:0, daysInMonth, chiTieu });
+                const target = getKeHoachTarget(selectedToName, nam, thang);
+                const chiTieu = target.chiTieu;
+                const veBocKeHoach = target.veBoc;
+                monthlyTotals.set(mkey, { nam, thang, totRev:0, daysWithData:0, daysInMonth, chiTieu, veBocKeHoach });
             }
             const mt = monthlyTotals.get(mkey);
             mt.totRev += d.totRev; mt.daysWithData += 1;
@@ -3959,8 +3962,8 @@
                 });
             }
 
-            const veBocVal = (state.veBocMonth && state.veBocMonth[mkey]) ? state.veBocMonth[mkey] : 0;
-            const veBocVND = veBocVal * 1000;
+            const veBocKeHoach = mt.veBocKeHoach || 0;
+            const veBocVND = veBocKeHoach * 1000;
             const mTotRevEffective = mTotRev + veBocVND;
 
             const mDiffThangK = Math.round((mTotRevEffective - chiTieuThang) / 1000);
@@ -3992,21 +3995,21 @@
 
             const chiTieuDisp = mt.chiTieu > 0 ? fmtNum(mt.chiTieu) : '—';
             const tbNgayDisp = mt.chiTieu > 0 ? fmtNum(Math.round(mt.chiTieu / mt.daysInMonth)) + '/ngày' : '—';
-            const safeMKey = `${nam}_${thang}`;
+            
+            let veBocTextHtml = '';
+            if (veBocKeHoach > 0) {
+                veBocTextHtml = `<div style="color:#1d4ed8; font-weight:600; font-size:13px;">🎟️ Vé bóc ước tính: <b>${fmtNum(veBocKeHoach)}</b></div>`;
+            } else {
+                veBocTextHtml = `<div style="color:#64748b; font-weight:500; font-size:13px;">🎟️ Chưa tính vé bóc</div>`;
+            }
+
             html += `<tr class="daily-summary-footer summary-footer-plan" style="background:#dbeafe;">
                 <td class="summary-footer-cell" colspan="${totalCols}">
-                    <div style="display:flex; flex-direction:column; gap:2px;">
-                        <div class="footer-text-main" style="color:#1d4ed8; text-align:left;">
+                    <div style="display:flex; flex-direction:column; gap:4px; text-align:left;">
+                        <div class="footer-text-main" style="color:#1d4ed8;">
                             📅 Tháng ${thang}/${nam} — Kế hoạch: <b>${chiTieuDisp}</b> (${mt.daysInMonth} ngày, TB: <b>${tbNgayDisp}</b>)
                         </div>
-                        <div style="display:flex; align-items:center; gap:5px; color:#1e3a8a; white-space:nowrap;">
-                            <label style="margin:0; font-weight:600; cursor:pointer;" for="inpVeBoc_${safeMKey}">🎟️ Vé bóc:</label>
-                            <input type="text" id="inpVeBoc_${safeMKey}" class="footer-veboc-input" inputmode="numeric" placeholder="0" 
-                                value="${veBocVal > 0 ? fmtNum(veBocVal) : ''}" 
-                                oninput="window.handleVeBocInput('${mkey}', this)"
-                                onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}"
-                            >
-                        </div>
+                        ${veBocTextHtml}
                     </div>
                 </td>
             </tr>`;
@@ -4014,7 +4017,7 @@
             if (mt.chiTieu > 0) {
                 const remain = chiTieuThang - mTotRevEffective;
                 const pctDone = (mTotRevEffective / chiTieuThang * 100).toFixed(1);
-                const veBocExtraText = veBocVal > 0 ? ` (gồm ${fmtNum(veBocVal)} Vé bóc)` : '';
+                const veBocExtraText = veBocKeHoach > 0 ? ` (gồm ${fmtNum(veBocKeHoach)} Vé bóc ước tính)` : '';
 
                 if (isMonthlySummary) {
                     // Đánh giá kế hoạch tháng gộp cả tháng: so sánh trọn vẹn cả tháng
@@ -4126,6 +4129,27 @@
     window.populateKeHoachYears = populateKeHoachYears;
 
     // ==================== KẾ HOẠCH — TẢI TỪ FIREBASE ====================
+    function getKeHoachTarget(tenTo, nam, thang) {
+        if (!kehoachData) return { chiTieu: 0, veBoc: 0 };
+        const k1 = `${tenTo}|${nam}|${thang}`;
+        const k2 = `Tất Cả|${nam}|${thang}`;
+        const item = kehoachData[k1] || kehoachData[k2];
+        if (!item) return { chiTieu: 0, veBoc: 0 };
+        if (typeof item === 'number') return { chiTieu: item, veBoc: 0 };
+        return { chiTieu: item.chiTieu || 0, veBoc: item.veBoc || 0 };
+    }
+    window.getKeHoachTarget = getKeHoachTarget;
+
+    window.formatInputThousands = function(el) {
+        let raw = el.value.replace(/\D/g, '');
+        if (!raw) {
+            el.value = '';
+            return;
+        }
+        let num = parseInt(raw, 10);
+        el.value = num > 0 ? num.toLocaleString('vi-VN') : '';
+    };
+
     async function loadKeHoach() {
         try {
             const snapshot = await db.collection("config_kehoach").get();
@@ -4133,7 +4157,10 @@
             snapshot.forEach(doc => {
                 const item = doc.data();
                 const key = `${item.ten_to}|${item.nam}|${item.thang}`;
-                kehoachData[key] = parseFloat(item.chi_tieu) || 0;
+                kehoachData[key] = {
+                    chiTieu: parseFloat(item.chi_tieu) || 0,
+                    veBoc: parseFloat(item.ve_boc) || 0
+                };
             });
             populateKeHoachYears();
         } catch(e) {
@@ -4152,14 +4179,27 @@
                         'Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
         grid.innerHTML = months.map((label, i) => {
             const thang = i + 1;
-            const key   = `${tenTo}|${nam}|${thang}`;
-            const val   = (kehoachData[key] !== undefined && kehoachData[key] !== null && kehoachData[key] > 0) ? kehoachData[key] : '';
-            return `<div style="display:flex; flex-direction:column; gap:4px;">
-                <label style="font-size:12px; font-weight:600; color:#475569;">${label}</label>
-                <input type="number" id="kh_${thang}" min="0" step="1"
-                    value="${val}"
-                    style="padding:6px 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:13px; width:100%; box-sizing:border-box;"
-                    placeholder="0">
+            const target = getKeHoachTarget(tenTo, nam, thang);
+            const valCT = target.chiTieu > 0 ? target.chiTieu.toLocaleString('vi-VN') : '';
+            const valVB = target.veBoc > 0 ? target.veBoc.toLocaleString('vi-VN') : '';
+            return `<div style="display:flex; flex-direction:column; gap:6px; background:#f8fafc; padding:8px 10px; border:1.5px solid #e2e8f0; border-radius:8px;">
+                <div style="font-size:13px; font-weight:700; color:#1e293b; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">${label}</div>
+                <div>
+                    <label style="font-size:11px; font-weight:600; color:#475569;">Doanh số KH (kđ):</label>
+                    <input type="text" inputmode="numeric" id="kh_${thang}"
+                        value="${valCT}"
+                        oninput="window.formatInputThousands(this)"
+                        style="padding:6px 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:600; width:100%; box-sizing:border-box; background:#fff; color:#0f172a;"
+                        placeholder="0">
+                </div>
+                <div>
+                    <label style="font-size:11px; font-weight:600; color:#475569;">Vé bóc KH (kđ):</label>
+                    <input type="text" inputmode="numeric" id="kh_vb_${thang}"
+                        value="${valVB}"
+                        oninput="window.formatInputThousands(this)"
+                        style="padding:6px 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:600; width:100%; box-sizing:border-box; background:#fff; color:#0f172a;"
+                        placeholder="0">
+                </div>
             </div>`;
         }).join('');
     }
@@ -4169,18 +4209,26 @@
     async function saveKeHoach() {
         const tenTo = DOM.khSelectTo.value;
         const nam   = parseInt(DOM.khSelectNam.value);
+        const parseNum = str => {
+            if (!str) return 0;
+            const clean = str.replace(/\D/g, '');
+            return parseInt(clean, 10) || 0;
+        };
         const upsertRows = [];
         for (let thang = 1; thang <= 12; thang++) {
-            const inp = document.getElementById(`kh_${thang}`);
-            if (!inp) continue;
-            const strVal = inp.value.trim();
-            const key = `${tenTo}|${nam}|${thang}`;
-            if (strVal !== '') {
-                const val = parseFloat(strVal) || 0;
-                upsertRows.push({ ten_to: tenTo, nam, thang, chi_tieu: val });
-            } else if (kehoachData[key] !== undefined && kehoachData[key] > 0) {
-                // Giữ nguyên kế hoạch đã có nếu ô không sửa
-                upsertRows.push({ ten_to: tenTo, nam, thang, chi_tieu: kehoachData[key] });
+            const inpCT = document.getElementById(`kh_${thang}`);
+            const inpVB = document.getElementById(`kh_vb_${thang}`);
+            if (!inpCT && !inpVB) continue;
+            
+            const strCT = inpCT ? inpCT.value.trim() : '';
+            const strVB = inpVB ? inpVB.value.trim() : '';
+            const target = getKeHoachTarget(tenTo, nam, thang);
+            
+            const valCT = strCT !== '' ? parseNum(strCT) : target.chiTieu;
+            const valVB = strVB !== '' ? parseNum(strVB) : target.veBoc;
+            
+            if (valCT > 0 || valVB > 0 || strCT === '0' || strVB === '0') {
+                upsertRows.push({ ten_to: tenTo, nam, thang, chi_tieu: valCT, ve_boc: valVB });
             }
         }
         if (!upsertRows.length) { showNotification('Không có dữ liệu để lưu.', 'error'); return; }
@@ -4199,7 +4247,7 @@
             if (DOM.dailySummaryWrapper && DOM.dailySummaryWrapper.style.display !== 'none') {
                 generateDailySummaryView();
             }
-            showNotification('✅ Đã lưu kế hoạch thành công lên Firebase!', 'success');
+            showNotification('✅ Đã lưu kế hoạch và Vé bóc thành công!', 'success');
         } catch(e) {
             showNotification('Lỗi lưu kế hoạch: ' + e.message, 'error');
         } finally {
