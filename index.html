@@ -3021,6 +3021,32 @@
         const clonedTable = cloned.querySelector('table');
         if (clonedTable) {
             clonedTable.id = 'clonedTable';
+
+            // Bỏ cột Thưởng khi copy ảnh để tiết kiệm diện tích theo yêu cầu của người dùng
+            let thuongColIdx = -1;
+            const headers = Array.from(clonedTable.querySelectorAll('thead tr th'));
+            headers.forEach((th, idx) => {
+                if (th.textContent.trim().includes('Thưởng')) {
+                    thuongColIdx = idx;
+                }
+            });
+            if (thuongColIdx !== -1) {
+                headers[thuongColIdx].remove();
+                clonedTable.querySelectorAll('tbody tr').forEach(tr => {
+                    const cells = Array.from(tr.children);
+                    if (cells[thuongColIdx]) cells[thuongColIdx].remove();
+                });
+                clonedTable.querySelectorAll('tfoot tr').forEach(tr => {
+                    const cells = Array.from(tr.children);
+                    if (cells[thuongColIdx]) cells[thuongColIdx].remove();
+                });
+                clonedTable.querySelectorAll('.summary-footer-cell').forEach(td => {
+                    let curColspan = parseInt(td.getAttribute('colspan') || '1', 10);
+                    if (curColspan > 1) {
+                        td.setAttribute('colspan', String(curColspan - 1));
+                    }
+                });
+            }
             clonedTable.style.setProperty('width', '100%', 'important');
             clonedTable.style.setProperty('min-width', '100%', 'important');
             clonedTable.style.setProperty('max-width', '100%', 'important');
@@ -3845,8 +3871,9 @@
                 const daysInMonth = new Date(nam, thang, 0).getDate();
                 const target = getKeHoachTarget(selectedToName, nam, thang);
                 const chiTieu = target.chiTieu;
+                const chiTieu2 = target.chiTieu2 || 0;
                 const veBocKeHoach = target.veBoc;
-                monthlyTotals.set(mkey, { nam, thang, totRev:0, daysWithData:0, daysInMonth, chiTieu, veBocKeHoach });
+                monthlyTotals.set(mkey, { nam, thang, totRev:0, daysWithData:0, daysInMonth, chiTieu, chiTieu2, veBocKeHoach });
             }
             const mt = monthlyTotals.get(mkey);
             mt.totRev += d.totRev; mt.daysWithData += 1;
@@ -3855,8 +3882,12 @@
         const fmtK   = v => (Math.round(v / 1000)).toLocaleString('vi-VN');
         const fmtNum = v => v.toLocaleString('vi-VN');
 
+        // Kiểm tra xem đơn vị có cấu hình Kế hoạch 2 hay không
+        let hasKH2 = false;
+        monthlyTotals.forEach(mt => { if ((mt.chiTieu2 || 0) > 0) hasKH2 = true; });
+
         // Đếm tổng số cột để dùng cho colspan
-        const totalCols = 1 + (showLotoDB?1:0) + (showLotoCap?1:0) + (showC323?1:0) + (showC227?1:0) + (showXSKT?1:0) + 1 + (showThuong?1:0) + 2;
+        const totalCols = 1 + (showLotoDB?1:0) + (showLotoCap?1:0) + (showC323?1:0) + (showC227?1:0) + (showXSKT?1:0) + 1 + (showThuong?1:0) + 2 + (hasKH2 ? 2 : 0);
 
         const stickyDateTh = `position:sticky; left:0; top:0; z-index:20; min-width:56px; width:56px; max-width:56px; background-color:#107c41 !important; color:#ffffff !important; box-shadow: 2px 0 4px rgba(0,0,0,0.15);`;
         const stickyDateTd = (bg) => `position:sticky; left:0; z-index:5; min-width:56px; width:56px; max-width:56px; background-color:${bg} !important; box-shadow: 2px 0 4px rgba(0,0,0,0.10);`;
@@ -3873,8 +3904,10 @@
                     ${showXSKT   ? `<th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">XSKT</th>` : ''}
                     <th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#1a5c28;">Thực hiện</th>
                     ${showThuong  ? `<th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">Thưởng</th>` : ''}
-                    <th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">(+/-)</th>
-                    <th style="padding:6px 6px; text-align:center; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">Đạt</th>
+                    <th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">${hasKH2 ? '(+/- KH1)' : '(+/-)'}</th>
+                    <th style="padding:6px 6px; text-align:center; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">${hasKH2 ? 'Đạt KH1' : 'Đạt'}</th>
+                    ${hasKH2 ? `<th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#0f766e;">(+/- KH2)</th>
+                    <th style="padding:6px 6px; text-align:center; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#0f766e;">Đạt KH2</th>` : ''}
                 </tr>
             </thead>
             <tbody>`;
@@ -3943,7 +3976,27 @@
                         const diffBadge = diffK >= 0
                             ? `<span style="color:#15803d; font-weight:700;">+${fmtNum(diffK)} (Thừa)</span>`
                             : `<span style="color:#dc2626; font-weight:700;">${fmtNum(diffK)} (Thiếu)</span>`;
-                        khCellHtml = `<div style="font-size:11px; color:#475569;">KH: <b>${fmtNum(chiTieuNgayK)}</b></div><div style="font-size:11px;">${diffBadge}</div>`;
+                        khCellHtml = `<div style="font-size:11px; color:#475569;">KH1: <b>${fmtNum(chiTieuNgayK)}</b></div><div style="font-size:11px;">${diffBadge}</div>`;
+                    }
+
+                    // TÍNH TOÁN CỘT KẾ HOẠCH 2
+                    let khCellHtml2 = '—', pctText2 = '—', pctColor2 = '';
+                    if (hasKH2) {
+                        const chiTieuThang2 = (mt.chiTieu2 || 0) * 1000;
+                        const chiTieuNgay2 = mt.daysInMonth > 0 ? (chiTieuThang2 / mt.daysInMonth) : 0;
+                        const chiTieuNgayK2 = Math.round(chiTieuNgay2 / 1000);
+                        const diffNgay2 = d.totRev - chiTieuNgay2;
+                        const diffK2 = Math.round(diffNgay2 / 1000);
+                        const pct2 = chiTieuNgay2 > 0 ? (d.totRev / chiTieuNgay2 * 100) : null;
+                        pctColor2 = pct2 === null ? '' : (pct2 >= 100 ? '#15803d' : (pct2 >= 80 ? '#d97706' : '#dc2626'));
+                        pctText2 = pct2 === null ? (mt.chiTieu2 > 0 ? '—' : 'Chưa có KH2') : `${pct2.toFixed(1)}%`;
+
+                        if (mt.chiTieu2 > 0) {
+                            const diffBadge2 = diffK2 >= 0
+                                ? `<span style="color:#15803d; font-weight:700;">+${fmtNum(diffK2)} (Thừa)</span>`
+                                : `<span style="color:#dc2626; font-weight:700;">${fmtNum(diffK2)} (Thiếu)</span>`;
+                            khCellHtml2 = `<div style="font-size:11px; color:#475569;">KH2: <b>${fmtNum(chiTieuNgayK2)}</b></div><div style="font-size:11px;">${diffBadge2}</div>`;
+                        }
                     }
 
                     const rowBg = idx % 2 === 0 ? '#fff' : '#f8fafc';
@@ -3958,6 +4011,8 @@
                         ${showThuong  ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; color:#dc2626; white-space:nowrap;">${d.thuong > 0 ? fmtK(d.thuong) : ''}</td>` : ''}
                         <td style="padding:3px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${khCellHtml}</td>
                         <td style="padding:4px 6px; text-align:center; border:1px solid #e2e8f0; font-weight:700; color:${pctColor}; white-space:nowrap;">${pctText}${lkHtml}</td>
+                        ${hasKH2 ? `<td style="padding:3px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${khCellHtml2}</td>
+                        <td style="padding:4px 6px; text-align:center; border:1px solid #e2e8f0; font-weight:700; color:${pctColor2}; white-space:nowrap;">${pctText2}</td>` : ''}
                     </tr>`;
                 });
             }
@@ -3976,7 +4031,23 @@
                 const mDiffBadge = mDiffThangK >= 0
                     ? `<span style="color:#86efac; font-weight:700;">+${fmtNum(mDiffThangK)} (Vượt)</span>`
                     : `<span style="color:#fca5a5; font-weight:700;">${fmtNum(mDiffThangK)} (Thiếu)</span>`;
-                mKhCellHtml = `<div style="font-size:11px; color:#e2e8f0;">KH: <b>${fmtNum(mt.chiTieu)}</b></div><div style="font-size:11px;">${mDiffBadge}</div>`;
+                mKhCellHtml = `<div style="font-size:11px; color:#e2e8f0;">KH1: <b>${fmtNum(mt.chiTieu)}</b></div><div style="font-size:11px;">${mDiffBadge}</div>`;
+            }
+
+            let mKhCellHtml2 = '—', mPctText2 = '—', mPctColor2 = '';
+            if (hasKH2) {
+                const chiTieuThang2 = (mt.chiTieu2 || 0) * 1000;
+                const mDiffThangK2 = Math.round((mTotRevEffective - chiTieuThang2) / 1000);
+                const mPct2 = chiTieuThang2 > 0 ? (mTotRevEffective / chiTieuThang2 * 100) : null;
+                mPctColor2 = mPct2 === null ? '' : (mPct2 >= 100 ? '#86efac' : (mPct2 >= 80 ? '#fde047' : '#fca5a5'));
+                mPctText2 = mPct2 === null ? (mt.chiTieu2 > 0 ? '—' : 'Chưa có KH2') : `${mPct2.toFixed(1)}%`;
+
+                if (mt.chiTieu2 > 0) {
+                    const mDiffBadge2 = mDiffThangK2 >= 0
+                        ? `<span style="color:#86efac; font-weight:700;">+${fmtNum(mDiffThangK2)} (Vượt)</span>`
+                        : `<span style="color:#fca5a5; font-weight:700;">${fmtNum(mDiffThangK2)} (Thiếu)</span>`;
+                    mKhCellHtml2 = `<div style="font-size:11px; color:#e2e8f0;">KH2: <b>${fmtNum(mt.chiTieu2)}</b></div><div style="font-size:11px;">${mDiffBadge2}</div>`;
+                }
             }
 
             const stickyMonthTd = `position:sticky; left:0; z-index:6; min-width:56px; width:56px; max-width:56px; background-color:#0b592e !important; color:#ffffff !important; box-shadow: 2px 0 4px rgba(0,0,0,0.15);`;
@@ -3991,10 +4062,14 @@
                 ${showThuong  ? `<td style="padding:6px 6px; text-align:right; border:1px solid #166534; color:#fca5a5; white-space:nowrap;">${fmtK(mThuong)}</td>` : ''}
                 <td style="padding:4px 6px; text-align:right; border:1px solid #166534; white-space:nowrap;">${mKhCellHtml}</td>
                 <td style="padding:6px 6px; text-align:center; border:1px solid #166534; font-weight:700; color:${mPctColor}; font-size:13px; white-space:nowrap;">${mPctText}</td>
+                ${hasKH2 ? `<td style="padding:4px 6px; text-align:right; border:1px solid #166534; white-space:nowrap;">${mKhCellHtml2}</td>
+                <td style="padding:6px 6px; text-align:center; border:1px solid #166534; font-weight:700; color:${mPctColor2}; font-size:13px; white-space:nowrap;">${mPctText2}</td>` : ''}
             </tr>`;
 
-            const chiTieuDisp = mt.chiTieu > 0 ? fmtNum(mt.chiTieu) : '—';
-            const tbNgayDisp = mt.chiTieu > 0 ? fmtNum(Math.round(mt.chiTieu / mt.daysInMonth)) + '/ngày' : '—';
+            const chiTieuDisp1 = mt.chiTieu > 0 ? fmtNum(mt.chiTieu) : '—';
+            const chiTieuDisp2 = mt.chiTieu2 > 0 ? fmtNum(mt.chiTieu2) : '—';
+            const tbNgayDisp1  = mt.chiTieu > 0 ? fmtNum(Math.round(mt.chiTieu / mt.daysInMonth)) + '/ngày' : '—';
+            const kh2LabelText = mt.chiTieu2 > 0 ? ` | KH2: <b>${chiTieuDisp2}</b>` : '';
             
             let veBocTextHtml = '';
             if (veBocKeHoach > 0) {
@@ -4007,65 +4082,82 @@
                 <td class="summary-footer-cell" colspan="${totalCols}">
                     <div style="display:flex; flex-direction:column; gap:4px; text-align:left;">
                         <div class="footer-text-main" style="color:#1d4ed8;">
-                            📅 Tháng ${thang}/${nam} — Kế hoạch: <b>${chiTieuDisp}</b> (${mt.daysInMonth} ngày, TB: <b>${tbNgayDisp}</b>)
+                            📅 Tháng ${thang}/${nam} — KH1: <b>${chiTieuDisp1}</b> (${mt.daysInMonth} ngày, TB: <b>${tbNgayDisp1}</b>)${kh2LabelText}
                         </div>
                         ${veBocTextHtml}
                     </div>
                 </td>
             </tr>`;
 
-            if (mt.chiTieu > 0) {
-                const remain = chiTieuThang - mTotRevEffective;
-                const pctDone = (mTotRevEffective / chiTieuThang * 100).toFixed(1);
+            if (mt.chiTieu > 0 || (mt.chiTieu2 || 0) > 0) {
                 const veBocExtraText = veBocKeHoach > 0 ? ` (gồm ${fmtNum(veBocKeHoach)} Vé bóc ước tính)` : '';
+                const lastDayStr = days[days.length - 1];
+                const lastDay = lastDayStr ? new Date(lastDayStr + 'T00:00:00').getDate() : days.length;
+                const remainDays = mt.daysInMonth - lastDay;
 
-                if (isMonthlySummary) {
-                    // Đánh giá kế hoạch tháng gộp cả tháng: so sánh trọn vẹn cả tháng
-                    if (remain > 0) {
-                        html += `<tr class="daily-summary-footer summary-footer-eval" style="background:#fef9c3;">
-                            <td class="summary-footer-cell" colspan="${totalCols}" style="color:#92400e; text-align:left;">
-                                <div class="footer-text-main">⚡ Tháng ${thang}/${nam} (Dữ liệu gộp cả tháng): Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong></div>
-                                <div class="footer-text-sub">Chưa đạt chỉ tiêu (còn thiếu <strong>${fmtK(remain)}</strong>)</div>
-                            </td>
-                        </tr>`;
-                    } else {
-                        html += `<tr class="daily-summary-footer summary-footer-eval completed" style="background:#dcfce7;">
-                            <td class="summary-footer-cell" colspan="${totalCols}" style="color:#15803d; text-align:left;">
-                                <div class="footer-text-main">✅ Tháng ${thang}/${nam} (Dữ liệu gộp cả tháng): Đã HOÀN THÀNH kế hoạch (${pctDone}%)</div>
-                                <div class="footer-text-sub">Vượt <strong>${fmtK(Math.abs(remain))}</strong>${veBocExtraText}</div>
-                            </td>
-                        </tr>`;
-                    }
-                } else {
-                    // Đánh giá kế hoạch tháng chi tiết từng ngày
-                    const lastDayStr = days[days.length - 1];
-                    const lastDay = lastDayStr ? new Date(lastDayStr + 'T00:00:00').getDate() : days.length;
-                    const remainDays = mt.daysInMonth - lastDay;
+                const getEvalData = (targetVal) => {
+                    if (!targetVal || targetVal <= 0) return null;
+                    const chiTieuVND = targetVal * 1000;
+                    const remain = chiTieuVND - mTotRevEffective;
+                    const pctDone = (mTotRevEffective / chiTieuVND * 100).toFixed(1);
                     const needed = remainDays > 0 && remain > 0 ? remain / remainDays : 0;
+                    return { targetVal, chiTieuVND, remain, pctDone, needed };
+                };
 
-                    if (remain > 0 && remainDays > 0) {
-                        html += `<tr class="daily-summary-footer summary-footer-eval" style="background:#fef9c3;">
-                            <td class="summary-footer-cell" colspan="${totalCols}" style="color:#92400e; text-align:left;">
-                                <div class="footer-text-main">⚡ Tháng ${thang}/${nam}: Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong></div>
-                                <div class="footer-text-sub">Còn lại <strong>${fmtK(remain)}</strong> (${remainDays} ngày còn lại, cần TB <strong>${fmtK(needed)}/ngày</strong>)</div>
-                            </td>
-                        </tr>`;
-                    } else if (remain > 0 && remainDays <= 0) {
-                        html += `<tr class="daily-summary-footer summary-footer-eval" style="background:#fef9c3;">
-                            <td class="summary-footer-cell" colspan="${totalCols}" style="color:#92400e; text-align:left;">
-                                <div class="footer-text-main">⚡ Tháng ${thang}/${nam}: Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(mt.chiTieu)} (${pctDone}%)</strong></div>
-                                <div class="footer-text-sub">Chưa đạt chỉ tiêu (còn thiếu <strong>${fmtK(remain)}</strong>)</div>
-                            </td>
-                        </tr>`;
+                const ev1 = getEvalData(mt.chiTieu);
+                const ev2 = getEvalData(mt.chiTieu2);
+
+                const renderEvalItem = (ev, label, colorTheme) => {
+                    if (!ev) return '';
+                    const mainColor = colorTheme === 'teal' ? '#0f766e' : '#92400e';
+                    const successColor = colorTheme === 'teal' ? '#0d9488' : '#15803d';
+                    
+                    if (isMonthlySummary) {
+                        if (ev.remain > 0) {
+                            return `<div style="padding: 2px 0;">
+                                <div class="footer-text-main" style="color:${mainColor}; font-weight:700;">⚡ [${label}] (Gộp cả tháng): Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(ev.targetVal)} (${ev.pctDone}%)</strong></div>
+                                <div class="footer-text-sub" style="color:${mainColor};">Chưa đạt chỉ tiêu (còn thiếu <strong>${fmtK(ev.remain)}</strong>)</div>
+                            </div>`;
+                        } else {
+                            return `<div style="padding: 2px 0;">
+                                <div class="footer-text-main" style="color:${successColor}; font-weight:700;">✅ [${label}] (Gộp cả tháng): Đã HOÀN THÀNH (${ev.pctDone}%)</div>
+                                <div class="footer-text-sub" style="color:${successColor};">Vượt <strong>${fmtK(Math.abs(ev.remain))}</strong>${veBocExtraText}</div>
+                            </div>`;
+                        }
                     } else {
-                        html += `<tr class="daily-summary-footer summary-footer-eval completed" style="background:#dcfce7;">
-                            <td class="summary-footer-cell" colspan="${totalCols}" style="color:#15803d; text-align:left;">
-                                <div class="footer-text-main">✅ Tháng ${thang}/${nam}: Đã HOÀN THÀNH kế hoạch (${pctDone}%)</div>
-                                <div class="footer-text-sub">Vượt <strong>${fmtK(Math.abs(remain))}</strong>${veBocExtraText}</div>
-                            </td>
-                        </tr>`;
+                        if (ev.remain > 0 && remainDays > 0) {
+                            return `<div style="padding: 2px 0;">
+                                <div class="footer-text-main" style="color:${mainColor}; font-weight:700;">⚡ [${label}] Tháng ${thang}/${nam}: Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(ev.targetVal)} (${ev.pctDone}%)</strong></div>
+                                <div class="footer-text-sub" style="color:${mainColor};">Còn thiếu <strong>${fmtK(ev.remain)}</strong> (${remainDays} ngày còn lại, cần TB <strong>${fmtK(ev.needed)}/ngày</strong>)</div>
+                            </div>`;
+                        } else if (ev.remain > 0 && remainDays <= 0) {
+                            return `<div style="padding: 2px 0;">
+                                <div class="footer-text-main" style="color:${mainColor}; font-weight:700;">⚡ [${label}] Tháng ${thang}/${nam}: Đã đạt <strong>${fmtK(mTotRevEffective)}${veBocExtraText} / ${fmtNum(ev.targetVal)} (${ev.pctDone}%)</strong></div>
+                                <div class="footer-text-sub" style="color:${mainColor};">Chưa đạt chỉ tiêu (còn thiếu <strong>${fmtK(ev.remain)}</strong>)</div>
+                            </div>`;
+                        } else {
+                            return `<div style="padding: 2px 0;">
+                                <div class="footer-text-main" style="color:${successColor}; font-weight:700;">✅ [${label}] Tháng ${thang}/${nam}: Đã HOÀN THÀNH (${ev.pctDone}%)</div>
+                                <div class="footer-text-sub" style="color:${successColor};">Vượt <strong>${fmtK(Math.abs(ev.remain))}</strong>${veBocExtraText}</div>
+                            </div>`;
+                        }
                     }
-                }
+                };
+
+                const item1Html = renderEvalItem(ev1, 'KH1', 'amber');
+                const item2Html = renderEvalItem(ev2, 'KH2', 'teal');
+
+                const isAllCompleted = (!ev1 || ev1.remain <= 0) && (!ev2 || ev2.remain <= 0);
+                const bgStyle = isAllCompleted ? 'background:#dcfce7; color:#15803d;' : 'background:#fef9c3; color:#92400e;';
+
+                html += `<tr class="daily-summary-footer summary-footer-eval" style="${bgStyle}">
+                    <td class="summary-footer-cell" colspan="${totalCols}" style="text-align:left;">
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                            ${item1Html}
+                            ${item2Html ? `<div style="border-top:1px dashed #cbd5e1; margin-top:2px; padding-top:4px;">${item2Html}</div>` : ''}
+                        </div>
+                    </td>
+                </tr>`;
             }
         });
 
@@ -4130,14 +4222,14 @@
 
     // ==================== KẾ HOẠCH — TẢI TỪ FIREBASE ====================
     function getKeHoachTarget(tenTo, nam, thang) {
-        if (!kehoachData) return { chiTieu: 0, veBoc: 0 };
+        if (!kehoachData) return { chiTieu: 0, chiTieu2: 0, veBoc: 0 };
         // Độc lập 100%: Mỗi đơn vị / tổ / 'Tất Cả' chỉ lấy duy nhất kế hoạch được nhập riêng cho chính nó
         const targetKey = (tenTo === 'all' || !tenTo) ? 'Tất Cả' : tenTo;
         const key = `${targetKey}|${nam}|${thang}`;
         const item = kehoachData[key];
-        if (!item) return { chiTieu: 0, veBoc: 0 };
-        if (typeof item === 'number') return { chiTieu: item, veBoc: 0 };
-        return { chiTieu: item.chiTieu || 0, veBoc: item.veBoc || 0 };
+        if (!item) return { chiTieu: 0, chiTieu2: 0, veBoc: 0 };
+        if (typeof item === 'number') return { chiTieu: item, chiTieu2: 0, veBoc: 0 };
+        return { chiTieu: item.chiTieu || 0, chiTieu2: item.chiTieu2 || 0, veBoc: item.veBoc || 0 };
     }
     window.getKeHoachTarget = getKeHoachTarget;
 
@@ -4160,6 +4252,7 @@
                 const key = `${item.ten_to}|${item.nam}|${item.thang}`;
                 kehoachData[key] = {
                     chiTieu: parseFloat(item.chi_tieu) || 0,
+                    chiTieu2: parseFloat(item.chi_tieu_2) || 0,
                     veBoc: parseFloat(item.ve_boc) || 0
                 };
             });
@@ -4181,16 +4274,25 @@
         grid.innerHTML = months.map((label, i) => {
             const thang = i + 1;
             const target = getKeHoachTarget(tenTo, nam, thang);
-            const valCT = target.chiTieu > 0 ? target.chiTieu.toLocaleString('vi-VN') : '';
-            const valVB = target.veBoc > 0 ? target.veBoc.toLocaleString('vi-VN') : '';
-            return `<div style="display:flex; flex-direction:column; gap:6px; background:#f8fafc; padding:8px 10px; border:1.5px solid #e2e8f0; border-radius:8px;">
-                <div style="font-size:13px; font-weight:700; color:#1e293b; border-bottom:1px solid #e2e8f0; padding-bottom:4px;">${label}</div>
+            const valCT1 = target.chiTieu > 0 ? target.chiTieu.toLocaleString('vi-VN') : '';
+            const valCT2 = target.chiTieu2 > 0 ? target.chiTieu2.toLocaleString('vi-VN') : '';
+            const valVB  = target.veBoc > 0 ? target.veBoc.toLocaleString('vi-VN') : '';
+            return `<div style="display:flex; flex-direction:column; gap:5px; background:#f8fafc; padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:8px;">
+                <div style="font-size:13px; font-weight:700; color:#1e293b; border-bottom:1px solid #e2e8f0; padding-bottom:3px;">${label}</div>
                 <div>
-                    <label style="font-size:11px; font-weight:600; color:#475569;">Doanh số KH (kđ):</label>
+                    <label style="font-size:11px; font-weight:600; color:#15803d;">Doanh số KH 1 (kđ):</label>
                     <input type="text" inputmode="numeric" id="kh_${thang}"
-                        value="${valCT}"
+                        value="${valCT1}"
                         oninput="window.formatInputThousands(this)"
-                        style="padding:6px 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:600; width:100%; box-sizing:border-box; background:#fff; color:#0f172a;"
+                        style="padding:5px 7px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:600; width:100%; box-sizing:border-box; background:#fff; color:#0f172a;"
+                        placeholder="0">
+                </div>
+                <div>
+                    <label style="font-size:11px; font-weight:600; color:#0f766e;">Doanh số KH 2 (kđ):</label>
+                    <input type="text" inputmode="numeric" id="kh2_${thang}"
+                        value="${valCT2}"
+                        oninput="window.formatInputThousands(this)"
+                        style="padding:5px 7px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:600; width:100%; box-sizing:border-box; background:#fff; color:#0f172a;"
                         placeholder="0">
                 </div>
                 <div>
@@ -4198,7 +4300,7 @@
                     <input type="text" inputmode="numeric" id="kh_vb_${thang}"
                         value="${valVB}"
                         oninput="window.formatInputThousands(this)"
-                        style="padding:6px 8px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:600; width:100%; box-sizing:border-box; background:#fff; color:#0f172a;"
+                        style="padding:5px 7px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:600; width:100%; box-sizing:border-box; background:#fff; color:#0f172a;"
                         placeholder="0">
                 </div>
             </div>`;
@@ -4217,19 +4319,22 @@
         };
         const upsertRows = [];
         for (let thang = 1; thang <= 12; thang++) {
-            const inpCT = document.getElementById(`kh_${thang}`);
-            const inpVB = document.getElementById(`kh_vb_${thang}`);
-            if (!inpCT && !inpVB) continue;
+            const inpCT1 = document.getElementById(`kh_${thang}`);
+            const inpCT2 = document.getElementById(`kh2_${thang}`);
+            const inpVB  = document.getElementById(`kh_vb_${thang}`);
+            if (!inpCT1 && !inpCT2 && !inpVB) continue;
             
-            const strCT = inpCT ? inpCT.value.trim() : '';
-            const strVB = inpVB ? inpVB.value.trim() : '';
+            const strCT1 = inpCT1 ? inpCT1.value.trim() : '';
+            const strCT2 = inpCT2 ? inpCT2.value.trim() : '';
+            const strVB  = inpVB ? inpVB.value.trim() : '';
             const target = getKeHoachTarget(tenTo, nam, thang);
             
-            const valCT = strCT !== '' ? parseNum(strCT) : target.chiTieu;
-            const valVB = strVB !== '' ? parseNum(strVB) : target.veBoc;
+            const valCT1 = strCT1 !== '' ? parseNum(strCT1) : target.chiTieu;
+            const valCT2 = strCT2 !== '' ? parseNum(strCT2) : target.chiTieu2;
+            const valVB  = strVB  !== '' ? parseNum(strVB)  : target.veBoc;
             
-            if (valCT > 0 || valVB > 0 || strCT === '0' || strVB === '0') {
-                upsertRows.push({ ten_to: tenTo, nam, thang, chi_tieu: valCT, ve_boc: valVB });
+            if (valCT1 > 0 || valCT2 > 0 || valVB > 0 || strCT1 === '0' || strCT2 === '0' || strVB === '0') {
+                upsertRows.push({ ten_to: tenTo, nam, thang, chi_tieu: valCT1, chi_tieu_2: valCT2, ve_boc: valVB });
             }
         }
         if (!upsertRows.length) { showNotification('Không có dữ liệu để lưu.', 'error'); return; }
