@@ -17,23 +17,20 @@
 
     <style>
         :root {
-            --primary-color: #0a246a;
+            --primary-color: #0a246a; /* Classic Windows Server 2000 Navy */
             --primary-dark: #001547;
             --secondary-color: #ece9d8;
             --header-bg: #0a246a;
             --header-text: #ffffff;
-            --body-bg: #3a6ea5; /* Classic Win2K Desktop Blue */
-            --container-bg: #ece9d8; /* Classic Win2K Window Face */
+            --body-bg: #eef1f5; /* Clean neutral web background */
+            --container-bg: #ffffff; /* Clean white card container */
             --text-color: #000000;
             --text-light: #444444;
-            --border-color: #7f9db9;
+            --border-color: #7f9db9; /* Crisp 1px flat Win2K border */
             --success-color: #0b6a38;
             --danger-color: #a80000;
             --warning-color: #c95100;
             --logo-color: #0a246a;
-            --win2k-face: #ece9d8;
-            --win2k-border: #7f9db9;
-            --win2k-dark: #0a246a;
         }
 
         * { 
@@ -58,140 +55,27 @@
             -webkit-user-select: none;
         }
 
-        /* WIN2K WINDOW CONTAINER */
-        .page, .win2k-window {
+        /* 2D FLAT PAGE CONTAINERS */
+        .page {
             background-color: var(--container-bg);
-            border: 2px solid #0a246a;
-            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.45);
+            border: 1px solid #7f9db9;
+            box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
             position: relative; 
-            overflow: hidden;
             margin: 0 auto;
         }
 
         #homePage { 
-            max-width: 520px !important; 
+            max-width: 540px !important; 
             margin: 20px auto; 
-            padding: 0; 
-            background: #ece9d8; 
+            padding: 24px 20px; 
+            background: #ffffff; 
         }
         #mainPage { 
-            max-width: 1240px; 
-            margin: 10px auto; 
-            padding: 0; 
-            border: 2px solid #0a246a; 
-            background: #ece9d8; 
-        }
-
-        .win2k-window-body {
-            padding: 14px;
-            background: #ece9d8;
-        }
-
-        /* WIN2K TITLE BAR */
-        .win2k-titlebar {
-            background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
-            color: #ffffff;
-            padding: 3px 6px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            user-select: none;
-            height: 28px;
-            border-bottom: 1px solid #000040;
-        }
-        .win2k-titlebar-text {
-            font-weight: bold;
-            font-size: 12.5px;
-            letter-spacing: 0.3px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .win2k-title-icon {
-            font-size: 14px;
-            line-height: 1;
-        }
-        .win2k-titlebar-controls {
-            display: flex;
-            gap: 2px;
-            align-items: center;
-            flex-shrink: 0;
-        }
-        .win2k-btn-sys {
-            width: 19px;
-            height: 19px;
-            min-width: 19px;
-            padding: 0 !important;
-            background: #ece9d8 !important;
-            color: #000000 !important;
-            border: 1px solid #707070 !important;
-            font-size: 11px !important;
-            font-weight: 800 !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            line-height: 1 !important;
-            cursor: pointer !important;
-            box-shadow: none !important;
-        }
-        .win2k-btn-sys:hover {
-            background: #ffffff !important;
-            border-color: #000000 !important;
-        }
-        .win2k-btn-sys:active {
-            background: #b0b0b0 !important;
-        }
-        .win2k-btn-close:hover {
-            background: #c42b1c !important;
-            color: #ffffff !important;
-            border-color: #800000 !important;
-        }
-
-        /* WIN2K MENUBAR */
-        .win2k-menubar {
-            background: #ece9d8;
-            border-bottom: 1px solid #7f9db9;
-            padding: 2px 4px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2px;
-            font-size: 12px;
-            user-select: none;
-        }
-        .win2k-menu-item {
-            padding: 3px 9px;
-            cursor: pointer;
-            color: #000000;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .win2k-menu-item:hover {
-            background: #0a246a;
-            color: #ffffff;
-        }
-
-        /* WIN2K STATUSBAR */
-        .win2k-statusbar {
-            background: #ece9d8;
-            border-top: 1px solid #7f9db9;
-            padding: 3px 6px;
-            display: flex;
-            gap: 4px;
-            font-size: 11.5px;
-            color: #333333;
-            align-items: center;
-        }
-        .win2k-status-panel {
-            background: #ffffff;
-            border: 1px solid #7f9db9;
-            padding: 2px 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-weight: 600;
+            max-width: 1260px; 
+            margin: 15px auto; 
+            padding: 16px; 
+            border: 1px solid #7f9db9; 
+            background: #ffffff; 
         }
 
         h2 { font-size: 20px; font-weight: 800; text-align: center; color: var(--text-color); margin-bottom: 12px; }
@@ -906,9 +790,8 @@
         }
 
         @media (max-width: 768px) {
-            body { padding: 4px !important; background-color: #3a6ea5; }
-            #mainPage, #homePage { border: 1.5px solid #0a246a !important; border-radius: 0 !important; box-shadow: 1px 1px 0px rgba(0,0,0,0.4) !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; }
-            .win2k-window-body { padding: 8px 6px !important; }
+            body { padding: 4px !important; background-color: var(--body-bg); }
+            #mainPage, #homePage { border: 1px solid #7f9db9 !important; border-radius: 0 !important; box-shadow: none !important; padding: 12px 8px !important; width: 100% !important; max-width: 100% !important; }
             .controls-panel { padding: 10px 8px; margin-bottom: 10px; }
             .home-menu-grid { margin-top: 8px; margin-bottom: 12px; gap: 6px; }
             .home-menu-btn { padding: 8px 4px; font-size: 12px; }
@@ -1001,7 +884,7 @@
             th, td { border: 1px solid #000 !important; position: static !important; }
             th { background: #0a246a !important; color: white !important; }
             #summaryTotalRow td { background-color: #0a246a !important; color: white !important; font-weight: bold !important; border: 1px solid #000 !important; position: static !important; }
-            .controls-panel, .summary-actions-bottom, .home-menu-grid, .nav-header, .simple-animated-logo, #notification-area, #actionButtonContainer, .win2k-titlebar, .win2k-menubar, .win2k-statusbar { display: none !important; }
+            .controls-panel, .summary-actions-bottom, .home-menu-grid, .nav-header, .simple-animated-logo, #notification-area, #actionButtonContainer { display: none !important; }
             #summaryTitle, #summaryDate, #dailySummaryTitle, #dailySummarySubtitle { text-align: center !important; display: block !important; }
         }
     </style>
@@ -1028,106 +911,71 @@
     </div>
 
     <!-- HOME PAGE -->
-    <div id="homePage" class="page win2k-window">
-        <div class="win2k-titlebar">
-            <div class="win2k-titlebar-text">
-                <span class="win2k-title-icon">🗔</span> Báo Cáo Thu Tiền - Windows Server 2000
-            </div>
-            <div class="win2k-titlebar-controls">
-                <button type="button" class="win2k-btn-sys" title="Minimize">_</button>
-                <button type="button" class="win2k-btn-sys" title="Maximize">□</button>
-                <button type="button" class="win2k-btn-sys win2k-btn-close" title="Close">✕</button>
-            </div>
+    <div id="homePage" class="page">
+        <div class="simple-animated-logo" onclick="window.location.href = window.location.pathname; return false;">
+            <img src="logoXSND.gif" alt="Logo XSKT Trực Ninh" style="width: 100px; height: 100px; object-fit: contain;">
         </div>
-        <div class="win2k-window-body">
-            <div class="simple-animated-logo" onclick="window.location.href = window.location.pathname; return false;">
-                <img src="logoXSND.gif" alt="Logo XSKT Trực Ninh" style="width: 100px; height: 100px; object-fit: contain;">
+        <h2>Báo cáo Thu Tiền</h2>
+
+        <div class="controls-panel">
+            <div style="display: flex; gap: 4px; background: #ece9d8; padding: 3px; border: 1px solid #7f9db9; margin-bottom: 5px;">
+                <button class="tab-btn active" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px;">
+                    <svg width="17" height="17" viewBox="120 40 1000 1210" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0; vertical-align: middle;">
+                        <path d="M472 1199.23C629.77 1251.96 774.171 1234.98 833 1191.19L627.096 966 472 1199.23Z" fill="#FDAF67" fill-rule="evenodd"/>
+                        <path d="M647.544 48C48.1671 708.284 710.816 1158.75 827.1 1199 1128.07 993.464 1095.58 813.62 1099 751.96 1051.12 429.954 798.029 282.653 647.544 48Z" fill="#DD6447" fill-rule="evenodd"/>
+                        <path d="M216.25 531.56C106.695 897.796 269.316 1089.47 473.02 1199 712.672 1046.69 705.824 832.763 652.759 726.658 568.881 569.21 423.377 493.91 216.25 531.56Z" fill="#FFD97F" fill-rule="evenodd"/>
+                    </svg>
+                    <span>DATA CENTER</span>
+                </button>
+                <button class="tab-btn secondary" style="flex:1;" onclick="openConfigWithAuth()">⚙️ Cấu hình</button>
             </div>
-            <h2>Báo cáo Thu Tiền</h2>
 
-            <div class="controls-panel">
-                <div style="display: flex; gap: 4px; background: #ece9d8; padding: 3px; border: 1px solid #7f9db9; margin-bottom: 5px;">
-                    <button class="tab-btn active" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px;">
-                        <svg width="17" height="17" viewBox="120 40 1000 1210" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0; vertical-align: middle;">
-                            <path d="M472 1199.23C629.77 1251.96 774.171 1234.98 833 1191.19L627.096 966 472 1199.23Z" fill="#FDAF67" fill-rule="evenodd"/>
-                            <path d="M647.544 48C48.1671 708.284 710.816 1158.75 827.1 1199 1128.07 993.464 1095.58 813.62 1099 751.96 1051.12 429.954 798.029 282.653 647.544 48Z" fill="#DD6447" fill-rule="evenodd"/>
-                            <path d="M216.25 531.56C106.695 897.796 269.316 1089.47 473.02 1199 712.672 1046.69 705.824 832.763 652.759 726.658 568.881 569.21 423.377 493.91 216.25 531.56Z" fill="#FFD97F" fill-rule="evenodd"/>
-                        </svg>
-                        <span>DATA CENTER</span>
-                    </button>
-                    <button class="tab-btn secondary" style="flex:1;" onclick="openConfigWithAuth()">⚙️ Cấu hình</button>
-                </div>
-
-                <div style="margin-top: 5px;">
-                    <label>Chọn Khoảng Thời Gian:</label>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span style="font-size: 13px; font-weight: bold; color: #2c3e50; width: 42px; flex-shrink: 0;">Từ:</span>
-                            <select id="selFromMonthHome" style="flex: 1; font-weight: bold; border: 1px solid var(--border-color); padding: 6px 8px;"></select>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span style="font-size: 13px; font-weight: bold; color: #2c3e50; width: 42px; flex-shrink: 0;">Đến:</span>
-                            <select id="selToMonthHome" style="flex: 1; font-weight: bold; border: 1px solid var(--border-color); padding: 6px 8px;"></select>
-                        </div>
+            <div style="margin-top: 5px;">
+                <label>Chọn Khoảng Thời Gian:</label>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 13px; font-weight: bold; color: #2c3e50; width: 42px; flex-shrink: 0;">Từ:</span>
+                        <select id="selFromMonthHome" style="flex: 1; font-weight: bold; border: 1px solid var(--border-color); padding: 6px 8px;"></select>
                     </div>
-
-                    <button id="btnFetchDataHome" class="success" style="padding: 10px 14px; width: 100%; margin-top: 12px; font-size: 14px;">
-                        ⚡ TẢI DỮ LIỆU
-                    </button>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 13px; font-weight: bold; color: #2c3e50; width: 42px; flex-shrink: 0;">Đến:</span>
+                        <select id="selToMonthHome" style="flex: 1; font-weight: bold; border: 1px solid var(--border-color); padding: 6px 8px;"></select>
+                    </div>
                 </div>
 
-                <!-- PHÂN HỆ NẠP FILE EXCEL THỦ CÔNG -->
-                <div style="margin-top: 14px; border-top: 1px dashed #7f9db9; padding-top: 12px;">
-                    <label style="color: #444; font-size: 12px; margin-bottom: 8px;">Nạp dữ liệu từ máy lên CSDL:</label>
-                    <label for="excelFile1" style="font-size: 12px;">Biểu 31 (Lô tô):</label>
-                    <input type="file" id="excelFile1" accept=".xls,.xlsx" multiple>
-                    <div style="height: 6px;"></div>
-                    <label for="excelFile2" style="font-size: 12px;">Biểu 35 (XSKT):</label>
-                    <input type="file" id="excelFile2" accept=".xls,.xlsx" multiple>
-                    <button id="btnLoadData" class="primary" style="width: 100%; margin-top: 8px; padding: 10px 14px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <svg width="20" height="20" viewBox="120 40 1000 1210" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0; vertical-align: middle;">
-                            <path d="M472 1199.23C629.77 1251.96 774.171 1234.98 833 1191.19L627.096 966 472 1199.23Z" fill="#FDAF67" fill-rule="evenodd"/>
-                            <path d="M647.544 48C48.1671 708.284 710.816 1158.75 827.1 1199 1128.07 993.464 1095.58 813.62 1099 751.96 1051.12 429.954 798.029 282.653 647.544 48Z" fill="#DD6447" fill-rule="evenodd"/>
-                            <path d="M216.25 531.56C106.695 897.796 269.316 1089.47 473.02 1199 712.672 1046.69 705.824 832.763 652.759 726.658 568.881 569.21 423.377 493.91 216.25 531.56Z" fill="#FFD97F" fill-rule="evenodd"/>
-                            <path d="M403.17 531 423.427 534.597C523.935 561.329 600.385 627.706 652.777 726.203 689.238 799.218 703.866 923.242 631.62 1043.17L622.987 1056 613.292 1047.17C499.023 934.6 387.85 764.659 401.073 550.782Z" fill="#FDAF67" fill-rule="evenodd"/>
-                        </svg>
-                        <span>Nạp Lên CSDL Firebase</span>
-                    </button>
-                </div>
+                <button id="btnFetchDataHome" class="success" style="padding: 10px 14px; width: 100%; margin-top: 12px; font-size: 14px;">
+                    ⚡ TẢI DỮ LIỆU
+                </button>
             </div>
-            <div style="text-align: center; font-size: 11px; color: #666; font-weight: 600;">© 2026 ZENG FINANCE - Win2K Server</div>
+
+            <!-- PHÂN HỆ NẠP FILE EXCEL THỦ CÔNG -->
+            <div style="margin-top: 14px; border-top: 1px dashed #7f9db9; padding-top: 12px;">
+                <label style="color: #444; font-size: 12px; margin-bottom: 8px;">Nạp dữ liệu từ máy lên CSDL:</label>
+                <label for="excelFile1" style="font-size: 12px;">Biểu 31 (Lô tô):</label>
+                <input type="file" id="excelFile1" accept=".xls,.xlsx" multiple>
+                <div style="height: 6px;"></div>
+                <label for="excelFile2" style="font-size: 12px;">Biểu 35 (XSKT):</label>
+                <input type="file" id="excelFile2" accept=".xls,.xlsx" multiple>
+                <button id="btnLoadData" class="primary" style="width: 100%; margin-top: 8px; padding: 10px 14px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg width="20" height="20" viewBox="120 40 1000 1210" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0; vertical-align: middle;">
+                        <path d="M472 1199.23C629.77 1251.96 774.171 1234.98 833 1191.19L627.096 966 472 1199.23Z" fill="#FDAF67" fill-rule="evenodd"/>
+                        <path d="M647.544 48C48.1671 708.284 710.816 1158.75 827.1 1199 1128.07 993.464 1095.58 813.62 1099 751.96 1051.12 429.954 798.029 282.653 647.544 48Z" fill="#DD6447" fill-rule="evenodd"/>
+                        <path d="M216.25 531.56C106.695 897.796 269.316 1089.47 473.02 1199 712.672 1046.69 705.824 832.763 652.759 726.658 568.881 569.21 423.377 493.91 216.25 531.56Z" fill="#FFD97F" fill-rule="evenodd"/>
+                        <path d="M403.17 531 423.427 534.597C523.935 561.329 600.385 627.706 652.777 726.203 689.238 799.218 703.866 923.242 631.62 1043.17L622.987 1056 613.292 1047.17C499.023 934.6 387.85 764.659 401.073 550.782Z" fill="#FDAF67" fill-rule="evenodd"/>
+                    </svg>
+                    <span>Nạp Lên CSDL Firebase</span>
+                </button>
+            </div>
         </div>
-        <div class="win2k-statusbar">
-            <div class="win2k-status-panel" style="flex:1;">Hệ thống sẵn sàng</div>
-            <div class="win2k-status-panel">CSDL: Online</div>
-            <div class="win2k-status-panel">Win2K Edition</div>
-        </div>
+        <div style="text-align: center; font-size: 11px; color: #666; font-weight: 600;">© 2026 ZENG FINANCE</div>
     </div>
 
     <!-- MAIN PAGE -->
-    <div id="mainPage" class="page win2k-window" style="display: none;">
-        <div class="win2k-titlebar">
-            <div class="win2k-titlebar-text">
-                <span class="win2k-title-icon">🗔</span> Quản Lý Báo Cáo & Kế Hoạch - Windows Server 2000 Console
-            </div>
-            <div class="win2k-titlebar-controls">
-                <button type="button" class="win2k-btn-sys" title="Minimize">_</button>
-                <button type="button" class="win2k-btn-sys" title="Maximize">□</button>
-                <button type="button" class="win2k-btn-sys win2k-btn-close" title="Close" onclick="window.location.href=window.location.pathname">✕</button>
-            </div>
+    <div id="mainPage" class="page" style="display: none;">
+        
+        <div class="simple-animated-logo main-page-logo" onclick="window.location.href = window.location.pathname; return false;">
+            <img src="logoXSND.gif" alt="Logo XSKT Trực Ninh" style="width: 100px; height: 100px; object-fit: contain;">
         </div>
-        <div class="win2k-menubar">
-            <span class="win2k-menu-item" onclick="var b=document.getElementById('btnBackFromSummary')||document.querySelector('.back-btn'); if(b) b.click();">Tệp (<u>F</u>)</span>
-            <span class="win2k-menu-item" onclick="var b=document.getElementById('btnGoToKeHoach'); if(b) b.click();">Kế hoạch (<u>P</u>)</span>
-            <span class="win2k-menu-item" onclick="var b=document.getElementById('btnBackFromSummary'); if(b) b.click();">Tra cứu (<u>V</u>)</span>
-            <span class="win2k-menu-item" onclick="openConfigWithAuth()">Cấu hình (<u>S</u>)</span>
-            <span class="win2k-menu-item" onclick="window.print()">In báo cáo (<u>P</u>)</span>
-        </div>
-        <div class="win2k-window-body">
-            
-            <div class="simple-animated-logo main-page-logo" onclick="window.location.href = window.location.pathname; return false;">
-                <img src="logoXSND.gif" alt="Logo XSKT Trực Ninh" style="width: 100px; height: 100px; object-fit: contain;">
-            </div>
 
         <!-- 1. PHÂN HỆ TỔNG HỢP -->
         <div id="summarySection" class="main-section" style="display: none;">
@@ -1579,12 +1427,6 @@
             </div>
         </div>
 
-        </div> <!-- end .win2k-window-body -->
-        <div class="win2k-statusbar">
-            <div class="win2k-status-panel" style="flex: 1;" id="win2kStatusText">Sẵn sàng</div>
-            <div class="win2k-status-panel">Bảo mật: Xác thực</div>
-            <div class="win2k-status-panel">Win2K Console v2026.1</div>
-        </div>
     </div>
 
     <!-- MODAL XÁC NHẬN XÓA DỮ LIỆU CSDL AN TOÀN -->
