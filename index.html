@@ -1309,7 +1309,7 @@
             </div>
 
             <div class="cfg-card">
-                <button onclick="saveKeHoach()" class="success" style="width:100%; padding:13px; font-size:15px; font-weight:bold; box-shadow:0 4px 6px rgba(16,124,65,0.2);">
+                <button id="btnSaveKeHoach" onclick="saveKeHoach()" class="success" style="width:100%; padding:13px; font-size:15px; font-weight:bold; box-shadow:0 4px 6px rgba(16,124,65,0.2);">
                     🚀 LƯU KẾ HOẠCH VÀO CƠ SỞ DỮ LIỆU
                 </button>
             </div>
@@ -4240,7 +4240,24 @@
             return;
         }
         let num = parseInt(raw, 10);
-        el.value = num > 0 ? num.toLocaleString('vi-VN') : '';
+        if (num === 0) {
+            el.value = '0';
+            return;
+        }
+        el.value = num.toLocaleString('vi-VN');
+    };
+
+    window.handleKeHoachEnter = function(e, nextId) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (nextId) {
+                const nextEl = document.getElementById(nextId);
+                if (nextEl) {
+                    nextEl.focus();
+                    if (nextEl.select) nextEl.select();
+                }
+            }
+        }
     };
 
     async function loadKeHoach() {
@@ -4277,6 +4294,11 @@
             const valCT1 = target.chiTieu > 0 ? target.chiTieu.toLocaleString('vi-VN') : '';
             const valCT2 = target.chiTieu2 > 0 ? target.chiTieu2.toLocaleString('vi-VN') : '';
             const valVB  = target.veBoc > 0 ? target.veBoc.toLocaleString('vi-VN') : '';
+
+            const nextFromCT1 = `kh2_${thang}`;
+            const nextFromCT2 = `kh_vb_${thang}`;
+            const nextFromVB  = thang < 12 ? `kh_${thang + 1}` : 'btnSaveKeHoach';
+
             return `<div style="display:flex; flex-direction:column; gap:5px; background:#f8fafc; padding:8px 10px; border:1.5px solid #cbd5e1; border-radius:8px;">
                 <div style="font-size:13px; font-weight:700; color:#1e293b; border-bottom:1px solid #e2e8f0; padding-bottom:3px;">${label}</div>
                 <div>
@@ -4284,6 +4306,7 @@
                     <input type="text" inputmode="numeric" id="kh_${thang}"
                         value="${valCT1}"
                         oninput="window.formatInputThousands(this)"
+                        onkeydown="window.handleKeHoachEnter(event, '${nextFromCT1}')"
                         style="padding:5px 7px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:600; width:100%; box-sizing:border-box; background:#fff; color:#0f172a;"
                         placeholder="0">
                 </div>
@@ -4292,6 +4315,7 @@
                     <input type="text" inputmode="numeric" id="kh2_${thang}"
                         value="${valCT2}"
                         oninput="window.formatInputThousands(this)"
+                        onkeydown="window.handleKeHoachEnter(event, '${nextFromCT2}')"
                         style="padding:5px 7px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:600; width:100%; box-sizing:border-box; background:#fff; color:#0f172a;"
                         placeholder="0">
                 </div>
@@ -4300,6 +4324,7 @@
                     <input type="text" inputmode="numeric" id="kh_vb_${thang}"
                         value="${valVB}"
                         oninput="window.formatInputThousands(this)"
+                        onkeydown="window.handleKeHoachEnter(event, '${nextFromVB}')"
                         style="padding:5px 7px; border:1.5px solid #cbd5e1; border-radius:6px; font-size:13px; font-weight:600; width:100%; box-sizing:border-box; background:#fff; color:#0f172a;"
                         placeholder="0">
                 </div>
@@ -4329,11 +4354,14 @@
             const strVB  = inpVB ? inpVB.value.trim() : '';
             const target = getKeHoachTarget(tenTo, nam, thang);
             
-            const valCT1 = strCT1 !== '' ? parseNum(strCT1) : target.chiTieu;
-            const valCT2 = strCT2 !== '' ? parseNum(strCT2) : target.chiTieu2;
-            const valVB  = strVB  !== '' ? parseNum(strVB)  : target.veBoc;
+            const valCT1 = parseNum(strCT1);
+            const valCT2 = parseNum(strCT2);
+            const valVB  = parseNum(strVB);
             
-            if (valCT1 > 0 || valCT2 > 0 || valVB > 0 || strCT1 === '0' || strCT2 === '0' || strVB === '0') {
+            const hasCurrentVal = (valCT1 > 0 || valCT2 > 0 || valVB > 0);
+            const hadPreviousVal = ((target.chiTieu || 0) > 0 || (target.chiTieu2 || 0) > 0 || (target.veBoc || 0) > 0);
+            
+            if (hasCurrentVal || hadPreviousVal) {
                 upsertRows.push({ ten_to: tenTo, nam, thang, chi_tieu: valCT1, chi_tieu_2: valCT2, ve_boc: valVB });
             }
         }
