@@ -948,23 +948,56 @@
                 </button>
             </div>
 
-            <!-- PHÂN HỆ NẠP FILE EXCEL THỦ CÔNG -->
+            <!-- PHÂN HỆ NẠP DỮ LIỆU TỪ MÁY LÊN CSDL (TABS: FILE EXCEL & DỮ LIỆU THÔ) -->
             <div style="margin-top: 14px; border-top: 1px dashed #7f9db9; padding-top: 12px;">
-                <label style="color: #444; font-size: 12px; margin-bottom: 8px;">Nạp dữ liệu từ máy lên CSDL:</label>
-                <label for="excelFile1" style="font-size: 12px;">Biểu 31 (Lô tô):</label>
-                <input type="file" id="excelFile1" accept=".xls,.xlsx" multiple>
-                <div style="height: 6px;"></div>
-                <label for="excelFile2" style="font-size: 12px;">Biểu 35 (XSKT):</label>
-                <input type="file" id="excelFile2" accept=".xls,.xlsx" multiple>
-                <button id="btnLoadData" class="primary" style="width: 100%; margin-top: 8px; padding: 10px 14px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                    <svg width="20" height="20" viewBox="120 40 1000 1210" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0; vertical-align: middle;">
-                        <path d="M472 1199.23C629.77 1251.96 774.171 1234.98 833 1191.19L627.096 966 472 1199.23Z" fill="#FDAF67" fill-rule="evenodd"/>
-                        <path d="M647.544 48C48.1671 708.284 710.816 1158.75 827.1 1199 1128.07 993.464 1095.58 813.62 1099 751.96 1051.12 429.954 798.029 282.653 647.544 48Z" fill="#DD6447" fill-rule="evenodd"/>
-                        <path d="M216.25 531.56C106.695 897.796 269.316 1089.47 473.02 1199 712.672 1046.69 705.824 832.763 652.759 726.658 568.881 569.21 423.377 493.91 216.25 531.56Z" fill="#FFD97F" fill-rule="evenodd"/>
-                        <path d="M403.17 531 423.427 534.597C523.935 561.329 600.385 627.706 652.777 726.203 689.238 799.218 703.866 923.242 631.62 1043.17L622.987 1056 613.292 1047.17C499.023 934.6 387.85 764.659 401.073 550.782Z" fill="#FDAF67" fill-rule="evenodd"/>
-                    </svg>
-                    <span>Nạp Lên CSDL Firebase</span>
-                </button>
+                <label style="color: #444; font-size: 12px; margin-bottom: 8px;">Nạp dữ liệu lên CSDL Firebase:</label>
+                
+                <div style="display: flex; gap: 4px; background: #ece9d8; padding: 3px; border: 1px solid #7f9db9; margin-bottom: 10px;">
+                    <button type="button" id="tabUploadExcel" class="tab-btn active" onclick="switchUploadTab('excel')" style="flex:1; padding: 7px 4px; font-size: 12px; font-weight: 700; background: #0a246a; color: #ffffff; border: 1px solid #000000; cursor: pointer;">
+                        📁 Nạp File Excel
+                    </button>
+                    <button type="button" id="tabUploadRaw" class="tab-btn secondary" onclick="switchUploadTab('raw')" style="flex:1; padding: 7px 4px; font-size: 12px; font-weight: 700; background: #ece9d8; color: #000000; border: 1px solid #7f9db9; cursor: pointer;">
+                        📝 Nạp dữ liệu thô lên CSDL
+                    </button>
+                </div>
+
+                <!-- TAB 1: NẠP FILE EXCEL -->
+                <div id="panelUploadExcel">
+                    <label for="excelFile1" style="font-size: 12px;">Biểu 31 (Lô tô):</label>
+                    <input type="file" id="excelFile1" accept=".xls,.xlsx" multiple>
+                    <div style="height: 6px;"></div>
+                    <label for="excelFile2" style="font-size: 12px;">Biểu 35 (XSKT):</label>
+                    <input type="file" id="excelFile2" accept=".xls,.xlsx" multiple>
+                    <button id="btnLoadData" class="primary" style="width: 100%; margin-top: 8px; padding: 10px 14px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <svg width="20" height="20" viewBox="120 40 1000 1210" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0; vertical-align: middle;">
+                            <path d="M472 1199.23C629.77 1251.96 774.171 1234.98 833 1191.19L627.096 966 472 1199.23Z" fill="#FDAF67" fill-rule="evenodd"/>
+                            <path d="M647.544 48C48.1671 708.284 710.816 1158.75 827.1 1199 1128.07 993.464 1095.58 813.62 1099 751.96 1051.12 429.954 798.029 282.653 647.544 48Z" fill="#DD6447" fill-rule="evenodd"/>
+                            <path d="M216.25 531.56C106.695 897.796 269.316 1089.47 473.02 1199 712.672 1046.69 705.824 832.763 652.759 726.658 568.881 569.21 423.377 493.91 216.25 531.56Z" fill="#FFD97F" fill-rule="evenodd"/>
+                            <path d="M403.17 531 423.427 534.597C523.935 561.329 600.385 627.706 652.777 726.203 689.238 799.218 703.866 923.242 631.62 1043.17L622.987 1056 613.292 1047.17C499.023 934.6 387.85 764.659 401.073 550.782Z" fill="#FDAF67" fill-rule="evenodd"/>
+                        </svg>
+                        <span>Nạp Lên CSDL Firebase</span>
+                    </button>
+                </div>
+
+                <!-- TAB 2: NẠP DỮ LIỆU THÔ LÊN CSDL -->
+                <div id="panelUploadRaw" style="display: none;">
+                    <label for="txtRawDataInput" style="font-size: 12px; margin-bottom: 4px;">Dán dữ liệu thô (từ Clipboard / Excel / CSV):</label>
+                    <textarea id="txtRawDataInput" rows="7" placeholder='Ví dụ:&#10;"U966","01/08","LT","140","11,2","0","128,8"&#10;hoặc cú pháp gọn:&#10;U966, 01/08, LT, 140&#10;P966, 01/08, XSKT, 200, 50' style="font-family: Consolas, monospace; font-size: 12px; white-space: pre; overflow-x: auto;"></textarea>
+                    <div style="font-size: 11px; color: #555; margin-top: 4px; line-height: 1.4;">
+                        * Hỗ trợ các định dạng:<br>
+                        1. Dòng CSV: <code>"Mã","Ngày","LH","Dsố","Hhồng","Thưởng","Nộp"</code><br>
+                        2. Cú pháp gọn: <code>Mã, Ngày, Loại, Dsố, Thưởng</code> (Loại: LT, DB, LC, 2/27, 3/23, XSKT)
+                    </div>
+                    <button id="btnLoadRawData" class="primary" style="width: 100%; margin-top: 8px; padding: 10px 14px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <svg width="20" height="20" viewBox="120 40 1000 1210" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0; vertical-align: middle;">
+                            <path d="M472 1199.23C629.77 1251.96 774.171 1234.98 833 1191.19L627.096 966 472 1199.23Z" fill="#FDAF67" fill-rule="evenodd"/>
+                            <path d="M647.544 48C48.1671 708.284 710.816 1158.75 827.1 1199 1128.07 993.464 1095.58 813.62 1099 751.96 1051.12 429.954 798.029 282.653 647.544 48Z" fill="#DD6447" fill-rule="evenodd"/>
+                            <path d="M216.25 531.56C106.695 897.796 269.316 1089.47 473.02 1199 712.672 1046.69 705.824 832.763 652.759 726.658 568.881 569.21 423.377 493.91 216.25 531.56Z" fill="#FFD97F" fill-rule="evenodd"/>
+                            <path d="M403.17 531 423.427 534.597C523.935 561.329 600.385 627.706 652.777 726.203 689.238 799.218 703.866 923.242 631.62 1043.17L622.987 1056 613.292 1047.17C499.023 934.6 387.85 764.659 401.073 550.782Z" fill="#FDAF67" fill-rule="evenodd"/>
+                        </svg>
+                        <span>Nạp Dữ Liệu Thô Lên CSDL Firebase</span>
+                    </button>
+                </div>
             </div>
         </div>
         <div style="text-align: center; font-size: 11px; color: #666; font-weight: 600;">© 2026 ZENG FINANCE</div>
@@ -1382,6 +1415,78 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- 4. QUẢN LÝ, SỬA & XÓA DỮ LIỆU ĐẠI LÝ TRÊN CSDL FIREBASE -->
+                <div class="cfg-card" style="border: 1.5px solid #d97706; background: #fffbeb;">
+                    <h4 style="margin: 0 0 10px 0; color: #b45309; font-size: 14.5px;">👤 SỬA & XÓA DỮ LIỆU ĐẠI LÝ TRÊN CSDL FIREBASE</h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div>
+                            <label style="font-size: 13px; font-weight: bold; color: #92400e;">1. Nhập Mã Đại Lý hoặc Số Sổ:</label>
+                            <input type="text" id="txtManageAgentCode" placeholder="Ví dụ: 919 hoặc U919" style="padding: 9px; font-weight: bold; font-size: 16px; text-align: center; border: 1.5px solid #d97706; border-radius: 6px; width: 100%; box-sizing: border-box; background: white; color: #b45309;">
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; font-weight: bold; color: #92400e;">2. Chọn khoảng thời gian:</label>
+                            <select id="selManageAgentScope" onchange="toggleManageAgentScopeInputs()" style="padding: 8px; font-weight: bold; width: 100%; border: 1.5px solid #d97706; border-radius: 6px; background: white;">
+                                <option value="range" selected>Theo khoảng ngày (Từ ngày... Đến ngày...)</option>
+                                <option value="month">Theo 1 tháng cụ thể</option>
+                                <option value="all">Tất cả các ngày có trong CSDL</option>
+                            </select>
+                        </div>
+                        <div id="manageAgentRangeContainer" style="display: flex; gap: 8px; align-items: center;">
+                            <input type="date" id="manageAgentFromDate" style="padding: 7px; font-weight: bold; flex: 1; border: 1px solid #d97706; border-radius: 6px;">
+                            <span style="font-weight: bold; color: #92400e;">đến</span>
+                            <input type="date" id="manageAgentToDate" style="padding: 7px; font-weight: bold; flex: 1; border: 1px solid #d97706; border-radius: 6px;">
+                        </div>
+                        <div id="manageAgentMonthContainer" style="display: none;">
+                            <input type="month" id="manageAgentMonthSelect" value="2026-08" style="padding: 7px; font-weight: bold; width: 100%; border: 1px solid #d97706; border-radius: 6px; box-sizing: border-box;">
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 4px;">
+                            <button type="button" onclick="loadAgentRecordsForManagement()" class="primary" style="flex: 2; padding: 11px; font-size: 14px; font-weight: bold; background: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                                🔍 TẢI DỮ LIỆU ĐỂ SỬA
+                            </button>
+                            <button type="button" onclick="promptDeleteSpecificAgentFromDbTab()" class="danger" style="flex: 1; padding: 11px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer;">
+                                🗑️ XÓA TOÀN BỘ
+                            </button>
+                        </div>
+
+                        <!-- KHUNG BẢNG HIỂN THỊ DỮ LIỆU ĐỂ SỬA -->
+                        <div id="manageAgentEditorContainer" style="display: none; margin-top: 10px; border-top: 1.5px dashed #d97706; padding-top: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+                                <strong id="manageAgentSummaryText" style="color: #92400e; font-size: 13.5px;"></strong>
+                                <span style="font-size: 11.5px; color: #64748b; font-style: italic;">* Nhập số (VNĐ hoặc nghìn đồng, vd: 140 hoặc 140.000)</span>
+                            </div>
+
+                            <div style="overflow-x: auto; max-height: 450px; border: 1.5px solid #fed7aa; border-radius: 8px; background: white; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);">
+                                <table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 680px;">
+                                    <thead style="background: #ffedd5; position: sticky; top: 0; z-index: 2; border-bottom: 1.5px solid #fdba74;">
+                                        <tr>
+                                            <th style="padding: 8px 6px; border: 1px solid #fed7aa; text-align: center; white-space: nowrap;">Ngày</th>
+                                            <th style="padding: 8px 6px; border: 1px solid #fed7aa; text-align: center; white-space: nowrap;">Mã ĐL</th>
+                                            <th style="padding: 8px 6px; border: 1px solid #fed7aa; text-align: right; color: #b45309; white-space: nowrap;">Lô tô ĐB</th>
+                                            <th style="padding: 8px 6px; border: 1px solid #fed7aa; text-align: right; color: #b45309; white-space: nowrap;">Lô Cặp</th>
+                                            <th style="padding: 8px 6px; border: 1px solid #fed7aa; text-align: right; color: #b45309; white-space: nowrap;">Lô 2/27</th>
+                                            <th style="padding: 8px 6px; border: 1px solid #fed7aa; text-align: right; color: #b45309; white-space: nowrap;">Lô 3/23</th>
+                                            <th style="padding: 8px 6px; border: 1px solid #fed7aa; text-align: right; color: #0284c7; white-space: nowrap;">XSKT</th>
+                                            <th style="padding: 8px 6px; border: 1px solid #fed7aa; text-align: right; color: #16a34a; white-space: nowrap;">Thưởng</th>
+                                            <th style="padding: 8px 6px; border: 1px solid #fed7aa; text-align: center; white-space: nowrap; width: 45px;">Xóa</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="manageAgentTableBody"></tbody>
+                                </table>
+                            </div>
+
+                            <div style="display: flex; gap: 10px; margin-top: 12px;">
+                                <button type="button" onclick="promptSaveAgentRecordsEdit()" class="success" style="flex: 2; padding: 12px; font-size: 14px; font-weight: bold; background: #16a34a; color: white; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(22,163,74,0.3);">
+                                    💾 LƯU THAY ĐỔI VÀO CSDL
+                                </button>
+                                <button type="button" onclick="closeAgentRecordsEditor()" class="secondary" style="flex: 1; padding: 12px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer;">
+                                    ✕ ĐÓNG
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1561,7 +1666,10 @@
         btnFetchDataHome: document.getElementById('btnFetchDataHome'),
         cfgTableSelect: document.getElementById('cfgTableSelect'), cfgEditorList: document.getElementById('cfgEditorList'), cfgEditorTitle: document.getElementById('cfgEditorTitle'),
         btnGoToKeHoach: document.getElementById('btnGoToKeHoach'),
-        khSelectTo: document.getElementById('khSelectTo'), khSelectNam: document.getElementById('khSelectNam'), khMonthGrid: document.getElementById('khMonthGrid')
+        khSelectTo: document.getElementById('khSelectTo'), khSelectNam: document.getElementById('khSelectNam'), khMonthGrid: document.getElementById('khMonthGrid'),
+        tabUploadExcel: document.getElementById('tabUploadExcel'), tabUploadRaw: document.getElementById('tabUploadRaw'),
+        panelUploadExcel: document.getElementById('panelUploadExcel'), panelUploadRaw: document.getElementById('panelUploadRaw'),
+        txtRawDataInput: document.getElementById('txtRawDataInput'), btnLoadRawData: document.getElementById('btnLoadRawData')
     };
 
 
@@ -2186,7 +2294,320 @@
         };
         DOM.authConfigModal.style.display = 'block';
         setTimeout(() => DOM.txtAdminPassword.focus(), 100);
-    };;
+    };
+
+    // ==================== CHUYỂN ĐỔI TAB NẠP DỮ LIỆU LÊN CSDL ====================
+    window.switchUploadTab = function(tab) {
+        const tabExcel = document.getElementById('tabUploadExcel');
+        const tabRaw = document.getElementById('tabUploadRaw');
+        const panelExcel = document.getElementById('panelUploadExcel');
+        const panelRaw = document.getElementById('panelUploadRaw');
+        if (!tabExcel || !tabRaw || !panelExcel || !panelRaw) return;
+
+        if (tab === 'excel') {
+            tabExcel.className = 'tab-btn active';
+            tabRaw.className = 'tab-btn secondary';
+            tabExcel.style.backgroundColor = '#0a246a';
+            tabExcel.style.color = '#ffffff';
+            tabExcel.style.border = '1px solid #000000';
+            tabRaw.style.backgroundColor = '#ece9d8';
+            tabRaw.style.color = '#000000';
+            tabRaw.style.border = '1px solid #7f9db9';
+            panelExcel.style.display = 'block';
+            panelRaw.style.display = 'none';
+        } else {
+            tabExcel.className = 'tab-btn secondary';
+            tabRaw.className = 'tab-btn active';
+            tabRaw.style.backgroundColor = '#0a246a';
+            tabRaw.style.color = '#ffffff';
+            tabRaw.style.border = '1px solid #000000';
+            tabExcel.style.backgroundColor = '#ece9d8';
+            tabExcel.style.color = '#000000';
+            tabExcel.style.border = '1px solid #7f9db9';
+            panelExcel.style.display = 'none';
+            panelRaw.style.display = 'block';
+            const ta = document.getElementById('txtRawDataInput');
+            if (ta) setTimeout(() => ta.focus(), 80);
+        }
+    };
+
+    // ==================== BÓC TÁCH DỮ LIỆU THÔ (CSV / BÁO CÁO) ====================
+    function parseRawInputData(text) {
+        if (!text || !text.trim()) return null;
+
+        const lines = text.split('\n');
+        let defaultYear = 2026;
+
+        // Tự động tìm dải ngày tiêu đề nếu có (VD: "Từ ngày 01/08/2026 đến ngày 31/08/2026")
+        const dateRangeRegex = /Từ ngày\s+(\d{1,2})[\/-](\d{1,2})(?:[\/-](\d{2,4}))?\s+(?:đến|to|-)\s+ngày\s+(\d{1,2})[\/-](\d{1,2})(?:[\/-](\d{2,4}))?/i;
+        for (const line of lines) {
+            const m = line.match(dateRangeRegex);
+            if (m) {
+                if (m[3]) {
+                    let y = parseInt(m[3], 10);
+                    if (y < 100) y += 2000;
+                    defaultYear = y;
+                } else if (m[6]) {
+                    let y = parseInt(m[6], 10);
+                    if (y < 100) y += 2000;
+                    defaultYear = y;
+                }
+                break;
+            }
+        }
+
+        const parseMoney = (val) => {
+            if (val === null || val === undefined) return 0;
+            let s = String(val).trim().replace(/[\s\u00A0]+/g, '');
+            if (!s || s === '-' || s === '--' || s.toUpperCase() === 'NONE') return 0;
+
+            if (s.includes('.') && s.includes(',')) {
+                if (s.indexOf('.') < s.indexOf(',')) {
+                    s = s.replace(/\./g, '').replace(',', '.');
+                } else {
+                    s = s.replace(/,/g, '');
+                }
+            } else if (s.includes(',')) {
+                s = s.replace(',', '.');
+            } else if (s.includes('.')) {
+                const p = s.split('.');
+                if (p[p.length - 1].length === 3) {
+                    s = s.replace(/\./g, '');
+                }
+            }
+            let n = parseFloat(s);
+            if (isNaN(n)) return 0;
+            if (n > 0 && n < 100000) n = n * 1000;
+            return Math.round(n);
+        };
+
+        const normalizeDate = (rawDate) => {
+            if (!rawDate) return null;
+            let s = String(rawDate).trim().replace(/[()"]/g, '');
+            if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(s)) {
+                const [y, m, d] = s.split('-');
+                return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            }
+            const mFull = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})$/);
+            if (mFull) {
+                let d = parseInt(mFull[1], 10);
+                let m = parseInt(mFull[2], 10);
+                let y = parseInt(mFull[3], 10);
+                if (y < 100) y += 2000;
+                return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            }
+            const mShort = s.match(/^(\d{1,2})[\/-](\d{1,2})$/);
+            if (mShort) {
+                let d = parseInt(mShort[1], 10);
+                let m = parseInt(mShort[2], 10);
+                return `${defaultYear}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            }
+            return null;
+        };
+
+        const mapField = (typeRaw) => {
+            if (!typeRaw) return 'loto_db';
+            const t = String(typeRaw).toUpperCase().trim();
+            if (['LT', 'DB', 'LOTO_DB', 'LOTODB', 'LÔ TÔ ĐB', 'LÔ ĐB', 'LÔTO ĐB', 'LOTO ĐB'].some(k => t.includes(k) || t === k)) return 'loto_db';
+            if (['LC', 'CAP', 'CẶP', 'LOTO_CAP', 'LOTOCAP', 'LÔ CẶP'].some(k => t.includes(k) || t === k)) return 'loto_cap';
+            if (['L2', '2/27', 'L2/27', '2-27', 'LÔ 2/27', 'LO 2/27'].some(k => t.includes(k) || t === k)) return 'loto_2_27';
+            if (['L3', '3/23', 'L3/23', '3-23', 'LÔ 3/23', 'LO 3/23'].some(k => t.includes(k) || t === k)) return 'loto_3_23';
+            if (['XSKT', 'XS', 'VÉ SỐ', 'VESO'].some(k => t.includes(k) || t === k)) return 'xskt';
+            return 'loto_db';
+        };
+
+        const parsedMap = new Map();
+        let validRowCount = 0;
+        let errorRowCount = 0;
+
+        lines.forEach(line => {
+            line = line.trim();
+            if (!line) return;
+            if (/^Từ ngày/i.test(line)) return;
+
+            let parts = [];
+            if (line.includes('\t')) {
+                parts = line.split('\t').map(s => s.trim().replace(/^["']|["']$/g, ''));
+            } else {
+                const csvTokenRegex = /(?:^|,)(?:"([^"]*)"|([^,]*))/g;
+                let m;
+                while ((m = csvTokenRegex.exec(line)) !== null) {
+                    let v = m[1] !== undefined ? m[1] : m[2];
+                    parts.push(v.trim());
+                }
+            }
+
+            if (parts.length >= 4) {
+                let code = parts[0].trim().toUpperCase();
+                if (code.endsWith('.0')) code = code.slice(0, -2);
+                if (!code || ["MÃ ĐL", "MADL", "MÃ", "CODE", "STT", "TỔNG", "CỘNG"].includes(code)) return;
+
+                const dateStr = parts[1];
+                const isoDate = normalizeDate(dateStr);
+                if (!isoDate) {
+                    errorRowCount++;
+                    return;
+                }
+
+                const typeRaw = parts[2].trim();
+                const field = mapField(typeRaw);
+
+                const revVal = parseMoney(parts[3]);
+                let bonusVal = 0;
+                if (parts.length >= 7) {
+                    bonusVal = parseMoney(parts[5]);
+                } else if (parts.length >= 5) {
+                    bonusVal = parseMoney(parts[4]);
+                }
+
+                const mapKey = `${isoDate}_${code}`;
+                if (!parsedMap.has(mapKey)) {
+                    parsedMap.set(mapKey, {
+                        ngay: isoDate,
+                        ma_dl: code,
+                        loto_db: 0,
+                        loto_cap: 0,
+                        loto_2_27: 0,
+                        loto_3_23: 0,
+                        thuong: 0,
+                        xskt: 0
+                    });
+                }
+                const rec = parsedMap.get(mapKey);
+                rec[field] = (rec[field] || 0) + revVal;
+                if (bonusVal > 0) {
+                    rec.thuong = (rec.thuong || 0) + bonusVal;
+                }
+                validRowCount++;
+            } else {
+                errorRowCount++;
+            }
+        });
+
+        return {
+            parsedMap,
+            validRowCount,
+            errorRowCount
+        };
+    }
+
+    // ==================== NẠP DỮ LIỆU THÔ LÊN CSDL FIREBASE ====================
+    async function executeRawDataWebUpload(parsedMap) {
+        if (!parsedMap || parsedMap.size === 0) {
+            return showNotification("Không có bản ghi dữ liệu thô nào hợp lệ!", "warning");
+        }
+
+        showLoading();
+        try {
+            const rawRecords = Array.from(parsedMap.values());
+            const targetDates = Array.from(new Set(rawRecords.map(r => r.ngay))).sort();
+
+            if (targetDates.length === 0) {
+                hideLoading();
+                return showNotification("Không tìm thấy ngày hợp lệ trong dữ liệu thô!", "warning");
+            }
+
+            // Tải bản ghi hiện có từ Firebase đối với các ngày này để merge không làm mất dữ liệu cũ
+            let mergedMap = new Map();
+            for (const d of targetDates) {
+                try {
+                    const docSnap = await db.collection("daily_records").doc(d).get();
+                    if (docSnap.exists) {
+                        const data = docSnap.data();
+                        if (Array.isArray(data.records)) {
+                            data.records.forEach(r => {
+                                const key = `${r.ngay}_${r.ma_dl}`;
+                                mergedMap.set(key, { ...r });
+                            });
+                        }
+                    }
+                } catch(e) {
+                    console.warn("Lỗi đọc ngày từ Firebase:", d, e);
+                }
+            }
+
+            // Merge dữ liệu thô vào mergedMap
+            parsedMap.forEach((r, key) => {
+                if (mergedMap.has(key)) {
+                    const cur = mergedMap.get(key);
+                    if (r.loto_db > 0) cur.loto_db = r.loto_db;
+                    if (r.loto_cap > 0) cur.loto_cap = r.loto_cap;
+                    if (r.loto_2_27 > 0) cur.loto_2_27 = r.loto_2_27;
+                    if (r.loto_3_23 > 0) cur.loto_3_23 = r.loto_3_23;
+                    if (r.xskt > 0) cur.xskt = r.xskt;
+                    if (r.thuong > 0) cur.thuong = r.thuong;
+                } else {
+                    mergedMap.set(key, { ...r });
+                }
+            });
+
+            const recordsToPush = Array.from(mergedMap.values());
+
+            // Ghi lên CSDL Firebase Firestore theo từng ngày
+            const batch = db.batch();
+            for (const d of targetDates) {
+                const dayRecords = recordsToPush.filter(r => r.ngay === d);
+                const docRef = db.collection("daily_records").doc(d);
+                batch.set(docRef, {
+                    ngay: d,
+                    count: dayRecords.length,
+                    records: dayRecords,
+                    updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            }
+            await batch.commit();
+
+            showNotification(`🚀 Đã nạp thành công ${parsedMap.size} đại lý (${targetDates.length} ngày) từ Dữ liệu thô lên CSDL Firebase!`, 'success');
+
+            const rawInputEl = document.getElementById('txtRawDataInput');
+            if (rawInputEl) rawInputEl.value = '';
+
+            let targetM = 8;
+            if (targetDates.length > 0) {
+                const p = targetDates[0].split('-');
+                targetM = parseInt(p[1], 10) || 8;
+            }
+            if (DOM.selFromMonthHome) DOM.selFromMonthHome.value = targetM;
+            if (DOM.selToMonthHome) DOM.selToMonthHome.value = targetM;
+            if (DOM.selFromMonthMain) DOM.selFromMonthMain.value = targetM;
+            if (DOM.selToMonthMain) DOM.selToMonthMain.value = targetM;
+            await loadDataFromFirebase(targetM, targetM);
+
+            await fetchDatabaseStats();
+        } catch(err) {
+            console.error(err);
+            showNotification("Lỗi nạp dữ liệu thô: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+
+        DOM.homePage.style.display = 'none';
+        DOM.mainPage.style.display = 'block';
+        showSection('summarySection');
+    }
+
+    if (DOM.btnLoadRawData) {
+        DOM.btnLoadRawData.onclick = () => {
+            const text = DOM.txtRawDataInput ? DOM.txtRawDataInput.value.trim() : '';
+            if (!text) return showNotification("Vui lòng dán dữ liệu thô vào khung trước!", 'warning');
+
+            const parseResult = parseRawInputData(text);
+            if (!parseResult || !parseResult.parsedMap || parseResult.parsedMap.size === 0) {
+                return showNotification("Không trích xuất được bản ghi hợp lệ nào! Vui lòng kiểm tra lại định dạng.", 'error');
+            }
+
+            DOM.txtAdminPassword.value = '';
+            const t = document.getElementById('authModalTitle');
+            const st = document.getElementById('authModalSubTitle');
+            if (t) t.textContent = '🔐 Xác Nhận Nạp CSDL';
+            if (st) st.textContent = `Nhập mật khẩu quản trị để nạp ${parseResult.parsedMap.size} đại lý dữ liệu thô lên Firebase`;
+            pendingAuthCallback = async () => {
+                await executeRawDataWebUpload(parseResult.parsedMap);
+            };
+            DOM.authConfigModal.style.display = 'block';
+            setTimeout(() => DOM.txtAdminPassword.focus(), 100);
+        };
+    }
 
     window.toggleWinCalendar = function(boxId, event) {
         if (event) event.stopPropagation();
@@ -5282,9 +5703,531 @@
         }
     };
 
+    // ==================== QUẢN LÝ / SỬA & XÓA ĐẠI LÝ TRÊN CSDL FIREBASE ====================
+    window.toggleManageAgentScopeInputs = function() {
+        const scopeSelect = document.getElementById('selManageAgentScope') || document.getElementById('selDeleteAgentScope');
+        const scope = scopeSelect ? scopeSelect.value : 'range';
+        const monthCont = document.getElementById('manageAgentMonthContainer') || document.getElementById('deleteAgentMonthContainer');
+        const rangeCont = document.getElementById('manageAgentRangeContainer') || document.getElementById('deleteAgentRangeContainer');
+        if (monthCont) monthCont.style.display = (scope === 'month') ? 'block' : 'none';
+        if (rangeCont) rangeCont.style.display = (scope === 'range') ? 'flex' : 'none';
+    };
+    window.toggleDeleteAgentScopeInputs = window.toggleManageAgentScopeInputs;
+
+    window.handleAgentNumInputBlur = function(el) {
+        if (!el) return;
+        let s = String(el.value || '').trim().replace(/[\s\u00A0đĐ]+/g, '').replace(/[.,]/g, '');
+        let n = parseFloat(s);
+        if (isNaN(n) || n <= 0) {
+            el.value = '0';
+        } else {
+            if (n < 10000) n = n * 1000;
+            n = Math.round(n);
+            el.value = n.toLocaleString('vi-VN');
+        }
+    };
+
+    window.toggleDeleteAgentRow = function(rowId) {
+        const tr = document.getElementById(rowId);
+        if (!tr) return;
+        const isDel = tr.dataset.deleted === 'true';
+        const btn = tr.querySelector('button');
+        if (!isDel) {
+            tr.dataset.deleted = 'true';
+            tr.style.opacity = '0.45';
+            tr.style.backgroundColor = '#fee2e2';
+            tr.style.textDecoration = 'line-through';
+            if (btn) {
+                btn.textContent = '↩️';
+                btn.title = 'Bỏ đánh dấu xóa';
+            }
+        } else {
+            tr.dataset.deleted = 'false';
+            tr.style.opacity = '1';
+            tr.style.backgroundColor = '';
+            tr.style.textDecoration = 'none';
+            if (btn) {
+                btn.textContent = '🗑️';
+                btn.title = 'Đánh dấu xóa ngày này';
+            }
+        }
+    };
+
+    window.closeAgentRecordsEditor = function() {
+        const editorCont = document.getElementById('manageAgentEditorContainer');
+        if (editorCont) editorCont.style.display = 'none';
+    };
+
+    window.loadAgentRecordsForManagement = async function() {
+        const inputCode = document.getElementById('txtManageAgentCode') || document.getElementById('txtDeleteSpecificAgentCode');
+        const code = inputCode ? inputCode.value.trim().toUpperCase() : '';
+        if (!code) return showNotification("Vui lòng nhập Mã đại lý hoặc Số sổ!", "warning");
+
+        const scopeSelect = document.getElementById('selManageAgentScope') || document.getElementById('selDeleteAgentScope');
+        const scope = scopeSelect ? scopeSelect.value : 'range';
+        let fromDate = '', toDate = '', monthVal = '';
+
+        if (scope === 'range') {
+            fromDate = (document.getElementById('manageAgentFromDate') || document.getElementById('deleteAgentFromDate'))?.value;
+            toDate = (document.getElementById('manageAgentToDate') || document.getElementById('deleteAgentToDate'))?.value;
+            if (!fromDate || !toDate) return showNotification("Vui lòng chọn cả Từ ngày và Đến ngày!", "warning");
+            if (fromDate > toDate) {
+                const tmp = fromDate; fromDate = toDate; toDate = tmp;
+                const fInp = document.getElementById('manageAgentFromDate');
+                const tInp = document.getElementById('manageAgentToDate');
+                if (fInp) fInp.value = fromDate;
+                if (tInp) tInp.value = toDate;
+            }
+        } else if (scope === 'month') {
+            monthVal = (document.getElementById('manageAgentMonthSelect') || document.getElementById('deleteAgentMonthSelect'))?.value;
+            if (!monthVal) return showNotification("Vui lòng chọn Tháng!", "warning");
+            fromDate = `${monthVal}-01`;
+            toDate = `${monthVal}-31`;
+        }
+
+        showLoading();
+        try {
+            let query = db.collection("daily_records");
+            if (scope === 'range' || scope === 'month') {
+                query = query.where(firebase.firestore.FieldPath.documentId(), ">=", fromDate)
+                             .where(firebase.firestore.FieldPath.documentId(), "<=", toDate);
+            }
+
+            const snap = await query.get();
+            const cleanInput = code.toUpperCase();
+            const baseInput = getBaseId(cleanInput);
+
+            const matchedRows = [];
+            snap.forEach(docSnap => {
+                const d = docSnap.id;
+                const data = docSnap.data();
+                if (Array.isArray(data.records)) {
+                    data.records.forEach((r, idx) => {
+                        const m = String(r.ma_dl || '').trim().toUpperCase();
+                        const mb = getBaseId(m);
+                        const isMatch = (m === cleanInput) || 
+                                        (baseInput && mb === baseInput) ||
+                                        (baseInput && m === baseInput) ||
+                                        (baseInput && mb === cleanInput);
+                        if (isMatch) {
+                            matchedRows.push({
+                                docDate: d,
+                                recordIndex: idx,
+                                ma_dl: r.ma_dl,
+                                loto_db: parseFloat(r.loto_db) || 0,
+                                loto_cap: parseFloat(r.loto_cap) || 0,
+                                loto_2_27: parseFloat(r.loto_2_27) || 0,
+                                loto_3_23: parseFloat(r.loto_3_23) || 0,
+                                xskt: parseFloat(r.xskt) || 0,
+                                thuong: parseFloat(r.thuong) || 0
+                            });
+                        }
+                    });
+                }
+            });
+
+            const editorCont = document.getElementById('manageAgentEditorContainer');
+            const summaryText = document.getElementById('manageAgentSummaryText');
+            const tbody = document.getElementById('manageAgentTableBody');
+
+            if (matchedRows.length === 0) {
+                if (editorCont) editorCont.style.display = 'none';
+                let timeDesc = (scope === 'all') ? 'toàn bộ CSDL' : `từ ${fromDate} đến ${toDate}`;
+                showNotification(`Không tìm thấy dữ liệu nào của đại lý "${code}" trong ${timeDesc}.`, "info");
+                return;
+            }
+
+            // Sắp xếp ngày tăng dần
+            matchedRows.sort((a, b) => a.docDate.localeCompare(b.docDate));
+
+            if (summaryText) {
+                summaryText.innerHTML = `Tìm thấy <span style="color:#b45309; font-size:15px; font-weight:bold;">${matchedRows.length}</span> ngày của Đại lý <b>${code}</b>:`;
+            }
+
+            if (tbody) {
+                tbody.innerHTML = '';
+                matchedRows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.id = `agent_row_${row.docDate}_${row.recordIndex}`;
+                    tr.dataset.date = row.docDate;
+                    tr.dataset.maDl = row.ma_dl;
+                    tr.dataset.recordIndex = row.recordIndex;
+                    tr.dataset.deleted = "false";
+                    tr.style.borderBottom = "1px solid #fed7aa";
+
+                    const dateParts = row.docDate.split('-');
+                    const dateDisplay = (dateParts.length === 3) ? `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}` : row.docDate;
+
+                    const fmt = (v) => (v && v !== 0) ? Number(v).toLocaleString('vi-VN') : '0';
+
+                    tr.innerHTML = `
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; text-align: center; font-weight: bold; white-space: nowrap; background: #fffaf0;">
+                            ${dateDisplay}
+                        </td>
+                        <td style="padding: 6px 8px; border: 1px solid #fed7aa; text-align: center; font-weight: bold; color: #92400e; white-space: nowrap;">
+                            ${row.ma_dl}
+                        </td>
+                        <td style="padding: 4px 6px; border: 1px solid #fed7aa; text-align: right;">
+                            <input type="text" inputmode="numeric" class="agent-edit-input" data-field="loto_db" value="${fmt(row.loto_db)}" style="width: 80px; text-align: right; font-weight: bold; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px;" onfocus="this.select()" onblur="handleAgentNumInputBlur(this)">
+                        </td>
+                        <td style="padding: 4px 6px; border: 1px solid #fed7aa; text-align: right;">
+                            <input type="text" inputmode="numeric" class="agent-edit-input" data-field="loto_cap" value="${fmt(row.loto_cap)}" style="width: 80px; text-align: right; font-weight: bold; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px;" onfocus="this.select()" onblur="handleAgentNumInputBlur(this)">
+                        </td>
+                        <td style="padding: 4px 6px; border: 1px solid #fed7aa; text-align: right;">
+                            <input type="text" inputmode="numeric" class="agent-edit-input" data-field="loto_2_27" value="${fmt(row.loto_2_27)}" style="width: 80px; text-align: right; font-weight: bold; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px;" onfocus="this.select()" onblur="handleAgentNumInputBlur(this)">
+                        </td>
+                        <td style="padding: 4px 6px; border: 1px solid #fed7aa; text-align: right;">
+                            <input type="text" inputmode="numeric" class="agent-edit-input" data-field="loto_3_23" value="${fmt(row.loto_3_23)}" style="width: 80px; text-align: right; font-weight: bold; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px;" onfocus="this.select()" onblur="handleAgentNumInputBlur(this)">
+                        </td>
+                        <td style="padding: 4px 6px; border: 1px solid #fed7aa; text-align: right;">
+                            <input type="text" inputmode="numeric" class="agent-edit-input" data-field="xskt" value="${fmt(row.xskt)}" style="width: 80px; text-align: right; font-weight: bold; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; color: #0284c7;" onfocus="this.select()" onblur="handleAgentNumInputBlur(this)">
+                        </td>
+                        <td style="padding: 4px 6px; border: 1px solid #fed7aa; text-align: right;">
+                            <input type="text" inputmode="numeric" class="agent-edit-input" data-field="thuong" value="${fmt(row.thuong)}" style="width: 80px; text-align: right; font-weight: bold; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; color: #16a34a;" onfocus="this.select()" onblur="handleAgentNumInputBlur(this)">
+                        </td>
+                        <td style="padding: 4px 6px; border: 1px solid #fed7aa; text-align: center;">
+                            <button type="button" onclick="toggleDeleteAgentRow('${tr.id}')" title="Đánh dấu xóa ngày này" style="background: none; border: none; font-size: 17px; cursor: pointer; color: #ef4444; padding: 2px 4px;">🗑️</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            if (editorCont) {
+                editorCont.style.display = 'block';
+                editorCont.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        } catch(e) {
+            console.error("Lỗi tải dữ liệu đại lý:", e);
+            showNotification("Lỗi tải dữ liệu: " + e.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    window.promptSaveAgentRecordsEdit = function() {
+        const tbody = document.getElementById('manageAgentTableBody');
+        const rows = tbody ? tbody.querySelectorAll('tr') : [];
+        if (!rows || rows.length === 0) return showNotification("Không có dữ liệu nào trong bảng để lưu!", "warning");
+
+        const inputCode = document.getElementById('txtManageAgentCode') || document.getElementById('txtDeleteSpecificAgentCode');
+        const code = inputCode ? inputCode.value.trim().toUpperCase() : '';
+
+        DOM.txtAdminPassword.value = '';
+        const t = document.getElementById('authModalTitle');
+        const st = document.getElementById('authModalSubTitle');
+        if (t) t.textContent = '💾 Lưu Dữ Liệu Đại Lý';
+        if (st) st.textContent = `Lưu các thay đổi dữ liệu của đại lý ${code} vào CSDL Firebase. Nhập mật khẩu quản trị:`;
+        pendingAuthCallback = async () => {
+            await executeSaveAgentRecordsEdit();
+        };
+        DOM.authConfigModal.style.display = 'block';
+        setTimeout(() => DOM.txtAdminPassword.focus(), 100);
+    };
+
+    async function executeSaveAgentRecordsEdit() {
+        const tbody = document.getElementById('manageAgentTableBody');
+        const rows = tbody ? tbody.querySelectorAll('tr') : [];
+        if (!rows || rows.length === 0) return;
+
+        const inputCode = document.getElementById('txtManageAgentCode') || document.getElementById('txtDeleteSpecificAgentCode');
+        const code = inputCode ? inputCode.value.trim().toUpperCase() : '';
+        const cleanTargetCode = code;
+        const baseTargetCode = getBaseId(cleanTargetCode);
+
+        showLoading();
+        try {
+            // Gom các dòng theo ngày
+            const updatesByDate = new Map();
+            rows.forEach(tr => {
+                const d = tr.dataset.date;
+                const isDel = tr.dataset.deleted === 'true';
+                const ma_dl = tr.dataset.maDl || code;
+                const recIdx = parseInt(tr.dataset.recordIndex, 10);
+
+                const parseField = (f) => {
+                    const inp = tr.querySelector(`[data-field="${f}"]`);
+                    if (!inp) return 0;
+                    let s = String(inp.value || '').trim().replace(/[\s\u00A0đĐ]+/g, '').replace(/[.,]/g, '');
+                    let n = parseFloat(s);
+                    if (isNaN(n) || n <= 0) return 0;
+                    if (n < 10000) n = n * 1000;
+                    return Math.round(n);
+                };
+
+                if (!updatesByDate.has(d)) updatesByDate.set(d, []);
+                updatesByDate.get(d).push({
+                    isDeleted: isDel,
+                    ma_dl: ma_dl,
+                    recordIndex: isNaN(recIdx) ? -1 : recIdx,
+                    loto_db: parseField('loto_db'),
+                    loto_cap: parseField('loto_cap'),
+                    loto_2_27: parseField('loto_2_27'),
+                    loto_3_23: parseField('loto_3_23'),
+                    xskt: parseField('xskt'),
+                    thuong: parseField('thuong')
+                });
+            });
+
+            const uniqueDates = Array.from(updatesByDate.keys());
+            let updatedDaysCount = 0;
+
+            for (let i = 0; i < uniqueDates.length; i += 50) {
+                const slice = uniqueDates.slice(i, i + 50);
+                const batch = db.batch();
+                let batchHasChanges = false;
+
+                for (const d of slice) {
+                    const docRef = db.collection("daily_records").doc(d);
+                    const docSnap = await docRef.get();
+                    if (docSnap.exists) {
+                        const data = docSnap.data();
+                        let records = Array.isArray(data.records) ? [...data.records] : [];
+                        const dayUpdates = updatesByDate.get(d);
+
+                        dayUpdates.forEach(u => {
+                            const uCode = String(u.ma_dl).trim().toUpperCase();
+                            const uBase = getBaseId(uCode);
+
+                            if (u.isDeleted) {
+                                records = records.filter(r => {
+                                    const c = String(r.ma_dl || '').trim().toUpperCase();
+                                    const b = getBaseId(c);
+                                    const matches = (c === uCode) || (uBase && b === uBase) ||
+                                                    (cleanTargetCode && c === cleanTargetCode) ||
+                                                    (baseTargetCode && b === baseTargetCode);
+                                    return !matches;
+                                });
+                            } else {
+                                let matchedRec = null;
+                                if (u.recordIndex >= 0 && u.recordIndex < records.length) {
+                                    const cand = records[u.recordIndex];
+                                    const candC = String(cand.ma_dl || '').trim().toUpperCase();
+                                    const candB = getBaseId(candC);
+                                    if (candC === uCode || (uBase && candB === uBase) || (cleanTargetCode && candC === cleanTargetCode)) {
+                                        matchedRec = cand;
+                                    }
+                                }
+                                if (!matchedRec) {
+                                    matchedRec = records.find(r => {
+                                        const c = String(r.ma_dl || '').trim().toUpperCase();
+                                        const b = getBaseId(c);
+                                        return (c === uCode) || (uBase && b === uBase) ||
+                                               (cleanTargetCode && c === cleanTargetCode) ||
+                                               (baseTargetCode && b === baseTargetCode);
+                                    });
+                                }
+
+                                if (matchedRec) {
+                                    matchedRec.loto_db = u.loto_db;
+                                    matchedRec.loto_cap = u.loto_cap;
+                                    matchedRec.loto_2_27 = u.loto_2_27;
+                                    matchedRec.loto_3_23 = u.loto_3_23;
+                                    matchedRec.xskt = u.xskt;
+                                    matchedRec.thuong = u.thuong;
+                                } else {
+                                    records.push({
+                                        ngay: d,
+                                        ma_dl: u.ma_dl,
+                                        loto_db: u.loto_db,
+                                        loto_cap: u.loto_cap,
+                                        loto_2_27: u.loto_2_27,
+                                        loto_3_23: u.loto_3_23,
+                                        xskt: u.xskt,
+                                        thuong: u.thuong
+                                    });
+                                }
+                            }
+                        });
+
+                        batchHasChanges = true;
+                        updatedDaysCount++;
+                        if (records.length === 0) {
+                            batch.delete(docRef);
+                        } else {
+                            batch.set(docRef, {
+                                records: records,
+                                count: records.length,
+                                updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                            }, { merge: true });
+                        }
+                    }
+                }
+
+                if (batchHasChanges) {
+                    await batch.commit();
+                }
+            }
+
+            showNotification(`✅ Đã lưu thành công dữ liệu đại lý ${code} vào CSDL Firebase (${updatedDaysCount} ngày)!`, "success");
+
+            // Tải lại dữ liệu bộ nhớ ứng dụng
+            const fromM = DOM.selFromMonthMain ? DOM.selFromMonthMain.value : 8;
+            const toM = DOM.selToMonthMain ? DOM.selToMonthMain.value : 8;
+            await loadDataFromFirebase(fromM, toM);
+            await fetchDatabaseStats();
+
+            // Tải lại bảng để hiển thị dữ liệu mới nhất
+            await window.loadAgentRecordsForManagement();
+        } catch(e) {
+            console.error("Lỗi lưu dữ liệu đại lý:", e);
+            showNotification("Lỗi lưu dữ liệu: " + e.message, "error");
+        } finally {
+            hideLoading();
+        }
+    }
+
+    window.promptDeleteSpecificAgentFromDbTab = async function() {
+        const inputCode = document.getElementById('txtManageAgentCode') || document.getElementById('txtDeleteSpecificAgentCode');
+        const code = inputCode ? inputCode.value.trim().toUpperCase() : '';
+        if (!code) return showNotification("Vui lòng nhập Mã đại lý hoặc Số sổ cần xóa!", "warning");
+
+        const scopeSelect = document.getElementById('selManageAgentScope') || document.getElementById('selDeleteAgentScope');
+        const scope = scopeSelect ? scopeSelect.value : 'range';
+        let targetDates = [];
+
+        if (scope === 'month') {
+            const m = (document.getElementById('manageAgentMonthSelect') || document.getElementById('deleteAgentMonthSelect'))?.value;
+            if (!m) return showNotification("Vui lòng chọn Tháng!", "warning");
+            targetDates = dbAllAvailableDates.filter(d => d.startsWith(m));
+            if (targetDates.length === 0) {
+                const [yStr, mStr] = m.split('-');
+                const daysInM = new Date(parseInt(yStr, 10), parseInt(mStr, 10), 0).getDate();
+                for (let day = 1; day <= daysInM; day++) {
+                    targetDates.push(`${m}-${String(day).padStart(2, '0')}`);
+                }
+            }
+        } else if (scope === 'range') {
+            const fromD = (document.getElementById('manageAgentFromDate') || document.getElementById('deleteAgentFromDate'))?.value;
+            const toD = (document.getElementById('manageAgentToDate') || document.getElementById('deleteAgentToDate'))?.value;
+            if (!fromD || !toD) return showNotification("Vui lòng chọn cả Từ ngày và Đến ngày!", "warning");
+            targetDates = dbAllAvailableDates.filter(d => d >= fromD && d <= toD);
+            if (targetDates.length === 0) {
+                let cur = new Date(fromD);
+                const end = new Date(toD);
+                while (cur <= end) {
+                    const cy = cur.getFullYear();
+                    const cm = String(cur.getMonth() + 1).padStart(2, '0');
+                    const cd = String(cur.getDate()).padStart(2, '0');
+                    targetDates.push(`${cy}-${cm}-${cd}`);
+                    cur.setDate(cur.getDate() + 1);
+                }
+            }
+        } else {
+            targetDates = [...dbAllAvailableDates];
+            if (targetDates.length === 0) targetDates = [...globalAllDates];
+        }
+
+        if (targetDates.length === 0) return showNotification("Không tìm thấy ngày dữ liệu nào trong phạm vi đã chọn!", "warning");
+
+        DOM.txtAdminPassword.value = '';
+        const t = document.getElementById('authModalTitle');
+        const st = document.getElementById('authModalSubTitle');
+        if (t) t.textContent = '🗑️ Xóa Đại Lý Khỏi CSDL';
+        if (st) st.textContent = `Xóa vĩnh viễn đại lý ${code} trong ${targetDates.length} ngày khỏi Firebase. Nhập mật khẩu quản trị:`;
+        pendingAuthCallback = async () => {
+            await executeDeleteAgentFromFirebase([code], targetDates);
+            const editorCont = document.getElementById('manageAgentEditorContainer');
+            if (editorCont) editorCont.style.display = 'none';
+        };
+        DOM.authConfigModal.style.display = 'block';
+        setTimeout(() => DOM.txtAdminPassword.focus(), 100);
+    };
+
+    async function executeDeleteAgentFromFirebase(agentCodes, targetDates) {
+        showLoading();
+        try {
+            const cleanCodes = agentCodes.map(c => String(c).trim().toUpperCase());
+            const baseIds = cleanCodes.map(c => getBaseId(c));
+
+            let modifiedDaysCount = 0;
+            let removedRecordsCount = 0;
+
+            for (let i = 0; i < targetDates.length; i += 50) {
+                const slice = targetDates.slice(i, i + 50);
+                const batch = db.batch();
+                let batchHasChanges = false;
+
+                for (const d of slice) {
+                    const docRef = db.collection("daily_records").doc(d);
+                    const docSnap = await docRef.get();
+                    if (docSnap.exists) {
+                        const data = docSnap.data();
+                        if (Array.isArray(data.records)) {
+                            const originalLen = data.records.length;
+                            const filtered = data.records.filter(r => {
+                                const c = String(r.ma_dl || '').trim().toUpperCase();
+                                const b = getBaseId(c);
+                                return !cleanCodes.includes(c) && !baseIds.includes(b) && !baseIds.includes(c);
+                            });
+
+                            const diff = originalLen - filtered.length;
+                            if (diff > 0) {
+                                removedRecordsCount += diff;
+                                modifiedDaysCount++;
+                                batchHasChanges = true;
+                                if (filtered.length === 0) {
+                                    batch.delete(docRef);
+                                } else {
+                                    batch.set(docRef, {
+                                        records: filtered,
+                                        count: filtered.length,
+                                        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                                    }, { merge: true });
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (batchHasChanges) {
+                    await batch.commit();
+                }
+            }
+
+            if (removedRecordsCount === 0) {
+                showNotification(`Không tìm thấy dữ liệu của đại lý ${cleanCodes.join(', ')} trong các ngày đã chọn.`, 'info');
+            } else {
+                showNotification(`✅ Đã xóa ${removedRecordsCount} bản ghi của đại lý ${cleanCodes.join(', ')} khỏi ${modifiedDaysCount} ngày trên Firebase!`, 'success');
+                
+                // Tải lại dữ liệu
+                const fromM = DOM.selFromMonthMain ? DOM.selFromMonthMain.value : 8;
+                const toM = DOM.selToMonthMain ? DOM.selToMonthMain.value : 8;
+                await loadDataFromFirebase(fromM, toM);
+                await fetchDatabaseStats();
+
+                if (DOM.soSoInput) DOM.soSoInput.value = '';
+                state.currentSoSo = null;
+                showSection('summarySection');
+                generateSummaryView();
+            }
+        } catch(e) {
+            console.error("Lỗi xóa đại lý khỏi Firebase:", e);
+            showNotification("Lỗi xóa đại lý: " + e.message, "error");
+        } finally {
+            hideLoading();
+        }
+    }
+
+    function initManageAgentDates() {
+        const today = new Date();
+        const curY = today.getFullYear();
+        const curM = String(today.getMonth() + 1).padStart(2, '0');
+        const lastDay = new Date(curY, today.getMonth() + 1, 0).getDate();
+        const defaultFrom = `${curY}-${curM}-01`;
+        const defaultTo = `${curY}-${curM}-${String(lastDay).padStart(2, '0')}`;
+        const fInp = document.getElementById('manageAgentFromDate');
+        const tInp = document.getElementById('manageAgentToDate');
+        const mInp = document.getElementById('manageAgentMonthSelect');
+        if (fInp && !fInp.value) fInp.value = defaultFrom;
+        if (tInp && !tInp.value) tInp.value = defaultTo;
+        if (mInp && !mInp.value) mInp.value = `${curY}-${curM}`;
+    }
+
     // Khởi tạo
     initMonthDropdowns();
     initFirebaseConfigs();
+    initManageAgentDates();
 })();
 </script>
 </body>
