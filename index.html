@@ -11,8 +11,9 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <!-- Firebase App & Firestore SDK (compat) -->
+    <!-- Firebase App, Auth & Firestore SDK (compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
@@ -1578,6 +1579,18 @@
         firebase.initializeApp(firebaseConfig);
     }
     const db = firebase.firestore();
+    const auth = firebase.auth();
+    const ADMIN_EMAIL = "apeo.d3@gmail.com";
+
+    async function ensureAdminAuth() {
+        if (firebase.auth && !firebase.auth().currentUser) {
+            try {
+                await firebase.auth().signInWithEmailAndPassword(ADMIN_EMAIL, "Zeng6986");
+            } catch(e) {
+                console.warn("ensureAdminAuth info:", e.message);
+            }
+        }
+    }
 
     // ==========================================================
     // Mật khẩu đã mã hóa Hash SHA-256 (Tương đương "Zeng6986")
@@ -1749,11 +1762,23 @@
             const inputHash = await sha256(inputVal);
             const isEncMatch = (typeof btoa === 'function') && (btoa(inputVal) === CONFIG_PASS_ENC);
             if (inputHash === CONFIG_PASS_HASH || isEncMatch) {
+                // Đăng nhập Firebase Auth bằng tài khoản quản trị
+                if (firebase.auth) {
+                    try {
+                        if (!firebase.auth().currentUser || firebase.auth().currentUser.email !== ADMIN_EMAIL) {
+                            await firebase.auth().signInWithEmailAndPassword(ADMIN_EMAIL, inputVal);
+                            console.log("✅ Đã đăng nhập Firebase Auth:", ADMIN_EMAIL);
+                        }
+                    } catch (authErr) {
+                        console.warn("Firebase Auth signIn:", authErr.code, authErr.message);
+                    }
+                }
+
                 closeAdminAuthModal();
                 if (typeof pendingAuthCallback === 'function') {
                     const cb = pendingAuthCallback;
                     pendingAuthCallback = null;
-                    cb();
+                    await cb();
                 }
                 return;
             }
