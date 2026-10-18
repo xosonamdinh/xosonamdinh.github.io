@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>XSKT Nam Định - Quản Lý Lô Tô</title>
+  <link rel="stylesheet" href="/xskt/css/main.css?v=20261018O" />
+  <link rel="stylesheet" href="/xskt/css/shell.css?v=20261018O" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      corePlugins: { preflight: false },
+      important: false,
+    };
+  </script>
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════
+       LOADING OVERLAY
+  ═══════════════════════════════════════════════ -->
+  <div id="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Đang tải...</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       TOAST CONTAINER
+  ═══════════════════════════════════════════════ -->
+  <div id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ═══════════════════════════════════════════════
+       DATE PICKER MODAL
+  ═══════════════════════════════════════════════ -->
+  <div id="date-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="date-modal-title">
+    <div class="modal-box">
+      <h2 id="date-modal-title" class="modal-title">
+        📅 Chọn ngày mở thưởng
+      </h2>
+      <p class="modal-subtitle">Vui lòng chọn ngày kỳ mở thưởng cần làm việc:</p>
+      <div class="modal-body">
+        <label for="date-picker-input" class="form-label">Ngày mở thưởng</label>
+        <input type="date" id="date-picker-input" class="form-input date-input" />
+      </div>
+      <div class="modal-footer">
+        <button id="date-cancel-btn" class="btn btn-secondary">Hủy</button>
+        <button id="date-confirm-btn" class="btn btn-primary">✓ Xác nhận</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       LOGIN SCREEN
+  ═══════════════════════════════════════════════ -->
+  <div id="login-screen">
+    <div class="login-card">
+      <!-- Logo / Branding -->
+      <div class="login-logo-area">
+        <div class="login-logo-icon">X</div>
+        <h1 class="login-company-name">XSKT NAM ĐỊNH</h1>
+        <p class="login-company-sub">Quản Lý Lô Tô - Chi Nhánh TP. Nam Định</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" novalidate>
+        <div class="form-group">
+          <label for="login-email" class="form-label">Email đăng nhập</label>
+          <input
+            type="email"
+            id="login-email"
+            class="form-input"
+            placeholder="example@xskt.vn"
+            autocomplete="email"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="login-password" class="form-label">Mật khẩu</label>
+          <div class="input-password-wrap">
+            <input
+              type="password"
+              id="login-password"
+              class="form-input"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+            />
+            <button type="button" id="toggle-password" class="password-toggle" aria-label="Hiện/ẩn mật khẩu">
+              👁
+            </button>
+          </div>
+        </div>
+        <div id="login-error" class="login-error hidden"></div>
+        <button type="submit" id="login-btn" class="btn btn-primary btn-block">
+          <span id="login-btn-text">Đăng nhập</span>
+          <span id="login-btn-spinner" class="btn-spinner hidden"></span>
+        </button>
+        <button type="button" id="btn-quick-register" class="btn btn-secondary btn-block mt-2" style="font-size:0.85rem; padding: 0.5rem;">
+          ✨ Đăng ký tài khoản mới (Admin)
+        </button>
+      </form>
+
+      <p class="login-footer">© 2025 Công ty TNHH MTV XSKT Nam Định</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       APP SHELL
+  ═══════════════════════════════════════════════ -->
+  <div id="app-shell" class="hidden">
+
+    <!-- HEADER -->
+    <header id="app-header">
+      <div class="header-left-group" style="display: flex; align-items: center; gap: 10px;">
+        <button id="btn-toggle-sidebar" class="header-menu-btn" title="Đóng / Mở Menu (Ctrl+M)">
+          <span style="font-size: 15px;">☰</span>
+          <span style="font-size: 11px; font-weight: bold; letter-spacing: 0.5px;">MENU</span>
+        </button>
+        <div class="header-company">
+          <span class="header-logo-mini">X</span>
+          <span>CÔNG TY TNHH MTV XSKT NAM ĐỊNH - CHI NHÁNH XS TP. NAM ĐỊNH</span>
+        </div>
+      </div>
+      <div id="clock" class="header-clock">00:00:00</div>
+    </header>
+
+    <!-- INFO BAR -->
+    <div id="info-bar">
+      <span>Máy: <strong id="info-ma-may">—</strong></span>
+      <span class="info-sep">|</span>
+      <span>Ngày MT: <strong id="info-ngay">—</strong></span>
+      <span class="info-sep">|</span>
+      <span>Mã ĐL: <strong id="info-ma-dl">—</strong></span>
+      <span class="info-sep">|</span>
+      <span>Tên đại lý: <strong id="info-ten-dl">—</strong></span>
+      <span class="info-sep">|</span>
+      <span>Tổ số: <strong id="info-to-so">—</strong></span>
+    </div>
+
+    <!-- APP BODY: sidebar + content -->
+    <div id="app-body">
+
+      <!-- SIDEBAR -->
+      <nav id="sidebar">
+        <!-- Tab lồi ra ở mép trái khi ẩn menu -->
+        <div id="sidebar-edge-tab" title="Bấm để Đóng / Mở Menu">
+          <span id="edge-tab-arrow" style="font-size: 11px;">▶</span>
+          <span class="edge-tab-text">MENU</span>
+        </div>
+
+        <div class="sidebar-top-header" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.15);">
+          <div id="sidebar-logo" style="padding: 0; border: none; font-size: 18px; font-weight: 900; color: #90caf9;">XSKT</div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <button id="btn-pin-sidebar" style="background: none; border: none; color: #ffeb3b; cursor: pointer; font-size: 14px; padding: 2px 4px;" title="Ghim / Bỏ ghim Menu cố định">
+              📌
+            </button>
+            <button id="btn-close-sidebar" style="background: none; border: none; color: #90caf9; cursor: pointer; font-size: 14px; padding: 2px 4px;" title="Thu gọn Menu vào mép trái">
+              ◀
+            </button>
+          </div>
+        </div>
+
+        <ul id="sidebar-nav">
+          <li data-route="#/dashboard" class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Tổng quan</span>
+          </li>
+          <li data-route="#/nhaploto-don" class="nav-item">
+            <span class="nav-icon">🎫</span>
+            <span class="nav-label">Nhập Lô Tô Đặc biệt</span>
+          </li>
+          <li data-route="#/nhaploto-cap" class="nav-item">
+            <span class="nav-icon">🎟</span>
+            <span class="nav-label">Nhập Lô Tô Cặp Số</span>
+          </li>
+          <li data-route="#/ketqua" class="nav-item">
+            <span class="nav-icon">🎰</span>
+            <span class="nav-label">Kết quả XS</span>
+          </li>
+          <li data-route="#/baocao" class="nav-item">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">Báo cáo</span>
+          </li>
+          <li class="nav-separator"></li>
+          <li data-route="#/danhmuc" class="nav-item">
+            <span class="nav-icon">📋</span>
+            <span class="nav-label">Danh mục</span>
+          </li>
+          <li data-route="#/kymotuong" class="nav-item">
+            <span class="nav-icon">📅</span>
+            <span class="nav-label">Kỳ mở thưởng</span>
+          </li>
+          <li data-route="#/cauhinh" class="nav-item admin-only">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-label">Cấu hình</span>
+          </li>
+          <li id="logout-btn" class="nav-item nav-logout">
+            <span class="nav-icon">🚪</span>
+            <span class="nav-label">Đăng xuất</span>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- MAIN CONTENT -->
+      <main id="main-content">
+        <!-- Pages are rendered here by the router -->
+        <div class="page-loading">Đang tải trang...</div>
+      </main>
+    </div>
+
+    <!-- BOTTOM TOOLBAR -->
+    <div id="bottom-toolbar">
+      <button class="toolbar-btn" data-route="#/baocao" title="Báo cáo tổng hợp">
+        <span class="icon">📊</span>
+        <span>Báo cáo tổng hợp</span>
+      </button>
+      <button class="toolbar-btn" data-route="#/ketqua" title="Kết quả XS">
+        <span class="icon">🎰</span>
+        <span>Kết quả</span>
+      </button>
+      <button id="logout-bottom-btn" class="toolbar-btn" title="Thoát">
+        <span class="icon">🚪</span>
+        <span>Thoát</span>
+      </button>
+    </div>
+
+  </div><!-- /#app-shell -->
+
+  <script type="module" src="/xskt/js/app.js?v=20261018_FINAL_FIX"></script>
+</body>
+</html>
