@@ -55,6 +55,45 @@
   </div>
 
   <!-- ═══════════════════════════════════════════════
+       DEVICE MA MAY MODAL (Mã máy theo thiết bị vật lý)
+  ═══════════════════════════════════════════════ -->
+  <div id="modal-device-mamay" class="modal-overlay hidden" role="dialog" aria-modal="true" style="z-index: 9999;">
+    <div class="modal-box" style="max-width: 420px; width: 92%;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #e0e0e0; padding-bottom: 8px;">
+        <h2 class="modal-title" style="margin: 0; font-size: 1rem; color: #1565C0;">
+          💻 Cài Đặt Mã Máy Cho Thiết Bị
+        </h2>
+        <button type="button" id="btn-close-device-mamay" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #666; line-height: 1;">&times;</button>
+      </div>
+      <p class="modal-subtitle" style="font-size: 12px; line-height: 1.4; color: #555; margin-bottom: 14px;">
+        Mã máy này được lưu <strong>cố định trên máy tính / trình duyệt này</strong> và áp dụng cho mọi ca nhập số từ thiết bị này (không phụ thuộc vào tài khoản đăng nhập).
+      </p>
+      <div class="modal-body" style="padding: 0 0 12px 0;">
+        <label for="input-device-mamay" class="form-label" style="font-weight: bold; font-size: 12px; margin-bottom: 4px;">Mã máy thiết bị (*):</label>
+        <input
+          type="text"
+          id="input-device-mamay"
+          class="form-input"
+          style="text-align: center; font-size: 1.25rem; font-weight: bold; text-transform: uppercase; font-family: monospace; letter-spacing: 2px; color: #0d47a1; border: 2px solid #1976D2; padding: 8px;"
+          placeholder="VD: M01, M02, A01..."
+          maxlength="10"
+        />
+        <div style="display: flex; gap: 6px; justify-content: center; margin-top: 8px;">
+          <button type="button" class="btn-quick-mamay px-2 py-0.5 bg-gray-100 hover:bg-blue-100 border rounded text-xs font-mono font-bold" data-val="M01">M01</button>
+          <button type="button" class="btn-quick-mamay px-2 py-0.5 bg-gray-100 hover:bg-blue-100 border rounded text-xs font-mono font-bold" data-val="M02">M02</button>
+          <button type="button" class="btn-quick-mamay px-2 py-0.5 bg-gray-100 hover:bg-blue-100 border rounded text-xs font-mono font-bold" data-val="M03">M03</button>
+          <button type="button" class="btn-quick-mamay px-2 py-0.5 bg-gray-100 hover:bg-blue-100 border rounded text-xs font-mono font-bold" data-val="A00">A00</button>
+          <button type="button" class="btn-quick-mamay px-2 py-0.5 bg-gray-100 hover:bg-blue-100 border rounded text-xs font-mono font-bold" data-val="A01">A01</button>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding-top: 10px; border-top: 1px solid #e0e0e0;">
+        <button type="button" id="btn-cancel-device-mamay" class="btn btn-secondary">Hủy</button>
+        <button type="button" id="btn-save-device-mamay" class="btn btn-primary">✓ Lưu mã máy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
        LOGIN SCREEN
   ═══════════════════════════════════════════════ -->
   <div id="login-screen">
@@ -69,13 +108,13 @@
       <!-- Login Form -->
       <form id="login-form" novalidate>
         <div class="form-group">
-          <label for="login-email" class="form-label">Email đăng nhập</label>
+          <label for="login-email" class="form-label">Tên đăng nhập / Tài khoản</label>
           <input
-            type="email"
+            type="text"
             id="login-email"
             class="form-input"
-            placeholder="example@xskt.vn"
-            autocomplete="email"
+            placeholder="admin, may01, k hoặc email..."
+            autocomplete="username"
             required
           />
         </div>
@@ -131,7 +170,11 @@
 
     <!-- INFO BAR -->
     <div id="info-bar">
-      <span>Máy: <strong id="info-ma-may">—</strong></span>
+      <span style="display: inline-flex; align-items: center; gap: 4px;">
+        <span>Máy:</span>
+        <strong id="info-ma-may" style="cursor: pointer; color: #ffeb3b; text-decoration: underline dotted; padding: 0 2px;" title="Bấm để đổi mã máy cho thiết bị này">—</strong>
+        <button type="button" id="btn-edit-device-mamay" title="Đổi mã máy cho thiết bị này" style="background: none; border: none; cursor: pointer; color: #ffeb3b; font-size: 11px; padding: 0 2px; line-height: 1;">✏️</button>
+      </span>
       <span class="info-sep">|</span>
       <span>Ngày MT: <strong id="info-ngay">—</strong></span>
       <span class="info-sep">|</span>
@@ -231,6 +274,6 @@
 
   </div><!-- /#app-shell -->
 
-  <script type="module" src="/xskt/js/app.js?v=20261018_FINAL_FIX"></script>
+  <script type="module" src="/xskt/js/app.js?v=20261018_DEVICE_MAMAY"></script>
 </body>
 </html>

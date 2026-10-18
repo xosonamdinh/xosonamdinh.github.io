@@ -226,6 +226,8 @@ function renderReportTable({ ngay, tickets, ketQua, loaiHinh, daiLyId }) {
         <tr class="bg-gray-100 text-center font-bold">
           <th class="border border-gray-400 p-2">Mã ĐL</th>
           <th class="border border-gray-400 p-2">Tên Đại Lý</th>
+          <th class="border border-gray-400 p-2 w-14">Tờ</th>
+          <th class="border border-gray-400 p-2 w-20">Mã Máy</th>
           <th class="border border-gray-400 p-2">Loại hình</th>
           <th class="border border-gray-400 p-2">Doanh thu (đ)</th>
           <th class="border border-gray-400 p-2">Tiền trúng thưởng (đ)</th>
@@ -239,7 +241,7 @@ function renderReportTable({ ngay, tickets, ketQua, loaiHinh, daiLyId }) {
   let totalTienThuong = 0;
 
   if (tickets.length === 0) {
-    html += `<tr><td colspan="6" class="text-center py-4 text-gray-500">Không có dữ liệu vé nào cho ngày này.</td></tr>`;
+    html += `<tr><td colspan="8" class="text-center py-4 text-gray-500">Không có dữ liệu vé nào cho ngày này.</td></tr>`;
   } else {
     tickets.forEach(ticket => {
       if (loaiHinh !== 'all' && ticket.loaiHinh !== loaiHinh) return;
@@ -271,6 +273,10 @@ function renderReportTable({ ngay, tickets, ketQua, loaiHinh, daiLyId }) {
         <tr class="hover:bg-blue-50 border-b">
           <td class="border border-gray-300 p-2 text-center font-bold">${ticket.daiLyId}</td>
           <td class="border border-gray-300 p-2 font-medium">${ticket.daiLyTen || '—'}</td>
+          <td class="border border-gray-300 p-2 text-center font-bold text-gray-700">${ticket.toSo || 1}</td>
+          <td class="border border-gray-300 p-2 text-center">
+            <span class="font-mono font-bold text-blue-900 bg-blue-100 px-1.5 py-0.5 rounded border border-blue-300 text-[11px]">${ticket.maMay || '—'}</span>
+          </td>
           <td class="border border-gray-300 p-2 text-center font-semibold text-blue-800">
             ${ticket.loaiHinh === 'dac_biet' ? 'Lô Tô ĐB' : 'Lô Tô Cặp'}
           </td>

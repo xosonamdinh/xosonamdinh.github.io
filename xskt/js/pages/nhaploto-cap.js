@@ -14,6 +14,7 @@
  * - Bảng tổng hợp chân trang chuẩn: Bổ sung cặp 10K, 20K, 3X23, 2X27. Bảng master 7 cột (tính đúng dòng Vé 20.000 đ và Thành tiền cho Lô bao 3X23/2X27).
  */
 
+import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 import { db } from '../firebase-config.js';
 import {
   getDaiLyList,
@@ -22,24 +23,28 @@ import {
   unlockKyMoThuong,
   saveVeLoTo,
   getVeLoToByNgayDaiLy,
+  getVeLoToByNgay,
   getOrCreateDaiLy
-} from '../db.js';
+} from '../db.js?v=20261018_HOTKEY_V2';
 import {
   showToast,
   showLoading,
   formatCurrency,
   formatDate
 } from '../utils.js';
-import { navigate } from '../router.js?v=20261018_FINAL_FIX';
+import { navigate } from '../router.js?v=20261018_SYNC_ALL';
 
 let currentNgay = sessionStorage.getItem('xskt_ngay') || new Date().toISOString().slice(0, 10);
 let currentDaiLyId = '';
 let currentDaiLy = null;
 let daiLyList = [];
 let isLocked = false;
+let isOverTime = false;
+let isSessionLocked = false;
+let isSheetLocked = false;
 let currentToSo = 1;
 
-const TOTAL_ROWS = 15;
+const TOTAL_ROWS = 20;
 
 export async function render() {
   return /* html */ `
@@ -143,6 +148,11 @@ export async function render() {
                 />
                 <button id="btn-to-tiep-cap" class="classic-btn px-1.5 py-0.5 font-bold" title="Tờ tiếp (F6)">▶</button>
               </div>
+            </div>
+
+            <!-- HIỂN THỊ MÃ MÁY NHẬP DỮ LIỆU TỜ VÉ NÀY -->
+            <div id="sheet-mamay-badge-cap" class="text-[10px] text-blue-950 font-mono font-semibold bg-blue-50 border border-blue-200 px-1 py-0.5 rounded text-center" title="Xem mã máy đã nhập dữ liệu của tờ này">
+              💻 Máy nhập: —
             </div>
 
             <!-- CÁC LINK XANH NGHIÊNG GẠCH CHÂN CHUẨN HÌNH -->
@@ -256,21 +266,49 @@ export async function render() {
 
           <!-- THANH BỔ SUNG CẶP SỐ 10K, 20K, 3X23, 2X27 CHUẨN HÌNH (SÁT VỚI DÒNG CUỐI CỦA BẢNG) -->
           <div class="bonus-bar-cap border-t border-[#7a889b]">
-            <div>
+            <div class="flex items-center justify-between px-1.5">
               <span>Bổ sung cặp số 10.000:</span>
-              <span id="sum-bs-cap10k" class="font-extrabold pr-2 text-blue-950">0</span>
+              <input 
+                type="text" 
+                id="input-bs-cap10k" 
+                value="0" 
+                class="input-bo-sung-cap classic-input w-12 text-right font-black text-blue-950 bg-white border border-[#7a889b] px-1 py-0.5 rounded text-xs outline-none focus:bg-yellow-100 focus:ring-1 focus:ring-blue-500" 
+                title="Nhập số lượng vé bổ sung rồi Enter"
+                autocomplete="off"
+              />
             </div>
-            <div>
+            <div class="flex items-center justify-between px-1.5">
               <span>Bổ sung cặp số 20.000:</span>
-              <span id="sum-bs-cap20k" class="font-extrabold pr-2 text-blue-950">0</span>
+              <input 
+                type="text" 
+                id="input-bs-cap20k" 
+                value="0" 
+                class="input-bo-sung-cap classic-input w-12 text-right font-black text-blue-950 bg-white border border-[#7a889b] px-1 py-0.5 rounded text-xs outline-none focus:bg-yellow-100 focus:ring-1 focus:ring-blue-500" 
+                title="Nhập số lượng vé bổ sung rồi Enter"
+                autocomplete="off"
+              />
             </div>
-            <div>
+            <div class="flex items-center justify-between px-1.5">
               <span class="bonus-yellow-label">3X23 20.000:</span>
-              <span id="sum-bs-3x23" class="font-extrabold pr-2 text-blue-900">0</span>
+              <input 
+                type="text" 
+                id="input-bs-3x23" 
+                value="0" 
+                class="input-bo-sung-cap classic-input w-12 text-right font-black text-blue-900 bg-white border border-[#7a889b] px-1 py-0.5 rounded text-xs outline-none focus:bg-yellow-100 focus:ring-1 focus:ring-blue-500" 
+                title="Nhập số lượng vé bổ sung rồi Enter"
+                autocomplete="off"
+              />
             </div>
-            <div>
+            <div class="flex items-center justify-between px-1.5">
               <span class="bonus-yellow-label">2X27 20.000:</span>
-              <span id="sum-bs-2x27" class="font-extrabold pr-2 text-blue-900">0</span>
+              <input 
+                type="text" 
+                id="input-bs-2x27" 
+                value="0" 
+                class="input-bo-sung-cap classic-input w-12 text-right font-black text-blue-900 bg-white border border-[#7a889b] px-1 py-0.5 rounded text-xs outline-none focus:bg-yellow-100 focus:ring-1 focus:ring-blue-500" 
+                title="Nhập số lượng vé bổ sung rồi Enter"
+                autocomplete="off"
+              />
             </div>
           </div>
 
@@ -405,7 +443,7 @@ function generateCapRows(type, colsCount, color) {
 
   for (let r = 1; r <= TOTAL_ROWS; r++) {
     const stt = String(r).padStart(2, '0');
-    const isDivider = (r === 5 || r === 10);
+    const isDivider = (r === 5 || r === 10 || r === 15);
     const dividerClass = isDivider ? 'row-red-divider' : '';
 
     html += `
@@ -466,9 +504,38 @@ export async function init() {
   });
 
   document.getElementById('btn-save-cap')?.addEventListener('click', handleSave);
+
+  const capBonusIds = ['input-bs-cap10k', 'input-bs-cap20k', 'input-bs-3x23', 'input-bs-2x27'];
+  capBonusIds.forEach((id, idx) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      el.value = el.value.replace(/[^0-9]/g, '');
+      calculateTotals();
+    });
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        calculateTotals();
+        triggerAutoSaveCap(true);
+        showToast('Đã lưu dữ liệu bổ sung', 'success');
+        if (idx < capBonusIds.length - 1) {
+          const next = document.getElementById(capBonusIds[idx + 1]);
+          next?.focus();
+          next?.select();
+        } else {
+          focusFirstCell();
+        }
+      }
+    });
+  });
 }
 
 export function destroy() {
+  if (_autoSaveTimerCap) {
+    clearTimeout(_autoSaveTimerCap);
+    handleSave(true);
+  }
   if (window._lotoCapKeyHandler) {
     window.removeEventListener('keydown', window._lotoCapKeyHandler);
     window._lotoCapKeyHandler = null;
@@ -481,6 +548,9 @@ function startClock() {
   const update = () => {
     const d = new Date();
     clockEl.textContent = d.toTimeString().split(' ')[0];
+    if (d.getSeconds() === 0) {
+      checkSessionLock();
+    }
   };
   update();
   setInterval(update, 1000);
@@ -489,8 +559,11 @@ function startClock() {
 function setupActionButtons() {
   document.getElementById('lnk-kiem-tra-dt-cap')?.addEventListener('click', () => showKiemTraDT());
   document.getElementById('lnk-in-bang-ke-cap')?.addEventListener('click', () => window.print());
-  document.getElementById('lnk-kiem-tra-f3-cap')?.addEventListener('click', () => showTongDaiLy());
-  document.getElementById('lnk-doi-to-cap')?.addEventListener('click', () => document.getElementById('input-to-so-cap')?.focus());
+  document.getElementById('lnk-kiem-tra-f3-cap')?.addEventListener('click', () => showTongDaiLy(false));
+  document.getElementById('lnk-doi-to-cap')?.addEventListener('click', () => {
+    const inp = document.getElementById('input-to-so-cap');
+    if (inp) { inp.focus(); inp.select(); }
+  });
   document.getElementById('lnk-doi-dai-ly-cap')?.addEventListener('click', () => openF11Modal());
 
   document.getElementById('btn-action-xoa-to-cap')?.addEventListener('click', () => {
@@ -558,11 +631,26 @@ function updateDaiLyDisplay() {
   if (inpMa) inpMa.value = currentDaiLy?.ma || currentDaiLyId || '---';
 }
 
-function changeToSo(delta) {
+let _autoSaveTimerCap = null;
+function triggerAutoSaveCap(immediate = false) {
+  clearTimeout(_autoSaveTimerCap);
+  if (immediate) {
+    handleSave(true);
+  } else {
+    _autoSaveTimerCap = setTimeout(() => {
+      handleSave(true);
+    }, 150);
+  }
+}
+
+async function changeToSo(delta) {
+  if (currentDaiLyId && !isLocked) {
+    await handleSave(true);
+  }
   currentToSo = Math.max(1, currentToSo + delta);
   const input = document.getElementById('input-to-so-cap');
   if (input) input.value = currentToSo;
-  loadExistingData();
+  await loadExistingData();
 }
 
 /**
@@ -575,6 +663,9 @@ function parseCapCell(value, type) {
   if (!value) return null;
   const str = String(value).trim();
   if (!str) return null;
+
+  // Bỏ qua các lệnh điều khiển như +5, .5, -5
+  if (/^(\+|\.|\-)[0-9]{1,2}$/.test(str)) return null;
 
   let raw = str;
   let sl = 1;
@@ -613,73 +704,134 @@ function parseCapCell(value, type) {
   };
 }
 
+function updateLockUICap() {
+  isLocked = isOverTime || isSessionLocked || isSheetLocked;
+  const badge = document.getElementById('badge-lock-status-cap');
+  const btnLock = document.getElementById('btn-quick-lock-toggle-cap');
+
+  if (badge) {
+    if (isOverTime) {
+      badge.className = 'text-red-200 font-black text-xs uppercase px-2 py-0.5 rounded bg-red-900/80 border border-red-500 animate-pulse';
+      badge.textContent = 'HẾT GIỜ NHẬN SỐ!';
+    } else if (isSessionLocked) {
+      badge.className = 'text-red-200 font-black text-xs uppercase px-1.5 py-0.5 rounded bg-red-900/60 border border-red-500';
+      badge.textContent = 'ĐÃ KHOÁ SỐ LIỆU!';
+    } else if (isSheetLocked) {
+      badge.className = 'text-amber-200 font-black text-xs uppercase px-1.5 py-0.5 rounded bg-amber-900/80 border border-amber-500';
+      badge.textContent = '🔒 ĐÃ KHÓA SỔ (CÓ DỮ LIỆU)';
+    } else {
+      badge.className = 'text-green-200 font-black text-xs uppercase px-1.5 py-0.5 rounded bg-green-900/60 border border-green-500';
+      badge.textContent = 'ĐANG NHẬN SỐ';
+    }
+  }
+
+  if (btnLock) {
+    if (isOverTime) {
+      btnLock.textContent = '⛔ Hết giờ';
+      btnLock.disabled = true;
+      btnLock.className = 'bg-gray-600 text-gray-300 font-bold text-xs px-2 py-0.5 rounded border border-gray-700 cursor-not-allowed';
+    } else if (isSessionLocked) {
+      btnLock.textContent = '🔓 Mở khóa';
+      btnLock.disabled = false;
+      btnLock.className = 'bg-red-700 hover:bg-red-800 text-white font-bold text-xs px-2 py-0.5 rounded border border-red-900 shadow';
+    } else if (isSheetLocked) {
+      btnLock.textContent = '🔓 Bỏ khóa (F10)';
+      btnLock.disabled = false;
+      btnLock.className = 'bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-2 py-0.5 rounded border border-amber-800 shadow';
+    } else {
+      btnLock.textContent = '🔒 Khóa sổ (F10)';
+      btnLock.disabled = false;
+      btnLock.className = 'bg-red-700 hover:bg-red-800 text-white font-bold text-xs px-2 py-0.5 rounded border border-red-900 shadow';
+    }
+  }
+
+  document.querySelectorAll('.input-grid-cell-cap, .input-bo-sung-cap').forEach(inp => {
+    inp.disabled = isLocked;
+  });
+  const saveBtn = document.getElementById('btn-save-cap');
+  if (saveBtn) saveBtn.disabled = isLocked;
+}
+
 async function checkSessionLock() {
   try {
+    // 1. Kiểm tra cấu hình thời gian nhận số từ config/gioNhanSo
+    try {
+      const snapCfg = await getDoc(doc(db, 'config', 'gioNhanSo'));
+      if (snapCfg.exists()) {
+        const cfg = snapCfg.data();
+        if (cfg.tuDongKhoa !== false && cfg.gioKhoaSo) {
+          const now = new Date();
+          const curTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+          if (cfg.gioBatDau && curTime < cfg.gioBatDau) {
+            isOverTime = true;
+          } else if (curTime >= cfg.gioKhoaSo) {
+            isOverTime = true;
+          } else {
+            isOverTime = false;
+          }
+        } else {
+          isOverTime = false;
+        }
+      }
+    } catch (e) {
+      console.warn('Lỗi kiểm tra giờ nhận số:', e);
+    }
+
+    // 2. Kiểm tra trạng thái khóa kỳ mở thưởng
     const session = await getKyMoThuong(currentNgay);
-    isLocked = session?.status === 'da_khoa' || session?.status === 'co_ket_qua';
-    const badge = document.getElementById('badge-lock-status-cap');
-    const btnLock = document.getElementById('btn-quick-lock-toggle-cap');
+    isSessionLocked = session?.status === 'da_khoa' || session?.status === 'co_ket_qua';
 
-    if (badge) {
-      if (isLocked) {
-        badge.className = 'text-red-200 font-black text-xs uppercase px-1.5 py-0.5 rounded bg-red-900/60 border border-red-500';
-        badge.textContent = 'ĐÃ KHOÁ SỐ LIỆU!';
-      } else {
-        badge.className = 'text-green-200 font-black text-xs uppercase px-1.5 py-0.5 rounded bg-green-900/60 border border-green-500';
-        badge.textContent = 'ĐANG NHẬN SỐ';
-      }
-    }
-
-    if (btnLock) {
-      if (isLocked) {
-        btnLock.textContent = '🔓 Mở khóa';
-      } else {
-        btnLock.textContent = '🔒 Khóa sổ';
-      }
-    }
-
-    document.querySelectorAll('.input-grid-cell-cap').forEach(inp => inp.disabled = isLocked);
-    const saveBtn = document.getElementById('btn-save-cap');
-    if (saveBtn) saveBtn.disabled = isLocked;
+    updateLockUICap();
   } catch (err) {
     console.error(err);
   }
 }
 
 async function toggleQuickLock() {
-  if (isLocked) {
+  if (isOverTime) {
+    showToast('Đã hết giờ nhận số theo quy định cấu hình hệ thống!', 'warning');
+    return;
+  }
+
+  if (isSessionLocked) {
     if (!confirm(`Xác nhận MỞ KHÓA ngày ${formatDate(currentNgay)} để tiếp tục nhận số?`)) return;
     const stop = showLoading('Đang mở khóa kỳ...');
     try {
       await unlockKyMoThuong(currentNgay);
-      await checkSessionLock();
+      isSessionLocked = false;
+      isSheetLocked = false;
+      updateLockUICap();
       showToast('Đã mở khóa ngày làm việc thành công!', 'success');
     } catch (err) {
       showToast('Lỗi mở khóa: ' + err.message, 'danger');
     } finally {
       stop?.();
     }
+    return;
+  }
+
+  // Chuyển đổi trạng thái khóa/mở tờ hiện tại
+  isSheetLocked = !isSheetLocked;
+  updateLockUICap();
+  if (isSheetLocked) {
+    showToast(`Đã KHÓA BẢO VỆ tờ số ${currentToSo}. Nhấn F10 hoặc "Bỏ khóa" để mở khóa sửa tiếp.`, 'warning');
   } else {
-    if (!confirm(`Xác nhận KHÓA SỔ ngày ${formatDate(currentNgay)}?`)) return;
-    const stop = showLoading('Đang khóa sổ kỳ...');
-    try {
-      await lockKyMoThuong(currentNgay);
-      await checkSessionLock();
-      showToast('Đã khóa sổ ngày làm việc thành công!', 'warning');
-    } catch (err) {
-      showToast('Lỗi khóa sổ: ' + err.message, 'danger');
-    } finally {
-      stop?.();
-    }
+    showToast(`Đã BỎ KHÓA tờ số ${currentToSo}. Bạn có thể nhập hoặc chỉnh sửa số liệu.`, 'success');
+    focusFirstCell();
   }
 }
 
 async function loadDaiLyList() {
   try {
     daiLyList = await getDaiLyList();
-    if (daiLyList.length > 0 && !currentDaiLyId) {
-      currentDaiLyId = daiLyList[0].id;
-      currentDaiLy = daiLyList[0];
+    if (daiLyList.length > 0) {
+      if (!currentDaiLyId) {
+        currentDaiLyId = daiLyList[0].id;
+        currentDaiLy = daiLyList[0];
+      } else {
+        currentDaiLy = daiLyList.find(d => d.id === currentDaiLyId) || daiLyList[0];
+        currentDaiLyId = currentDaiLy.id;
+      }
       updateDaiLyDisplay();
       await loadExistingData();
     }
@@ -694,6 +846,7 @@ function setupGridEvents() {
 
   container.addEventListener('input', (e) => {
     if (e.target.classList.contains('input-grid-cell-cap')) {
+      e.target.value = e.target.value.replace(/[^0-9+.\/\-\s]/g, '');
       calculateTotals();
     }
   });
@@ -715,25 +868,97 @@ function setupKeyboardNavigation() {
       return;
     }
 
-    if (e.key === '*' || e.key === 'F10') {
+    // F12 or PageUp or *: Chuyển loại hình (sang Lô tô Đặc biệt)
+    if (e.key === '*' || e.key === 'F12' || e.key === 'PageUp') {
       e.preventDefault();
       navigate('#/nhaploto-don');
       return;
     }
 
+    // F11 or PageDown: Chuyển đại lý
     if (e.key === 'F11' || e.key === 'PageDown') {
       e.preventDefault();
       openF11Modal();
       return;
     }
 
-    if (e.key === 'F2') { e.preventDefault(); showTongDaiLy(); return; }
-    if (e.key === 'F3') { e.preventDefault(); showTongDaiLy(); return; }
-    if (e.key === 'F5') { e.preventDefault(); changeToSo(-1); return; }
-    if (e.key === 'F6') { e.preventDefault(); changeToSo(1); return; }
-    if (e.key === 'F12' || e.key === 'PageUp') { e.preventDefault(); navigate('#/nhaploto-don'); return; }
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); handleSave(); return; }
-    if (e.ctrlKey && e.key === 'F5') { e.preventDefault(); showKiemTraDT(); return; }
+    // F2: Tổng đại lý (Ctrl+F2: Tổng toàn bộ ĐL)
+    if (e.key === 'F2') {
+      e.preventDefault();
+      showTongDaiLy(e.ctrlKey);
+      return;
+    }
+
+    // F3: Kiểm tra Đại lý (Ctrl+F3: Kiểm tra ĐL Lệch DT)
+    if (e.key === 'F3') {
+      e.preventDefault();
+      if (e.ctrlKey) {
+        showKiemTraLechDTCap();
+      } else {
+        showTongDaiLy(false);
+      }
+      return;
+    }
+
+    // F4: Tổng ngày (Ctrl+F4: Tổng ngày tất cả các máy)
+    if (e.key === 'F4') {
+      e.preventDefault();
+      showTongNgay(e.ctrlKey);
+      return;
+    }
+
+    // F5: Tờ trước (Ctrl+F5: Kiểm tra DT tờ hiện tại)
+    if (e.key === 'F5') {
+      e.preventDefault();
+      if (e.ctrlKey) {
+        showKiemTraDT();
+      } else {
+        changeToSo(-1);
+      }
+      return;
+    }
+
+    // F6: Tờ tiếp
+    if (e.key === 'F6') {
+      e.preventDefault();
+      changeToSo(1);
+      return;
+    }
+
+    // F7: Chèn ô
+    if (e.key === 'F7') {
+      e.preventDefault();
+      insertBlankCellCap();
+      return;
+    }
+
+    // F8: Xoá ô
+    if (e.key === 'F8') {
+      e.preventDefault();
+      deleteCellAndShiftUpCap();
+      return;
+    }
+
+    // F9: Đổi loại vé (quay vòng cap10k -> cap20k -> 3x23 -> 2x27)
+    if (e.key === 'F9') {
+      e.preventDefault();
+      switchTicketTypeCap();
+      return;
+    }
+
+    // F10: Bỏ khoá / Khóa sổ
+    if (e.key === 'F10') {
+      e.preventDefault();
+      toggleQuickLock();
+      return;
+    }
+
+    // Ctrl+S: Lưu dữ liệu
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      handleSave();
+      return;
+    }
 
     const active = document.activeElement;
     if (!active || !active.classList.contains('input-grid-cell-cap')) return;
@@ -741,17 +966,95 @@ function setupKeyboardNavigation() {
     const type = active.dataset.type;
     const r = parseInt(active.dataset.row, 10);
     const c = parseInt(active.dataset.col, 10);
+    const rawVal = active.value.trim();
 
     const sectionCols = { cap10k: 2, cap20k: 2, '3x23': 2, '2x27': 2 };
-    const maxCols = sectionCols[type] || 1;
-
-    let nextRow = r;
-    let nextCol = c;
-    let nextType = type;
+    const maxCols = sectionCols[type] || 2;
 
     if (e.key === 'Enter') {
       e.preventDefault();
-      // ĐI DỌC XUỐNG DÒNG DƯỚI (r -> r + 1)
+
+      // 1. +N hoặc .N -> Nhảy đến ô N
+      const jumpMatch = rawVal.match(/^(\+|\.)([0-9]{1,2})$/);
+      if (jumpMatch) {
+        active.value = '';
+        calculateTotals();
+        triggerAutoSaveCap();
+        const targetRow = Math.min(TOTAL_ROWS, Math.max(1, parseInt(jumpMatch[2], 10)));
+        focusCell(type, targetRow, c);
+        return;
+      }
+
+      // 2. -N -> Xoá N vé (đến ô N)
+      const delMatch = rawVal.match(/^-([0-9]{1,2})$/);
+      if (delMatch) {
+        active.value = '';
+        const targetNum = parseInt(delMatch[1], 10);
+        let startR = r;
+        let endR = r;
+        if (targetNum >= r && targetNum <= TOTAL_ROWS) {
+          endR = targetNum;
+        } else {
+          endR = Math.min(TOTAL_ROWS, r + targetNum - 1);
+        }
+        for (let rowIdx = startR; rowIdx <= endR; rowIdx++) {
+          const cellEl = document.querySelector(`.input-grid-cell-cap[data-type="${type}"][data-row="${rowIdx}"][data-col="${c}"]`);
+          if (cellEl) cellEl.value = '';
+        }
+        calculateTotals();
+        triggerAutoSaveCap();
+        showToast(`Đã xoá đến ô ${endR}`, 'info');
+        focusCell(type, startR, c);
+        return;
+      }
+
+      // 3. SDT.N -> Nhập SDT đến ô N
+      const fillToMatch = rawVal.match(/^(.+)\.([0-9]{1,2})$/);
+      if (fillToMatch && fillToMatch[1] && !fillToMatch[1].startsWith('.')) {
+        const sdtVal = fillToMatch[1].trim();
+        const targetRow = Math.min(TOTAL_ROWS, Math.max(r, parseInt(fillToMatch[2], 10)));
+        for (let rowIdx = r; rowIdx <= targetRow; rowIdx++) {
+          const cellEl = document.querySelector(`.input-grid-cell-cap[data-type="${type}"][data-row="${rowIdx}"][data-col="${c}"]`);
+          if (cellEl) cellEl.value = sdtVal;
+        }
+        calculateTotals();
+        triggerAutoSaveCap();
+        showToast(`Đã nhập "${sdtVal}" đến ô ${targetRow}`, 'success');
+        if (targetRow < TOTAL_ROWS) {
+          focusCell(type, targetRow + 1, c);
+        } else {
+          focusCell(type, 1, c < maxCols ? c + 1 : 1);
+        }
+        return;
+      }
+
+      // 4. SDT/N -> Nhập SDT Trên N ô
+      const fillCountMatch = rawVal.match(/^(.+)\/([0-9]{1,2})$/);
+      if (fillCountMatch && fillCountMatch[1]) {
+        const sdtVal = fillCountMatch[1].trim();
+        const count = parseInt(fillCountMatch[2], 10) || 1;
+        const endRow = Math.min(TOTAL_ROWS, r + count - 1);
+        for (let rowIdx = r; rowIdx <= endRow; rowIdx++) {
+          const cellEl = document.querySelector(`.input-grid-cell-cap[data-type="${type}"][data-row="${rowIdx}"][data-col="${c}"]`);
+          if (cellEl) cellEl.value = sdtVal;
+        }
+        calculateTotals();
+        triggerAutoSaveCap();
+        showToast(`Đã nhập "${sdtVal}" trên ${count} ô (đến ô ${endRow})`, 'success');
+        if (endRow < TOTAL_ROWS) {
+          focusCell(type, endRow + 1, c);
+        } else {
+          focusCell(type, 1, c < maxCols ? c + 1 : 1);
+        }
+        return;
+      }
+
+      // 5. Đi dọc xuống dòng dưới bình thường (r -> r + 1)
+      triggerAutoSaveCap();
+      let nextRow = r;
+      let nextCol = c;
+      let nextType = type;
+
       if (r < TOTAL_ROWS) {
         nextRow = r + 1;
         nextCol = c;
@@ -807,6 +1110,112 @@ function setupKeyboardNavigation() {
   };
 
   window.addEventListener('keydown', window._lotoCapKeyHandler);
+}
+
+function insertBlankCellCap() {
+  const active = document.activeElement;
+  if (!active || !active.classList.contains('input-grid-cell-cap')) return;
+  const type = active.dataset.type;
+  const r = parseInt(active.dataset.row, 10);
+  const c = parseInt(active.dataset.col, 10);
+
+  for (let rowIdx = TOTAL_ROWS; rowIdx > r; rowIdx--) {
+    const prev = document.querySelector(`.input-grid-cell-cap[data-type="${type}"][data-row="${rowIdx - 1}"][data-col="${c}"]`);
+    const curr = document.querySelector(`.input-grid-cell-cap[data-type="${type}"][data-row="${rowIdx}"][data-col="${c}"]`);
+    if (curr && prev) curr.value = prev.value;
+  }
+  active.value = '';
+  calculateTotals();
+  showToast('Đã chèn ô trống (F7)', 'info');
+}
+
+function deleteCellAndShiftUpCap() {
+  const active = document.activeElement;
+  if (!active || !active.classList.contains('input-grid-cell-cap')) return;
+  const type = active.dataset.type;
+  const r = parseInt(active.dataset.row, 10);
+  const c = parseInt(active.dataset.col, 10);
+
+  for (let rowIdx = r; rowIdx < TOTAL_ROWS; rowIdx++) {
+    const next = document.querySelector(`.input-grid-cell-cap[data-type="${type}"][data-row="${rowIdx + 1}"][data-col="${c}"]`);
+    const curr = document.querySelector(`.input-grid-cell-cap[data-type="${type}"][data-row="${rowIdx}"][data-col="${c}"]`);
+    if (curr && next) curr.value = next.value;
+  }
+  const last = document.querySelector(`.input-grid-cell-cap[data-type="${type}"][data-row="${TOTAL_ROWS}"][data-col="${c}"]`);
+  if (last) last.value = '';
+  calculateTotals();
+  showToast('Đã xoá ô và kéo dòng lên (F8)', 'info');
+}
+
+function switchTicketTypeCap() {
+  const active = document.activeElement;
+  const currentType = (active && active.dataset?.type) || 'cap10k';
+  const currentR = (active && parseInt(active.dataset?.row, 10)) || 1;
+  const currentC = (active && parseInt(active.dataset?.col, 10)) || 1;
+
+  const order = ['cap10k', 'cap20k', '3x23', '2x27'];
+  let idx = order.indexOf(currentType);
+  if (idx === -1) idx = 0;
+  const nextType = order[(idx + 1) % order.length];
+
+  const labelMap = {
+    'cap10k': 'Lô tô Cặp 10.000đ',
+    'cap20k': 'Lô tô Cặp 20.000đ',
+    '3x23': 'Lô tô 3X23 20.000đ',
+    '2x27': 'Lô tô 2X27 20.000đ'
+  };
+  focusCell(nextType, currentR, currentC);
+  showToast(`Đổi sang ${labelMap[nextType]} (F9)`, 'info');
+}
+
+function showKiemTraLechDTCap() {
+  const grandTotalTienEl = document.getElementById('grand-total-tien-cap');
+  const grandTotalTien = (parseInt(grandTotalTienEl?.textContent || '0', 10)) * 1000;
+  const dtBoSungInput = document.getElementById('input-dt-bo-sung-cap');
+  const dtBoSung = parseInt((dtBoSungInput?.value || '0').replace(/\D/g, ''), 10) || 0;
+
+  const lech = grandTotalTien - dtBoSung;
+  const dlTen = currentDaiLy ? (currentDaiLy.ten || currentDaiLy.name) : currentDaiLyId;
+  const dlMa = currentDaiLy?.ma || currentDaiLyId;
+
+  if (dtBoSung === 0) {
+    alert(`📊 KIỂM TRA LỆCH DOANH THU ĐẠI LÝ [${dlMa}] - ${dlTen}\n\n• Doanh thu nhập: ${formatCurrency(grandTotalTien)} đ\n• Doanh thu bổ sung/báo: 0 đ\n(Chưa nhập số liệu Doanh thu bổ sung để so khớp)`);
+  } else if (lech === 0) {
+    alert(`✅ DOANH THU KHỚP TUYỆT ĐỐI!\n\n• Đại lý [${dlMa}]: ${dlTen}\n• Doanh thu nhập: ${formatCurrency(grandTotalTien)} đ\n• Doanh thu báo: ${formatCurrency(dtBoSung)} đ\n• Lệch: 0 đ`);
+  } else if (lech > 0) {
+    alert(`⚠️ CẢNH BÁO: DOANH THU LỆCH THỪA!\n\n• Đại lý [${dlMa}]: ${dlTen}\n• Doanh thu nhập: ${formatCurrency(grandTotalTien)} đ\n• Doanh thu báo: ${formatCurrency(dtBoSung)} đ\n• LỆCH THỪA: +${formatCurrency(lech)} đ`);
+  } else {
+    alert(`⚠️ CẢNH BÁO: DOANH THU LỆCH THIẾU!\n\n• Đại lý [${dlMa}]: ${dlTen}\n• Doanh thu nhập: ${formatCurrency(grandTotalTien)} đ\n• Doanh thu báo: ${formatCurrency(dtBoSung)} đ\n• LỆCH THIẾU: ${formatCurrency(lech)} đ`);
+  }
+}
+
+async function showTongNgay(isCtrl = false) {
+  const stop = showLoading('Đang tổng hợp doanh thu ngày...');
+  try {
+    const allTickets = await getVeLoToByNgay(currentNgay);
+    let totalVe = 0;
+    let totalTien = 0;
+    const countDaily = new Set();
+
+    allTickets.forEach(t => {
+      totalVe += (t.tongVe || 0);
+      totalTien += (t.tongTien || 0);
+      if (t.daiLyId) countDaily.add(t.daiLyId);
+    });
+
+    alert(
+      `📅 TỔNG HỢP DOANH THU TOÀN BỘ NGÀY ${formatDate(currentNgay)} ${isCtrl ? '(Tất cả các máy)' : ''}\n` +
+      `───────────────────────────────\n` +
+      `• Số đại lý đã nhập: ${countDaily.size} đại lý\n` +
+      `• Tổng số tờ/bản ghi: ${allTickets.length} tờ\n` +
+      `• Tổng số vé: ${formatCurrency(totalVe)} vé\n` +
+      `▶ TỔNG DOANH THU: ${formatCurrency(totalTien)} đ`
+    );
+  } catch (err) {
+    showToast('Lỗi tổng ngày: ' + err.message, 'danger');
+  } finally {
+    stop?.();
+  }
 }
 
 function focusCell(type, row, col) {
@@ -943,7 +1352,35 @@ function showKiemTraDT() {
   alert(`📋 KIỂM TRA DOANH THU TỜ HIỆN TẠI (LÔ CẶP, 3X23, 2X27)\n\n• Tờ số: ${currentToSo}\n• Đại lý: ${currentDaiLy?.ten || currentDaiLyId}\n• Tổng vé: ${grandTotalVe} vé\n• Tổng tiền: ${grandTotalTien} nghìn đồng`);
 }
 
-async function showTongDaiLy() {
+async function showTongDaiLy(isCtrl = false) {
+  if (isCtrl) {
+    const stop = showLoading('Đang tổng hợp toàn bộ đại lý...');
+    try {
+      const allTickets = await getVeLoToByNgay(currentNgay);
+      let totalVe = 0;
+      let totalTien = 0;
+      const countDaily = new Set();
+      allTickets.forEach(t => {
+        totalVe += (t.tongVe || 0);
+        totalTien += (t.tongTien || 0);
+        if (t.daiLyId) countDaily.add(t.daiLyId);
+      });
+      alert(
+        `🏢 TỔNG TOÀN BỘ ĐẠI LÝ TRONG NGÀY ${formatDate(currentNgay)} (Ctrl+F2)\n` +
+        `───────────────────────────────\n` +
+        `• Tổng số đại lý đã nhập: ${countDaily.size} đại lý\n` +
+        `• Tổng số tờ: ${allTickets.length} tờ\n` +
+        `• Tổng số vé: ${formatCurrency(totalVe)} vé\n` +
+        `▶ TỔNG TOÀN BỘ DOANH THU: ${formatCurrency(totalTien)} đ`
+      );
+    } catch (err) {
+      showToast('Lỗi: ' + err.message, 'danger');
+    } finally {
+      stop?.();
+    }
+    return;
+  }
+
   if (!currentDaiLyId) {
     showToast('Chưa chọn đại lý để xem tổng hợp!', 'warning');
     return;
@@ -1055,15 +1492,25 @@ function calculateTotals() {
     }
   });
 
-  const tien10k = (c10_totalVe * 10000) / 1000;
-  const tien20k = (c20_totalVe * 20000) / 1000;
-  const tien3x23 = (ve3x23 * 20000) / 1000;
-  const tien2x27 = (ve2x27 * 20000) / 1000;
+  const bsCap10k = parseInt(document.getElementById('input-bs-cap10k')?.value || '0', 10) || 0;
+  const bsCap20k = parseInt(document.getElementById('input-bs-cap20k')?.value || '0', 10) || 0;
+  const bs3x23   = parseInt(document.getElementById('input-bs-3x23')?.value || '0', 10) || 0;
+  const bs2x27   = parseInt(document.getElementById('input-bs-2x27')?.value || '0', 10) || 0;
 
-  const totalVe20kRow = c20_totalVe + ve3x23 + ve2x27;
+  const c10_finalVe = c10_totalVe + bsCap10k;
+  const c20_finalVe = c20_totalVe + bsCap20k;
+  const finalVe3x23 = ve3x23 + bs3x23;
+  const finalVe2x27 = ve2x27 + bs2x27;
+
+  const tien10k = (c10_finalVe * 10000) / 1000;
+  const tien20k = (c20_finalVe * 20000) / 1000;
+  const tien3x23 = (finalVe3x23 * 20000) / 1000;
+  const tien2x27 = (finalVe2x27 * 20000) / 1000;
+
+  const totalVe20kRow = c20_finalVe + finalVe3x23 + finalVe2x27;
   const totalTien20kRow = tien20k + tien3x23 + tien2x27;
 
-  const grandVe = c10_totalVe + totalVe20kRow;
+  const grandVe = c10_finalVe + totalVe20kRow;
   const grandTien = tien10k + totalTien20kRow;
 
   // Dòng Vé 10.000 đ
@@ -1077,8 +1524,8 @@ function calculateTotals() {
   if (elC10_2) elC10_2.textContent = c10_2cap;
   if (elC10_3) elC10_3.textContent = c10_3cap;
   if (elC10_4) elC10_4.textContent = c10_4cap;
-  if (elSumVe10k) elSumVe10k.textContent = c10_totalVe;
-  if (elTotalVe10k) elTotalVe10k.textContent = c10_totalVe;
+  if (elSumVe10k) elSumVe10k.textContent = c10_finalVe;
+  if (elTotalVe10k) elTotalVe10k.textContent = c10_finalVe;
   if (elTotalTien10k) elTotalTien10k.textContent = tien10k;
 
   // Dòng Vé 20.000 đ
@@ -1094,9 +1541,9 @@ function calculateTotals() {
   if (elC20_2) elC20_2.textContent = c20_2cap;
   if (elC20_3) elC20_3.textContent = c20_3cap;
   if (elC20_4) elC20_4.textContent = c20_4cap;
-  if (elSumVe20k) elSumVe20k.textContent = c20_totalVe;
-  if (elVal3x23Ve) elVal3x23Ve.textContent = ve3x23;
-  if (elVal2x27Ve) elVal2x27Ve.textContent = ve2x27;
+  if (elSumVe20k) elSumVe20k.textContent = c20_finalVe;
+  if (elVal3x23Ve) elVal3x23Ve.textContent = finalVe3x23;
+  if (elVal2x27Ve) elVal2x27Ve.textContent = finalVe2x27;
   if (elTotalVe20k) elTotalVe20k.textContent = totalVe20kRow;
   if (elTotalTien20k) elTotalTien20k.textContent = totalTien20kRow;
 
@@ -1114,6 +1561,10 @@ function calculateTotals() {
 
 function clearAllInputs() {
   document.querySelectorAll('.input-grid-cell-cap').forEach(inp => inp.value = '');
+  ['input-bs-cap10k', 'input-bs-cap20k', 'input-bs-3x23', 'input-bs-2x27'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '0';
+  });
 }
 
 async function loadExistingData() {
@@ -1126,8 +1577,10 @@ async function loadExistingData() {
     const list = await getVeLoToByNgayDaiLy(currentNgay, currentDaiLyId);
     const docData = list.find(item => item.loaiHinh === 'cap_so' && (item.toSo || 1) === currentToSo);
     if (docData) {
+      let hasData = false;
       ['cap10k', 'cap20k', '3x23', '2x27'].forEach(type => {
         const items = docData[type] || [];
+        if (items.length > 0) hasData = true;
         items.forEach(item => {
           if (item.row && item.col) {
             const cell = document.querySelector(`.input-grid-cell-cap[data-type="${type}"][data-row="${item.row}"][data-col="${item.col}"]`);
@@ -1137,8 +1590,47 @@ async function loadExistingData() {
           }
         });
       });
+      const elBsCap10k = document.getElementById('input-bs-cap10k');
+      const elBsCap20k = document.getElementById('input-bs-cap20k');
+      const elBs3x23   = document.getElementById('input-bs-3x23');
+      const elBs2x27   = document.getElementById('input-bs-2x27');
+
+      const b1 = docData.boSungCap10k || 0;
+      const b2 = docData.boSungCap20k || 0;
+      const b3 = docData.boSung3x23 || 0;
+      const b4 = docData.boSung2x27 || 0;
+      if (b1 > 0 || b2 > 0 || b3 > 0 || b4 > 0) hasData = true;
+
+      if (elBsCap10k) elBsCap10k.value = b1;
+      if (elBsCap20k) elBsCap20k.value = b2;
+      if (elBs3x23)   elBs3x23.value   = b3;
+      if (elBs2x27)   elBs2x27.value   = b4;
+
       calculateTotals();
+
+      // Nếu tờ đã có dữ liệu -> Tự động khóa bảo vệ tránh lỡ tay nhập đè hoặc xóa
+      if (hasData) {
+        isSheetLocked = true;
+      } else {
+        isSheetLocked = false;
+      }
+
+      const badge = document.getElementById('sheet-mamay-badge-cap');
+      if (badge) {
+        if (docData.maMay) {
+          badge.innerHTML = `💻 Máy nhập: <strong class="text-blue-900 bg-blue-100 px-1 py-0.5 rounded font-mono">${docData.maMay}</strong>`;
+        } else {
+          badge.innerHTML = `💻 Máy nhập: <span class="text-gray-500">Chưa rõ</span>`;
+        }
+      }
+    } else {
+      isSheetLocked = false;
+      const badge = document.getElementById('sheet-mamay-badge-cap');
+      if (badge) {
+        badge.innerHTML = `💻 Máy nhập: <span class="text-gray-400">Tờ mới</span>`;
+      }
     }
+    updateLockUICap();
   } catch (err) {
     console.error(err);
   } finally {
@@ -1146,28 +1638,47 @@ async function loadExistingData() {
   }
 }
 
-async function handleSave() {
-  if (isLocked) {
-    showToast('Kỳ này đã bị khóa số liệu. Không thể lưu!', 'warning');
+async function handleSave(silent = false) {
+  if (isOverTime) {
+    if (!silent) showToast('Đã hết giờ nhận số theo quy định!', 'warning');
+    return;
+  }
+  if (isSessionLocked) {
+    if (!silent) showToast('Kỳ này đã bị khóa số liệu. Không thể lưu!', 'warning');
+    return;
+  }
+  if (isSheetLocked) {
+    if (!silent) showToast('Tờ này đang bị khóa bảo vệ. Nhấn F10 để bỏ khóa trước khi sửa!', 'warning');
     return;
   }
   if (!currentDaiLyId) {
-    showToast('Vui lòng chọn đại lý trước khi lưu!', 'warning');
+    if (!silent) showToast('Vui lòng chọn đại lý trước khi lưu!', 'warning');
     return;
   }
 
+  const bsCap10k = parseInt(document.getElementById('input-bs-cap10k')?.value || '0', 10) || 0;
+  const bsCap20k = parseInt(document.getElementById('input-bs-cap20k')?.value || '0', 10) || 0;
+  const bs3x23   = parseInt(document.getElementById('input-bs-3x23')?.value || '0', 10) || 0;
+  const bs2x27   = parseInt(document.getElementById('input-bs-2x27')?.value || '0', 10) || 0;
+
+  const deviceMaMay = (localStorage.getItem('xskt_ma_may') || 'A01').toUpperCase();
   const payload = {
     ngay: currentNgay,
     daiLyId: currentDaiLyId,
     daiLyTen: currentDaiLy?.ten || currentDaiLy?.name || '',
     toSo: currentToSo,
     loaiHinh: 'cap_so',
+    maMay: deviceMaMay,
     cap10k: [],
     cap20k: [],
     '3x23': [],
     '2x27': [],
-    tongVe: 0,
-    tongTien: 0
+    boSungCap10k: bsCap10k,
+    boSungCap20k: bsCap20k,
+    boSung3x23: bs3x23,
+    boSung2x27: bs2x27,
+    tongVe: bsCap10k + bsCap20k + bs3x23 + bs2x27,
+    tongTien: (bsCap10k * 10000) + (bsCap20k * 20000) + (bs3x23 * 20000) + (bs2x27 * 20000)
   };
 
   const values = { cap10k: 10000, cap20k: 20000, '3x23': 20000, '2x27': 20000 };
@@ -1192,14 +1703,22 @@ async function handleSave() {
     });
   });
 
-  const stop = showLoading('Đang lưu dữ liệu tờ...');
+  const stop = silent ? null : showLoading('Đang lưu dữ liệu tờ...');
+  const saveBtn = document.getElementById('btn-save-cap');
   try {
     const docId = `${currentNgay.replace(/-/g, '')}_${currentDaiLyId}_to${currentToSo}_capso`;
     await saveVeLoTo({ id: docId, ...payload });
-    showToast('Lưu tờ dữ liệu thành công!', 'success');
+    if (!silent) {
+      showToast('Lưu tờ dữ liệu thành công!', 'success');
+    } else if (saveBtn) {
+      saveBtn.textContent = '✓ Đã lưu tự động';
+      setTimeout(() => {
+        if (saveBtn) saveBtn.textContent = '💾 Lưu (Ctrl+S)';
+      }, 1000);
+    }
   } catch (err) {
     console.error('Save error:', err);
-    showToast('Lỗi lưu vé: ' + err.message, 'danger');
+    if (!silent) showToast('Lỗi lưu vé: ' + err.message, 'danger');
   } finally {
     stop?.();
   }

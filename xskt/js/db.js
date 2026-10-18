@@ -435,3 +435,15 @@ export async function getVeLoToByNgayDaiLy(ngay, daiLyId, daiLyMa = '') {
     })
     .sort((a, b) => (a.toSo || 1) - (b.toSo || 1));
 }
+
+/**
+ * Get all vé lô tô for a given date across all agents.
+ *
+ * @param {string} ngay - 'YYYY-MM-DD'
+ * @returns {Promise<Array<{id: string, [key: string]: any}>>}
+ */
+export async function getVeLoToByNgay(ngay) {
+  const list = await getDocs(COLLECTIONS.VE_LOTO);
+  return list.filter(d => !ngay || d.ngay === ngay);
+}
+

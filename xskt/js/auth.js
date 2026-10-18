@@ -60,14 +60,28 @@ export function hasPermission(role, requiredRole) {
 // ---------------------------------------------------------------------------
 
 /**
- * Sign in with email and password.
+ * Normalise any login input (plain username or email) to Firebase compatible email format.
+ * E.g. "k" -> "k@xskt.vn", "admin" -> "admin@xskt.vn", "user@gmail.com" -> "user@gmail.com".
  *
- * @param {string} email
+ * @param {string} input
+ * @returns {string}
+ */
+export function normalizeLogin(input) {
+  if (!input) return '';
+  const trimmed = String(input).trim().toLowerCase();
+  return trimmed.includes('@') ? trimmed : `${trimmed}@xskt.vn`;
+}
+
+/**
+ * Sign in with plain username or email and password.
+ *
+ * @param {string} usernameOrEmail
  * @param {string} password
  * @returns {Promise<import('firebase/auth').UserCredential>}
  */
-export async function signIn(email, password) {
+export async function signIn(usernameOrEmail, password) {
   try {
+    const email = normalizeLogin(usernameOrEmail);
     const credential = await signInWithEmailAndPassword(auth, email, password);
     return credential;
   } catch (error) {
@@ -79,19 +93,22 @@ export async function signIn(email, password) {
 /**
  * Register a new user and create their Firestore profile.
  *
- * @param {string} email
+ * @param {string} usernameOrEmail
  * @param {string} password
- * @param {{ displayName?: string, role?: string, maMay?: string }} [profileData]
+ * @param {{ displayName?: string, role?: string, maMay?: string, username?: string }} [profileData]
  * @returns {Promise<import('firebase/auth').UserCredential>}
  */
-export async function registerUser(email, password, profileData = {}) {
+export async function registerUser(usernameOrEmail, password, profileData = {}) {
   try {
+    const email = normalizeLogin(usernameOrEmail);
+    const rawUsername = String(usernameOrEmail).trim().toLowerCase().replace('@xskt.vn', '');
     const credential = await createUserWithEmailAndPassword(auth, email, password);
     const uid = credential.user.uid;
     const ref = doc(db, 'users', uid);
     await setDoc(ref, {
       email,
-      displayName: profileData.displayName || email.split('@')[0],
+      username: profileData.username || rawUsername,
+      displayName: profileData.displayName || rawUsername,
       role: profileData.role || ROLES.ADMIN,
       maMay: profileData.maMay || 'A00',
       createdAt: serverTimestamp(),

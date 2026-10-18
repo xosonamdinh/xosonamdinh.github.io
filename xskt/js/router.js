@@ -31,6 +31,7 @@ export const routes = new Map([
 /** @type {string} */
 let currentRoute = '';
 let currentModule = null;
+let _onNavigateCallback = null;
 
 /**
  * beforeEach hook — set this to a function that receives the target hash and
@@ -154,6 +155,20 @@ export async function navigate(hash) {
   }
   currentRoute = hash;
 
+  // Đồng bộ trạng thái sáng đèn (active) của menu sidebar
+  try {
+    const navItems = document.querySelectorAll('#sidebar .nav-item[data-route], .nav-item[data-route]');
+    navItems.forEach(li => {
+      const route = li.getAttribute('data-route');
+      li.classList.toggle('active', route === hash);
+    });
+    if (_onNavigateCallback) {
+      _onNavigateCallback(hash);
+    }
+  } catch (syncErr) {
+    console.warn('[router] Error syncing sidebar active item:', syncErr);
+  }
+
   // Teardown previous module if it defined a destroy hook
   if (currentModule && typeof currentModule.destroy === 'function') {
     try {
@@ -224,23 +239,20 @@ export function getCurrentRoute() {
  * Attaches the hashchange listener and performs the initial navigation.
  */
 export function initRouter(options = {}) {
-  const onNav = typeof options?.onNavigate === 'function' ? options.onNavigate : null;
+  _onNavigateCallback = typeof options?.onNavigate === 'function' ? options.onNavigate : null;
 
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash || '#/dashboard';
-    if (onNav) onNav(hash);
     navigate(hash);
   });
 
   // Handle browser back/forward (pushState navigation)
   window.addEventListener('popstate', () => {
     const hash = window.location.hash || '#/dashboard';
-    if (onNav) onNav(hash);
     navigate(hash);
   });
 
   // Initial load
   const initial = window.location.hash || '#/dashboard';
-  if (onNav) onNav(initial);
   navigate(initial);
 }

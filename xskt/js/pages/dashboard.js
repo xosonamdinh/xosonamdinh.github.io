@@ -8,7 +8,7 @@ import {
   collection, query, where, getDocs, doc, getDoc,
   Timestamp
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
-import { navigate } from '../router.js?v=20261018_FINAL_FIX';
+import { navigate } from '../router.js?v=20261018_SYNC_ALL';
 
 // We import state from app.js (lazy to avoid circular deps at parse time)
 function getAppState() {

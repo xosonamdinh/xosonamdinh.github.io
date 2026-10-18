@@ -9,6 +9,7 @@
  * - Bảng tổng hợp chân trang chuẩn: Bổ sung 5K, 10K, 20K. Bảng master 7 cột (Loại vé, 2-3-4 số ĐB, 2-3-4 số giải nhất, 2-3-4 cặp số, Lô bao 3X23/2X27, Tổng vé, Tổng tiền).
  */
 
+import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 import { db } from '../firebase-config.js';
 import {
   getDaiLyList,
@@ -17,24 +18,28 @@ import {
   unlockKyMoThuong,
   saveVeLoTo,
   getVeLoToByNgayDaiLy,
+  getVeLoToByNgay,
   getOrCreateDaiLy
-} from '../db.js';
+} from '../db.js?v=20261018_HOTKEY_V2';
 import {
   showToast,
   showLoading,
   formatCurrency,
   formatDate
 } from '../utils.js';
-import { navigate } from '../router.js?v=20261018_FINAL_FIX';
+import { navigate } from '../router.js?v=20261018_SYNC_ALL';
 
 let currentNgay = sessionStorage.getItem('xskt_ngay') || new Date().toISOString().slice(0, 10);
 let currentDaiLyId = '';
 let currentDaiLy = null;
 let daiLyList = [];
 let isLocked = false;
+let isOverTime = false;
+let isSessionLocked = false;
+let isSheetLocked = false;
 let currentToSo = 1;
 
-const TOTAL_ROWS = 15;
+const TOTAL_ROWS = 20;
 const SECTIONS = ['5k', '10k'];
 const COLS_PER_SECTION = 4;
 
@@ -146,6 +151,11 @@ export async function render() {
               </div>
             </div>
 
+            <!-- HIỂN THỊ MÃ MÁY NHẬP DỮ LIỆU TỜ VÉ NÀY -->
+            <div id="sheet-mamay-badge" class="text-[10px] text-blue-950 font-mono font-semibold bg-blue-50 border border-blue-200 px-1 py-0.5 rounded text-center" title="Xem mã máy đã nhập dữ liệu của tờ này">
+              💻 Máy nhập: —
+            </div>
+
             <!-- CÁC LINK XANH NGHIÊNG GẠCH CHÂN CHUẨN HÌNH -->
             <div class="flex flex-col gap-0.5 pt-1 border-t border-gray-300">
               <button id="lnk-kiem-tra-dt" class="classic-link-btn">Kiểm tra DT (Ctrl+F5)</button>
@@ -233,13 +243,27 @@ export async function render() {
 
           <!-- THANH BỔ SUNG LÔ TÔ 5.000 & 10.000 (SÁT VỚI DÒNG CUỐI CỦA BẢNG) -->
           <div class="bonus-bar-don border-t border-[#7a889b]">
-            <div>
-              <span>Bổ sung lô tô 5.000:</span>
-              <span id="sum-bs-5k" class="font-extrabold pr-2">0</span>
+            <div class="flex items-center justify-between px-2">
+              <span class="font-bold">Bổ sung lô tô 5.000:</span>
+              <input 
+                type="text" 
+                id="input-bs-5k" 
+                value="0" 
+                class="input-bo-sung classic-input w-14 text-right font-black text-blue-900 bg-white border border-[#7a889b] px-1 py-0.5 rounded text-xs outline-none focus:bg-yellow-100 focus:ring-1 focus:ring-blue-500" 
+                title="Nhập số lượng vé bổ sung rồi Enter"
+                autocomplete="off"
+              />
             </div>
-            <div>
-              <span>Bổ sung lô tô 10.000:</span>
-              <span id="sum-bs-10k" class="font-extrabold pr-2">0</span>
+            <div class="flex items-center justify-between px-2">
+              <span class="font-bold">Bổ sung lô tô 10.000:</span>
+              <input 
+                type="text" 
+                id="input-bs-10k" 
+                value="0" 
+                class="input-bo-sung classic-input w-14 text-right font-black text-blue-900 bg-white border border-[#7a889b] px-1 py-0.5 rounded text-xs outline-none focus:bg-yellow-100 focus:ring-1 focus:ring-blue-500" 
+                title="Nhập số lượng vé bổ sung rồi Enter"
+                autocomplete="off"
+              />
             </div>
           </div>
 
@@ -373,7 +397,7 @@ function generateGridRows(type) {
   let html = '';
   for (let r = 1; r <= TOTAL_ROWS; r++) {
     const stt = String(r).padStart(2, '0');
-    const isDivider = (r === 5 || r === 10);
+    const isDivider = (r === 5 || r === 10 || r === 15);
     const dividerClass = isDivider ? 'row-red-divider' : '';
 
     html += `
@@ -434,9 +458,37 @@ export async function init() {
   });
 
   document.getElementById('btn-save-loto')?.addEventListener('click', handleSave);
+
+  ['input-bs-5k', 'input-bs-10k'].forEach((id, idx) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      el.value = el.value.replace(/[^0-9]/g, '');
+      calculateTotals();
+    });
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        calculateTotals();
+        triggerAutoSave(true);
+        showToast('Đã lưu dữ liệu bổ sung', 'success');
+        if (id === 'input-bs-5k') {
+          const next = document.getElementById('input-bs-10k');
+          next?.focus();
+          next?.select();
+        } else {
+          focusFirstCell();
+        }
+      }
+    });
+  });
 }
 
 export function destroy() {
+  if (_autoSaveTimer) {
+    clearTimeout(_autoSaveTimer);
+    handleSave(true);
+  }
   if (window._lotoDonKeyHandler) {
     window.removeEventListener('keydown', window._lotoDonKeyHandler);
     window._lotoDonKeyHandler = null;
@@ -449,6 +501,9 @@ function startClock() {
   const update = () => {
     const d = new Date();
     clockEl.textContent = d.toTimeString().split(' ')[0];
+    if (d.getSeconds() === 0) {
+      checkSessionLock();
+    }
   };
   update();
   setInterval(update, 1000);
@@ -529,11 +584,26 @@ function updateDaiLyDisplay() {
   if (inpMa) inpMa.value = currentDaiLy?.ma || currentDaiLyId || '---';
 }
 
-function changeToSo(delta) {
+let _autoSaveTimer = null;
+function triggerAutoSave(immediate = false) {
+  clearTimeout(_autoSaveTimer);
+  if (immediate) {
+    handleSave(true);
+  } else {
+    _autoSaveTimer = setTimeout(() => {
+      handleSave(true);
+    }, 150);
+  }
+}
+
+async function changeToSo(delta) {
+  if (currentDaiLyId && !isLocked) {
+    await handleSave(true);
+  }
   currentToSo = Math.max(1, currentToSo + delta);
   const input = document.getElementById('input-to-so');
   if (input) input.value = currentToSo;
-  loadExistingData();
+  await loadExistingData();
 }
 
 function parseCell(value) {
@@ -554,73 +624,134 @@ function parseCell(value) {
   }
 }
 
+function updateLockUI() {
+  isLocked = isOverTime || isSessionLocked || isSheetLocked;
+  const badge = document.getElementById('badge-lock-status');
+  const btnLock = document.getElementById('btn-quick-lock-toggle');
+
+  if (badge) {
+    if (isOverTime) {
+      badge.className = 'text-red-200 font-black text-xs uppercase px-2 py-0.5 rounded bg-red-900/80 border border-red-500 animate-pulse';
+      badge.textContent = 'HẾT GIỜ NHẬN SỐ!';
+    } else if (isSessionLocked) {
+      badge.className = 'text-red-200 font-black text-xs uppercase px-1.5 py-0.5 rounded bg-red-900/60 border border-red-500';
+      badge.textContent = 'ĐÃ KHOÁ SỐ LIỆU!';
+    } else if (isSheetLocked) {
+      badge.className = 'text-amber-200 font-black text-xs uppercase px-1.5 py-0.5 rounded bg-amber-900/80 border border-amber-500';
+      badge.textContent = '🔒 ĐÃ KHÓA SỔ (CÓ DỮ LIỆU)';
+    } else {
+      badge.className = 'text-green-200 font-black text-xs uppercase px-1.5 py-0.5 rounded bg-green-900/60 border border-green-500';
+      badge.textContent = 'ĐANG NHẬN SỐ';
+    }
+  }
+
+  if (btnLock) {
+    if (isOverTime) {
+      btnLock.textContent = '⛔ Hết giờ';
+      btnLock.disabled = true;
+      btnLock.className = 'bg-gray-600 text-gray-300 font-bold text-xs px-2 py-0.5 rounded border border-gray-700 cursor-not-allowed';
+    } else if (isSessionLocked) {
+      btnLock.textContent = '🔓 Mở khóa';
+      btnLock.disabled = false;
+      btnLock.className = 'bg-red-700 hover:bg-red-800 text-white font-bold text-xs px-2 py-0.5 rounded border border-red-900 shadow';
+    } else if (isSheetLocked) {
+      btnLock.textContent = '🔓 Bỏ khóa (F10)';
+      btnLock.disabled = false;
+      btnLock.className = 'bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-2 py-0.5 rounded border border-amber-800 shadow';
+    } else {
+      btnLock.textContent = '🔒 Khóa sổ (F10)';
+      btnLock.disabled = false;
+      btnLock.className = 'bg-red-700 hover:bg-red-800 text-white font-bold text-xs px-2 py-0.5 rounded border border-red-900 shadow';
+    }
+  }
+
+  document.querySelectorAll('.input-grid-cell, .input-bo-sung-don').forEach(inp => {
+    inp.disabled = isLocked;
+  });
+  const saveBtn = document.getElementById('btn-save-loto');
+  if (saveBtn) saveBtn.disabled = isLocked;
+}
+
 async function checkSessionLock() {
   try {
+    // 1. Kiểm tra cấu hình thời gian nhận số từ config/gioNhanSo
+    try {
+      const snapCfg = await getDoc(doc(db, 'config', 'gioNhanSo'));
+      if (snapCfg.exists()) {
+        const cfg = snapCfg.data();
+        if (cfg.tuDongKhoa !== false && cfg.gioKhoaSo) {
+          const now = new Date();
+          const curTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+          if (cfg.gioBatDau && curTime < cfg.gioBatDau) {
+            isOverTime = true;
+          } else if (curTime >= cfg.gioKhoaSo) {
+            isOverTime = true;
+          } else {
+            isOverTime = false;
+          }
+        } else {
+          isOverTime = false;
+        }
+      }
+    } catch (e) {
+      console.warn('Lỗi kiểm tra giờ nhận số:', e);
+    }
+
+    // 2. Kiểm tra trạng thái khóa kỳ mở thưởng
     const session = await getKyMoThuong(currentNgay);
-    isLocked = session?.status === 'da_khoa' || session?.status === 'co_ket_qua';
-    const badge = document.getElementById('badge-lock-status');
-    const btnLock = document.getElementById('btn-quick-lock-toggle');
+    isSessionLocked = session?.status === 'da_khoa' || session?.status === 'co_ket_qua';
 
-    if (badge) {
-      if (isLocked) {
-        badge.className = 'text-red-200 font-black text-xs uppercase px-1.5 py-0.5 rounded bg-red-900/60 border border-red-500';
-        badge.textContent = 'ĐÃ KHOÁ SỐ LIỆU!';
-      } else {
-        badge.className = 'text-green-200 font-black text-xs uppercase px-1.5 py-0.5 rounded bg-green-900/60 border border-green-500';
-        badge.textContent = 'ĐANG NHẬN SỐ';
-      }
-    }
-
-    if (btnLock) {
-      if (isLocked) {
-        btnLock.textContent = '🔓 Mở khóa';
-      } else {
-        btnLock.textContent = '🔒 Khóa sổ';
-      }
-    }
-
-    document.querySelectorAll('.input-grid-cell').forEach(inp => inp.disabled = isLocked);
-    const saveBtn = document.getElementById('btn-save-loto');
-    if (saveBtn) saveBtn.disabled = isLocked;
+    updateLockUI();
   } catch (err) {
     console.error(err);
   }
 }
 
 async function toggleQuickLock() {
-  if (isLocked) {
+  if (isOverTime) {
+    showToast('Đã hết giờ nhận số theo quy định cấu hình hệ thống!', 'warning');
+    return;
+  }
+
+  if (isSessionLocked) {
     if (!confirm(`Xác nhận MỞ KHÓA ngày ${formatDate(currentNgay)} để tiếp tục nhận số?`)) return;
     const stop = showLoading('Đang mở khóa kỳ...');
     try {
       await unlockKyMoThuong(currentNgay);
-      await checkSessionLock();
+      isSessionLocked = false;
+      isSheetLocked = false;
+      updateLockUI();
       showToast('Đã mở khóa ngày làm việc thành công!', 'success');
     } catch (err) {
       showToast('Lỗi mở khóa: ' + err.message, 'danger');
     } finally {
       stop?.();
     }
+    return;
+  }
+
+  // Chuyển đổi trạng thái khóa/mở tờ hiện tại
+  isSheetLocked = !isSheetLocked;
+  updateLockUI();
+  if (isSheetLocked) {
+    showToast(`Đã KHÓA BẢO VỆ tờ số ${currentToSo}. Nhấn F10 hoặc "Bỏ khóa" để mở khóa sửa tiếp.`, 'warning');
   } else {
-    if (!confirm(`Xác nhận KHÓA SỔ ngày ${formatDate(currentNgay)}?`)) return;
-    const stop = showLoading('Đang khóa sổ kỳ...');
-    try {
-      await lockKyMoThuong(currentNgay);
-      await checkSessionLock();
-      showToast('Đã khóa sổ ngày làm việc thành công!', 'warning');
-    } catch (err) {
-      showToast('Lỗi khóa sổ: ' + err.message, 'danger');
-    } finally {
-      stop?.();
-    }
+    showToast(`Đã BỎ KHÓA tờ số ${currentToSo}. Bạn có thể nhập hoặc chỉnh sửa số liệu.`, 'success');
+    focusFirstCell();
   }
 }
 
 async function loadDaiLyList() {
   try {
     daiLyList = await getDaiLyList();
-    if (daiLyList.length > 0 && !currentDaiLyId) {
-      currentDaiLyId = daiLyList[0].id;
-      currentDaiLy = daiLyList[0];
+    if (daiLyList.length > 0) {
+      if (!currentDaiLyId) {
+        currentDaiLyId = daiLyList[0].id;
+        currentDaiLy = daiLyList[0];
+      } else {
+        currentDaiLy = daiLyList.find(d => d.id === currentDaiLyId) || daiLyList[0];
+        currentDaiLyId = currentDaiLy.id;
+      }
       updateDaiLyDisplay();
       await loadExistingData();
     }
@@ -635,7 +766,7 @@ function setupGridEvents() {
 
   container.addEventListener('input', (e) => {
     if (e.target.classList.contains('input-grid-cell')) {
-      e.target.value = e.target.value.replace(/[^0-9+]/g, '');
+      e.target.value = e.target.value.replace(/[^0-9+.\/\-\s]/g, '');
       calculateTotals();
     }
   });
@@ -657,26 +788,97 @@ function setupKeyboardNavigation() {
       return;
     }
 
-    // Phím * hoặc F10: Chuyển Lô Cặp
-    if (e.key === '*' || e.key === 'F10') {
+    // F12 or PageUp or *: Chuyển loại hình (sang Cặp số)
+    if (e.key === '*' || e.key === 'F12' || e.key === 'PageUp') {
       e.preventDefault();
       navigate('#/nhaploto-cap');
       return;
     }
 
+    // F11 or PageDown: Chuyển đại lý
     if (e.key === 'F11' || e.key === 'PageDown') {
       e.preventDefault();
       openF11Modal();
       return;
     }
 
-    if (e.key === 'F2') { e.preventDefault(); showTongDaiLy(); return; }
-    if (e.key === 'F3') { e.preventDefault(); showTongDaiLy(); return; }
-    if (e.key === 'F5') { e.preventDefault(); changeToSo(-1); return; }
-    if (e.key === 'F6') { e.preventDefault(); changeToSo(1); return; }
-    if (e.key === 'F12' || e.key === 'PageUp') { e.preventDefault(); navigate('#/nhaploto-cap'); return; }
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); handleSave(); return; }
-    if (e.ctrlKey && e.key === 'F5') { e.preventDefault(); showKiemTraDT(); return; }
+    // F2: Tổng đại lý (Ctrl+F2: Tổng toàn bộ ĐL)
+    if (e.key === 'F2') {
+      e.preventDefault();
+      showTongDaiLy(e.ctrlKey);
+      return;
+    }
+
+    // F3: Kiểm tra Đại lý (Ctrl+F3: Kiểm tra ĐL lệch DT)
+    if (e.key === 'F3') {
+      e.preventDefault();
+      if (e.ctrlKey) {
+        showKiemTraLechDT();
+      } else {
+        showTongDaiLy(false);
+      }
+      return;
+    }
+
+    // F4: Tổng ngày (Ctrl+F4: Tổng ngày tất cả các máy)
+    if (e.key === 'F4') {
+      e.preventDefault();
+      showTongNgay(e.ctrlKey);
+      return;
+    }
+
+    // F5: Tờ trước (Ctrl+F5: Kiểm tra DT)
+    if (e.key === 'F5') {
+      e.preventDefault();
+      if (e.ctrlKey) {
+        showKiemTraDT();
+      } else {
+        changeToSo(-1);
+      }
+      return;
+    }
+
+    // F6: Tờ tiếp
+    if (e.key === 'F6') {
+      e.preventDefault();
+      changeToSo(1);
+      return;
+    }
+
+    // F7: Chèn ô
+    if (e.key === 'F7') {
+      e.preventDefault();
+      insertBlankCell();
+      return;
+    }
+
+    // F8: Xoá ô
+    if (e.key === 'F8') {
+      e.preventDefault();
+      deleteCellAndShiftUp();
+      return;
+    }
+
+    // F9: Đổi loại vé
+    if (e.key === 'F9') {
+      e.preventDefault();
+      switchTicketType();
+      return;
+    }
+
+    // F10: Bỏ khoá / Khóa sổ
+    if (e.key === 'F10') {
+      e.preventDefault();
+      toggleQuickLock();
+      return;
+    }
+
+    // Ctrl+S: Lưu dữ liệu
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+      e.preventDefault();
+      handleSave();
+      return;
+    }
 
     const active = document.activeElement;
     if (!active || !active.classList.contains('input-grid-cell')) return;
@@ -684,24 +886,97 @@ function setupKeyboardNavigation() {
     const type = active.dataset.type;
     const r = parseInt(active.dataset.row, 10);
     const c = parseInt(active.dataset.col, 10);
-
-    let nextRow = r;
-    let nextCol = c;
-    let nextType = type;
+    const rawVal = active.value.trim();
 
     if (e.key === 'Enter') {
       e.preventDefault();
-      // ĐI DỌC XUỐNG DÒNG DƯỚI (r -> r + 1)
+
+      // 1. +N hoặc .N -> Nhảy đến ô N
+      const jumpMatch = rawVal.match(/^(\+|\.)([0-9]{1,2})$/);
+      if (jumpMatch) {
+        active.value = '';
+        calculateTotals();
+        triggerAutoSave();
+        const targetRow = Math.min(TOTAL_ROWS, Math.max(1, parseInt(jumpMatch[2], 10)));
+        focusCell(type, targetRow, c);
+        return;
+      }
+
+      // 2. -N -> Xoá N vé (đến ô N)
+      const delMatch = rawVal.match(/^-([0-9]{1,2})$/);
+      if (delMatch) {
+        active.value = '';
+        const targetNum = parseInt(delMatch[1], 10);
+        let startR = r;
+        let endR = r;
+        if (targetNum >= r && targetNum <= TOTAL_ROWS) {
+          endR = targetNum;
+        } else {
+          endR = Math.min(TOTAL_ROWS, r + targetNum - 1);
+        }
+        for (let rowIdx = startR; rowIdx <= endR; rowIdx++) {
+          const cellEl = document.querySelector(`.input-grid-cell[data-type="${type}"][data-row="${rowIdx}"][data-col="${c}"]`);
+          if (cellEl) cellEl.value = '';
+        }
+        calculateTotals();
+        triggerAutoSave();
+        showToast(`Đã xoá đến ô ${endR}`, 'info');
+        focusCell(type, startR, c);
+        return;
+      }
+
+      // 3. SDT.N -> Nhập SDT đến ô N
+      const fillToMatch = rawVal.match(/^([0-9+]+)\.([0-9]{1,2})$/);
+      if (fillToMatch) {
+        const sdtVal = fillToMatch[1];
+        const targetRow = Math.min(TOTAL_ROWS, Math.max(r, parseInt(fillToMatch[2], 10)));
+        for (let rowIdx = r; rowIdx <= targetRow; rowIdx++) {
+          const cellEl = document.querySelector(`.input-grid-cell[data-type="${type}"][data-row="${rowIdx}"][data-col="${c}"]`);
+          if (cellEl) cellEl.value = sdtVal;
+        }
+        calculateTotals();
+        triggerAutoSave();
+        showToast(`Đã nhập "${sdtVal}" đến ô ${targetRow}`, 'success');
+        if (targetRow < TOTAL_ROWS) {
+          focusCell(type, targetRow + 1, c);
+        } else {
+          focusCell(type, 1, c < COLS_PER_SECTION ? c + 1 : 1);
+        }
+        return;
+      }
+
+      // 4. SDT/N -> Nhập SDT Trên N ô
+      const fillCountMatch = rawVal.match(/^([0-9+]+)\/([0-9]{1,2})$/);
+      if (fillCountMatch) {
+        const sdtVal = fillCountMatch[1];
+        const count = parseInt(fillCountMatch[2], 10) || 1;
+        const endRow = Math.min(TOTAL_ROWS, r + count - 1);
+        for (let rowIdx = r; rowIdx <= endRow; rowIdx++) {
+          const cellEl = document.querySelector(`.input-grid-cell[data-type="${type}"][data-row="${rowIdx}"][data-col="${c}"]`);
+          if (cellEl) cellEl.value = sdtVal;
+        }
+        calculateTotals();
+        triggerAutoSave();
+        showToast(`Đã nhập "${sdtVal}" trên ${count} ô (đến ô ${endRow})`, 'success');
+        if (endRow < TOTAL_ROWS) {
+          focusCell(type, endRow + 1, c);
+        } else {
+          focusCell(type, 1, c < COLS_PER_SECTION ? c + 1 : 1);
+        }
+        return;
+      }
+
+      // 5. Đi dọc xuống dòng dưới bình thường (r -> r + 1)
+      let nextRow = r;
+      let nextCol = c;
+      let nextType = type;
+
       if (r < TOTAL_ROWS) {
         nextRow = r + 1;
-        nextCol = c;
-        nextType = type;
       } else {
-        // Hết dòng 20 của cột hiện tại -> Chuyển lên đầu dòng 1 cột tiếp theo
         nextRow = 1;
         if (c < COLS_PER_SECTION) {
           nextCol = c + 1;
-          nextType = type;
         } else if (type === '5k') {
           nextType = '10k';
           nextCol = 1;
@@ -711,6 +986,7 @@ function setupKeyboardNavigation() {
         }
       }
       focusCell(nextType, nextRow, nextCol);
+      triggerAutoSave();
       return;
     }
 
@@ -738,6 +1014,101 @@ function setupKeyboardNavigation() {
   };
 
   window.addEventListener('keydown', window._lotoDonKeyHandler);
+}
+
+function insertBlankCell() {
+  const active = document.activeElement;
+  if (!active || !active.classList.contains('input-grid-cell')) return;
+  const type = active.dataset.type;
+  const r = parseInt(active.dataset.row, 10);
+  const c = parseInt(active.dataset.col, 10);
+
+  for (let rowIdx = TOTAL_ROWS; rowIdx > r; rowIdx--) {
+    const prev = document.querySelector(`.input-grid-cell[data-type="${type}"][data-row="${rowIdx - 1}"][data-col="${c}"]`);
+    const curr = document.querySelector(`.input-grid-cell[data-type="${type}"][data-row="${rowIdx}"][data-col="${c}"]`);
+    if (curr && prev) curr.value = prev.value;
+  }
+  active.value = '';
+  calculateTotals();
+  showToast('Đã chèn ô trống (F7)', 'info');
+}
+
+function deleteCellAndShiftUp() {
+  const active = document.activeElement;
+  if (!active || !active.classList.contains('input-grid-cell')) return;
+  const type = active.dataset.type;
+  const r = parseInt(active.dataset.row, 10);
+  const c = parseInt(active.dataset.col, 10);
+
+  for (let rowIdx = r; rowIdx < TOTAL_ROWS; rowIdx++) {
+    const next = document.querySelector(`.input-grid-cell[data-type="${type}"][data-row="${rowIdx + 1}"][data-col="${c}"]`);
+    const curr = document.querySelector(`.input-grid-cell[data-type="${type}"][data-row="${rowIdx}"][data-col="${c}"]`);
+    if (curr && next) curr.value = next.value;
+  }
+  const last = document.querySelector(`.input-grid-cell[data-type="${type}"][data-row="${TOTAL_ROWS}"][data-col="${c}"]`);
+  if (last) last.value = '';
+  calculateTotals();
+  showToast('Đã xoá ô và kéo dòng lên (F8)', 'info');
+}
+
+function switchTicketType() {
+  const active = document.activeElement;
+  const currentType = (active && active.dataset?.type) || '5k';
+  const currentR = (active && parseInt(active.dataset?.row, 10)) || 1;
+  const currentC = (active && parseInt(active.dataset?.col, 10)) || 1;
+  const nextType = currentType === '5k' ? '10k' : '5k';
+  focusCell(nextType, currentR, currentC);
+  showToast(`Đổi loại vé sang ${nextType === '5k' ? '5.000đ' : '10.000đ'} (F9)`, 'info');
+}
+
+function showKiemTraLechDT() {
+  const grandTotalTienEl = document.getElementById('grand-total-tien');
+  const grandTotalTien = (parseInt(grandTotalTienEl?.textContent || '0', 10)) * 1000;
+  const dtBoSungInput = document.getElementById('input-dt-bo-sung');
+  const dtBoSung = parseInt((dtBoSungInput?.value || '0').replace(/\D/g, ''), 10) || 0;
+
+  const lech = grandTotalTien - dtBoSung;
+  const dlTen = currentDaiLy ? (currentDaiLy.ten || currentDaiLy.name) : currentDaiLyId;
+  const dlMa = currentDaiLy?.ma || currentDaiLyId;
+
+  if (dtBoSung === 0) {
+    alert(`📊 KIỂM TRA LỆCH DOANH THU ĐẠI LÝ [${dlMa}] - ${dlTen}\n\n• Doanh thu nhập: ${formatCurrency(grandTotalTien)} đ\n• Doanh thu bổ sung/báo: 0 đ\n(Chưa nhập số liệu Doanh thu bổ sung để so khớp)`);
+  } else if (lech === 0) {
+    alert(`✅ DOANH THU KHỚP TUYỆT ĐỐI!\n\n• Đại lý [${dlMa}]: ${dlTen}\n• Doanh thu nhập: ${formatCurrency(grandTotalTien)} đ\n• Doanh thu báo: ${formatCurrency(dtBoSung)} đ\n• Lệch: 0 đ`);
+  } else if (lech > 0) {
+    alert(`⚠️ CẢNH BÁO: DOANH THU LỆCH THỪA!\n\n• Đại lý [${dlMa}]: ${dlTen}\n• Doanh thu nhập: ${formatCurrency(grandTotalTien)} đ\n• Doanh thu báo: ${formatCurrency(dtBoSung)} đ\n• LỆCH THỪA: +${formatCurrency(lech)} đ`);
+  } else {
+    alert(`⚠️ CẢNH BÁO: DOANH THU LỆCH THIẾU!\n\n• Đại lý [${dlMa}]: ${dlTen}\n• Doanh thu nhập: ${formatCurrency(grandTotalTien)} đ\n• Doanh thu báo: ${formatCurrency(dtBoSung)} đ\n• LỆCH THIẾU: ${formatCurrency(lech)} đ`);
+  }
+}
+
+async function showTongNgay(isCtrl = false) {
+  const stop = showLoading('Đang tổng hợp doanh thu ngày...');
+  try {
+    const allTickets = await getVeLoToByNgay(currentNgay);
+    let totalVe = 0;
+    let totalTien = 0;
+    const countDaily = new Set();
+
+    allTickets.forEach(t => {
+      totalVe += (t.tongVe || 0);
+      totalTien += (t.tongTien || 0);
+      if (t.daiLyId) countDaily.add(t.daiLyId);
+    });
+
+    alert(
+      `📅 TỔNG HỢP DOANH THU TOÀN BỘ NGÀY ${formatDate(currentNgay)} ${isCtrl ? '(Tất cả các máy)' : ''}\n` +
+      `───────────────────────────────\n` +
+      `• Số đại lý đã nhập: ${countDaily.size} đại lý\n` +
+      `• Tổng số tờ/bản ghi: ${allTickets.length} tờ\n` +
+      `• Tổng số vé: ${formatCurrency(totalVe)} vé\n` +
+      `▶ TỔNG DOANH THU: ${formatCurrency(totalTien)} đ`
+    );
+  } catch (err) {
+    showToast('Lỗi tổng ngày: ' + err.message, 'danger');
+  } finally {
+    stop?.();
+  }
 }
 
 function focusCell(type, row, col) {
@@ -874,7 +1245,35 @@ function showKiemTraDT() {
   alert(`📋 KIỂM TRA DOANH THU TỜ HIỆN TẠI\n\n• Tờ số: ${currentToSo}\n• Đại lý: ${currentDaiLy?.ten || currentDaiLyId}\n• Tổng vé: ${grandTotalVe} vé\n• Tổng tiền: ${grandTotalTien} nghìn đồng`);
 }
 
-async function showTongDaiLy() {
+async function showTongDaiLy(isCtrl = false) {
+  if (isCtrl) {
+    const stop = showLoading('Đang tổng hợp toàn bộ đại lý...');
+    try {
+      const allTickets = await getVeLoToByNgay(currentNgay);
+      let totalVe = 0;
+      let totalTien = 0;
+      const countDaily = new Set();
+      allTickets.forEach(t => {
+        totalVe += (t.tongVe || 0);
+        totalTien += (t.tongTien || 0);
+        if (t.daiLyId) countDaily.add(t.daiLyId);
+      });
+      alert(
+        `🏢 TỔNG TOÀN BỘ ĐẠI LÝ TRONG NGÀY ${formatDate(currentNgay)} (Ctrl+F2)\n` +
+        `───────────────────────────────\n` +
+        `• Tổng số đại lý đã nhập: ${countDaily.size} đại lý\n` +
+        `• Tổng số tờ: ${allTickets.length} tờ\n` +
+        `• Tổng số vé: ${formatCurrency(totalVe)} vé\n` +
+        `▶ TỔNG TOÀN BỘ DOANH THU: ${formatCurrency(totalTien)} đ`
+      );
+    } catch (err) {
+      showToast('Lỗi: ' + err.message, 'danger');
+    } finally {
+      stop?.();
+    }
+    return;
+  }
+
   if (!currentDaiLyId) {
     showToast('Chưa chọn đại lý để xem tổng hợp!', 'warning');
     return;
@@ -949,6 +1348,10 @@ async function showTongDaiLy() {
 function calculateTotals() {
   const values = { '5k': 5000, '10k': 10000, '20k': 20000 };
 
+  const bs5k = parseInt(document.getElementById('input-bs-5k')?.value || '0', 10) || 0;
+  const bs10k = parseInt(document.getElementById('input-bs-10k')?.value || '0', 10) || 0;
+  const bonusMap = { '5k': bs5k, '10k': bs10k, '20k': 0 };
+
   let totalVeAll = 0;
   let totalTienAll = 0;
 
@@ -982,8 +1385,10 @@ function calculateTotals() {
       }
     });
 
-    const tienNghin = (totalVeType * values[type]) / 1000;
-    totalVeAll += totalVeType;
+    const bs = bonusMap[type] || 0;
+    const finalVeType = totalVeType + bs;
+    const tienNghin = (finalVeType * values[type]) / 1000;
+    totalVeAll += finalVeType;
     totalTienAll += tienNghin;
 
     const el2 = document.getElementById(`count-${type}-2so`);
@@ -996,8 +1401,8 @@ function calculateTotals() {
     if (el2) el2.textContent = count2so;
     if (el3) el3.textContent = count3so;
     if (el4) el4.textContent = count4so;
-    if (elSumVe) elSumVe.textContent = totalVeType;
-    if (elTotalVe) elTotalVe.textContent = totalVeType;
+    if (elSumVe) elSumVe.textContent = finalVeType;
+    if (elTotalVe) elTotalVe.textContent = finalVeType;
     if (elTotalTien) elTotalTien.textContent = tienNghin;
   });
 
@@ -1018,6 +1423,10 @@ function calculateTotals() {
 
 function clearAllInputs() {
   document.querySelectorAll('.input-grid-cell').forEach(inp => inp.value = '');
+  const elBs5k = document.getElementById('input-bs-5k');
+  const elBs10k = document.getElementById('input-bs-10k');
+  if (elBs5k) elBs5k.value = '0';
+  if (elBs10k) elBs10k.value = '0';
 }
 
 async function loadExistingData() {
@@ -1030,8 +1439,10 @@ async function loadExistingData() {
     const list = await getVeLoToByNgayDaiLy(currentNgay, currentDaiLyId);
     const docData = list.find(item => item.loaiHinh === 'dac_biet' && (item.toSo || 1) === currentToSo);
     if (docData) {
+      let hasData = false;
       SECTIONS.forEach(type => {
         const items = docData[`loTo${type.toUpperCase()}`] || [];
+        if (items.length > 0) hasData = true;
         items.forEach(item => {
           if (item.row && item.col) {
             const cell = document.querySelector(`.input-grid-cell[data-type="${type}"][data-row="${item.row}"][data-col="${item.col}"]`);
@@ -1041,8 +1452,38 @@ async function loadExistingData() {
           }
         });
       });
+      const elBs5k = document.getElementById('input-bs-5k');
+      const elBs10k = document.getElementById('input-bs-10k');
+      const b5 = docData.boSung5k || 0;
+      const b10 = docData.boSung10k || 0;
+      if (b5 > 0 || b10 > 0) hasData = true;
+      if (elBs5k) elBs5k.value = b5;
+      if (elBs10k) elBs10k.value = b10;
       calculateTotals();
+
+      // Nếu tờ đã có dữ liệu -> Tự động khóa bảo vệ tránh lỡ tay nhập đè hoặc xóa
+      if (hasData) {
+        isSheetLocked = true;
+      } else {
+        isSheetLocked = false;
+      }
+
+      const badge = document.getElementById('sheet-mamay-badge');
+      if (badge) {
+        if (docData.maMay) {
+          badge.innerHTML = `💻 Máy nhập: <strong class="text-blue-900 bg-blue-100 px-1 py-0.5 rounded font-mono">${docData.maMay}</strong>`;
+        } else {
+          badge.innerHTML = `💻 Máy nhập: <span class="text-gray-500">Chưa rõ</span>`;
+        }
+      }
+    } else {
+      isSheetLocked = false;
+      const badge = document.getElementById('sheet-mamay-badge');
+      if (badge) {
+        badge.innerHTML = `💻 Máy nhập: <span class="text-gray-400">Tờ mới</span>`;
+      }
     }
+    updateLockUI();
   } catch (err) {
     console.error(err);
   } finally {
@@ -1050,27 +1491,42 @@ async function loadExistingData() {
   }
 }
 
-async function handleSave() {
-  if (isLocked) {
-    showToast('Kỳ này đã bị khóa số liệu. Không thể lưu!', 'warning');
+async function handleSave(silent = false) {
+  if (isOverTime) {
+    if (!silent) showToast('Đã hết giờ nhận số theo quy định!', 'warning');
+    return;
+  }
+  if (isSessionLocked) {
+    if (!silent) showToast('Kỳ này đã bị khóa số liệu. Không thể lưu!', 'warning');
+    return;
+  }
+  if (isSheetLocked) {
+    if (!silent) showToast('Tờ này đang bị khóa bảo vệ. Nhấn F10 để bỏ khóa trước khi sửa!', 'warning');
     return;
   }
   if (!currentDaiLyId) {
-    showToast('Vui lòng chọn đại lý trước khi lưu!', 'warning');
+    if (!silent) showToast('Vui lòng chọn đại lý trước khi lưu!', 'warning');
     return;
   }
 
+  const bs5k = parseInt(document.getElementById('input-bs-5k')?.value || '0', 10) || 0;
+  const bs10k = parseInt(document.getElementById('input-bs-10k')?.value || '0', 10) || 0;
+
+  const deviceMaMay = (localStorage.getItem('xskt_ma_may') || 'A01').toUpperCase();
   const payload = {
     ngay: currentNgay,
     daiLyId: currentDaiLyId,
     daiLyTen: currentDaiLy?.ten || currentDaiLy?.name || '',
     toSo: currentToSo,
     loaiHinh: 'dac_biet',
+    maMay: deviceMaMay,
     loTo5K: [],
     loTo10K: [],
     loTo20K: [],
-    tongVe: 0,
-    tongTien: 0
+    boSung5k: bs5k,
+    boSung10k: bs10k,
+    tongVe: bs5k + bs10k,
+    tongTien: (bs5k * 5000) + (bs10k * 10000)
   };
 
   const values = { '5k': 5000, '10k': 10000, '20k': 20000 };
@@ -1095,14 +1551,22 @@ async function handleSave() {
     });
   });
 
-  const stop = showLoading('Đang lưu dữ liệu tờ...');
+  const stop = silent ? null : showLoading('Đang lưu dữ liệu tờ...');
+  const saveBtn = document.getElementById('btn-save-loto');
   try {
     const docId = `${currentNgay.replace(/-/g, '')}_${currentDaiLyId}_to${currentToSo}_dacbiet`;
     await saveVeLoTo({ id: docId, ...payload });
-    showToast('Lưu tờ dữ liệu thành công!', 'success');
+    if (!silent) {
+      showToast('Lưu tờ dữ liệu thành công!', 'success');
+    } else if (saveBtn) {
+      saveBtn.textContent = '✓ Đã lưu tự động';
+      setTimeout(() => {
+        if (saveBtn) saveBtn.textContent = '💾 Lưu (Ctrl+S)';
+      }, 1000);
+    }
   } catch (err) {
     console.error('Save error:', err);
-    showToast('Lỗi lưu vé: ' + err.message, 'danger');
+    if (!silent) showToast('Lỗi lưu vé: ' + err.message, 'danger');
   } finally {
     stop?.();
   }

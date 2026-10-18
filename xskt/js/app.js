@@ -6,7 +6,7 @@
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
 import { signIn, signOut, registerUser, getUserProfile, ROLES } from './auth.js';
-import { initRouter, navigate } from './router.js?v=20261018_FINAL_FIX';
+import { initRouter, navigate, setBeforeEach } from './router.js?v=20261018_LOCK_PROT_V2';
 import { formatDate, formatDateDisplay, getCurrentTime, today, showToast } from './utils.js';
 
 // ─────────────────────────────────────────────────────────
@@ -39,6 +39,14 @@ const $infoNgay   = document.getElementById('info-ngay');
 const $infoMaDl   = document.getElementById('info-ma-dl');
 const $infoTenDl  = document.getElementById('info-ten-dl');
 const $infoToSo   = document.getElementById('info-to-so');
+const $btnEditDeviceMaMay = document.getElementById('btn-edit-device-mamay');
+
+// Device MaMay modal (Mã máy theo thiết bị)
+const $modalDeviceMaMay = document.getElementById('modal-device-mamay');
+const $inputDeviceMaMay = document.getElementById('input-device-mamay');
+const $btnSaveDeviceMaMay = document.getElementById('btn-save-device-mamay');
+const $btnCancelDeviceMaMay = document.getElementById('btn-cancel-device-mamay');
+const $btnCloseDeviceMaMay = document.getElementById('btn-close-device-mamay');
 
 // Date modal
 const $dateModal      = document.getElementById('date-modal');
@@ -50,6 +58,46 @@ const $dateCancelBtn  = document.getElementById('date-cancel-btn');
 const $logoutBtn       = document.getElementById('logout-btn');
 const $logoutBottomBtn = document.getElementById('logout-bottom-btn');
 const $sidebarNav      = document.getElementById('sidebar-nav');
+
+// ─────────────────────────────────────────────────────────
+// DEVICE MACHINE CODE (MÃ MÁY THEO THIẾT BỊ VẬT LÝ)
+// ─────────────────────────────────────────────────────────
+export function getDeviceMaMay() {
+  let ma = localStorage.getItem('xskt_ma_may');
+  if (!ma) {
+    ma = currentProfile?.maMay || 'A01';
+    localStorage.setItem('xskt_ma_may', ma);
+  }
+  return ma.toUpperCase();
+}
+
+export function setDeviceMaMay(newMaMay) {
+  const clean = (newMaMay || '').trim().toUpperCase();
+  if (!clean) {
+    showToast('Vui lòng nhập Mã máy cho thiết bị!', 'warning');
+    return false;
+  }
+  localStorage.setItem('xskt_ma_may', clean);
+  if ($infoMaMay) $infoMaMay.textContent = clean;
+  showToast(`Đã thiết lập Mã máy cho thiết bị này là: ${clean}`, 'success');
+  return true;
+}
+
+function openDeviceMaMayModal() {
+  if (!$modalDeviceMaMay) return;
+  if ($inputDeviceMaMay) {
+    $inputDeviceMaMay.value = getDeviceMaMay();
+  }
+  $modalDeviceMaMay.classList.remove('hidden');
+  setTimeout(() => {
+    $inputDeviceMaMay?.focus();
+    $inputDeviceMaMay?.select();
+  }, 100);
+}
+
+function closeDeviceMaMayModal() {
+  $modalDeviceMaMay?.classList.add('hidden');
+}
 
 // ─────────────────────────────────────────────────────────
 // LOADING HELPERS
@@ -77,7 +125,7 @@ function stopClock() {
 // INFO BAR
 // ─────────────────────────────────────────────────────────
 export function updateInfoBar({ maMay, maDL, tenDL, toSo } = {}) {
-  if ($infoMaMay) $infoMaMay.textContent = maMay  || currentProfile?.maMay  || '—';
+  if ($infoMaMay) $infoMaMay.textContent = maMay  || getDeviceMaMay();
   if ($infoNgay)  $infoNgay.textContent  = currentNgay ? formatDateDisplay(currentNgay) : '—';
   if ($infoMaDl)  $infoMaDl.textContent  = maDL   || currentProfile?.maDL   || '—';
   if ($infoTenDl) $infoTenDl.textContent = tenDL  || currentProfile?.tenDL  || '—';
@@ -140,6 +188,49 @@ $dateModal.addEventListener('click', (e) => {
 });
 
 // ─────────────────────────────────────────────────────────
+// DEVICE MAMAY EVENT LISTENERS
+// ─────────────────────────────────────────────────────────
+$infoMaMay?.addEventListener('click', openDeviceMaMayModal);
+$btnEditDeviceMaMay?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  openDeviceMaMayModal();
+});
+$btnCloseDeviceMaMay?.addEventListener('click', closeDeviceMaMayModal);
+$btnCancelDeviceMaMay?.addEventListener('click', closeDeviceMaMayModal);
+$modalDeviceMaMay?.addEventListener('click', (e) => {
+  if (e.target === $modalDeviceMaMay) closeDeviceMaMayModal();
+});
+
+$btnSaveDeviceMaMay?.addEventListener('click', () => {
+  const val = $inputDeviceMaMay?.value;
+  if (setDeviceMaMay(val)) {
+    closeDeviceMaMayModal();
+  }
+});
+
+$inputDeviceMaMay?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const val = $inputDeviceMaMay.value;
+    if (setDeviceMaMay(val)) {
+      closeDeviceMaMayModal();
+    }
+  } else if (e.key === 'Escape') {
+    closeDeviceMaMayModal();
+  }
+});
+
+// Quick select buttons for MaMay
+document.querySelectorAll('.btn-quick-mamay').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if ($inputDeviceMaMay) {
+      $inputDeviceMaMay.value = btn.dataset.val;
+      $inputDeviceMaMay.focus();
+    }
+  });
+});
+
+// ─────────────────────────────────────────────────────────
 // PASSWORD TOGGLE
 // ─────────────────────────────────────────────────────────
 if ($togglePassword) {
@@ -159,7 +250,7 @@ $loginForm.addEventListener('submit', async (e) => {
   const password = $loginPassword.value;
 
   if (!email || !password) {
-    showLoginError('Vui lòng nhập đầy đủ email và mật khẩu.');
+    showLoginError('Vui lòng nhập Tên đăng nhập và Mật khẩu.');
     return;
   }
 
@@ -371,6 +462,7 @@ onAuthStateChanged(auth, async (user) => {
       console.warn('Could not load user profile:', err);
       currentProfile = { displayName: user.email, role: ROLES.USER };
     }
+    sessionStorage.setItem('xskt_profile', JSON.stringify({ uid: user.uid, ...currentProfile }));
 
     // Show app, hide login
     $loginScreen.classList.add('hidden');
@@ -384,6 +476,18 @@ onAuthStateChanged(auth, async (user) => {
 
     // Start clock
     startClock();
+
+    // Route guard: Only Admin can access #/cauhinh
+    setBeforeEach((targetHash) => {
+      if (targetHash === '#/cauhinh') {
+        const isAdmin = currentProfile?.role === ROLES.ADMIN || currentProfile?.role === 'admin';
+        if (!isAdmin) {
+          showToast('Chỉ có tài khoản Quản trị viên (Admin) mới có quyền truy cập Cấu hình!', 'warning');
+          return '#/dashboard';
+        }
+      }
+      return null;
+    });
 
     // Init router (handles URL hash routing)
     initRouter({
