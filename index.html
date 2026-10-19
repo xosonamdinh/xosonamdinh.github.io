@@ -927,14 +927,54 @@
         </div>
     </div>
 
+    <!-- MODAL THÊM / SỬA MẬT KHẨU FIREBASE (SUPER ADMIN & ADMIN) -->
+    <div id="authPasswordEditModal" class="modal-overlay" style="display: none; z-index: 10000;" onclick="if(event.target===this) closeAuthPasswordEditModal()">
+        <div class="auth-modal-card" style="max-width: 440px; text-align: left;" onclick="event.stopPropagation()">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+                <h3 id="authPasswordModalTitle" style="margin: 0; font-size: 16px; color: #0f172a;">➕ Thêm Mật Khẩu Mới</h3>
+                <button type="button" onclick="closeAuthPasswordEditModal()" style="border: none; background: none; font-size: 20px; cursor: pointer; color: #94a3b8; line-height: 1;">&times;</button>
+            </div>
+            <input type="hidden" id="authEditDocId">
+            <div style="margin-bottom: 10px;">
+                <label style="display: block; font-size: 12px; font-weight: bold; color: #334155; margin-bottom: 4px;">Tên / Định Danh Người Dùng:</label>
+                <input type="text" id="authEditName" placeholder="VD: Kế Toán Nam, Admin Ca Chiều..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; font-size: 13px;">
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label style="display: block; font-size: 12px; font-weight: bold; color: #334155; margin-bottom: 4px;">Phân Quyền:</label>
+                <select id="authEditRole" style="width: 100%; padding: 8px; border: 1.5px solid var(--primary-color); border-radius: 4px; box-sizing: border-box; font-weight: bold; font-size: 13px;">
+                    <option value="user">👤 User (Chỉ Nạp Dữ Liệu)</option>
+                    <option value="admin">🛡️ Admin (Quản Trị, Xem Gộp & Bổ Sung)</option>
+                    <option value="super_admin">👑 Super Admin (Toàn Quyền Hệ Thống)</option>
+                </select>
+                <div id="authRoleExplain" style="font-size: 11.5px; color: #64748b; margin-top: 4px; line-height: 1.4;"></div>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label style="display: block; font-size: 12px; font-weight: bold; color: #334155; margin-bottom: 4px;">Mật Khẩu:</label>
+                <div style="position: relative; display: flex;">
+                    <input type="text" id="authEditPassword" placeholder="Nhập mật khẩu..." style="flex: 1; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; font-family: monospace; font-weight: bold; font-size: 14px;">
+                    <button type="button" onclick="generateRandomPass()" style="padding: 0 10px; margin-left: 4px; background: #e2e8f0; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11.5px; cursor: pointer; white-space: nowrap;" title="Tạo mật khẩu ngẫu nhiên">🎲 Ngẫu nhiên</button>
+                </div>
+            </div>
+            <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 12px; font-weight: bold; color: #334155; margin-bottom: 4px;">Ghi Chú:</label>
+                <input type="text" id="authEditNote" placeholder="Ghi chú tùy chọn..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; box-sizing: border-box; font-size: 13px;">
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button type="button" onclick="closeAuthPasswordEditModal()" class="secondary" style="flex: 1; padding: 10px;">Hủy</button>
+                <button type="button" onclick="saveAuthPasswordToFirebase()" class="success" style="flex: 2; padding: 10px; font-weight: bold;">💾 Lưu Vào Firebase</button>
+            </div>
+        </div>
+    </div>
+
     <!-- HOME PAGE -->
     <div id="homePage" class="page">
         <div class="simple-animated-logo" onclick="window.location.href = window.location.pathname; return false;">
             <img src="logoXSND.gif" alt="Logo XSKT Trực Ninh" style="width: 100px; height: 100px; object-fit: contain;">
         </div>
         <h2>Báo cáo Thu Tiền</h2>
-
-        <div class="controls-panel">
+        <div style="text-align: center; margin-top: -6px; margin-bottom: 8px;">
+            <span class="auth-session-badge" style="display:none; font-size:12px; font-weight:bold; background:#e0f2fe; color:#0369a1; padding:3px 10px; border-radius:12px; border:1px solid #bae6fd; align-items:center; gap:5px;"></span>
+        </div>
             <div style="display: flex; gap: 4px; background: #ece9d8; padding: 3px; border: 1px solid #7f9db9; margin-bottom: 5px;">
                 <button class="tab-btn active" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px;">
                     <svg width="17" height="17" viewBox="120 40 1000 1210" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0; vertical-align: middle;">
@@ -1033,6 +1073,7 @@
                 <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
                     <button class="back-btn" id="btnBackFromSummary">⬅ Quay lại Tra cứu</button>
                     <button class="back-btn" id="btnGoToKeHoach" style="background-color:#0078d4;">📋 Kế hoạch</button>
+                    <span class="auth-session-badge" style="display:none; font-size:12px; font-weight:bold; background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:4px; border:1px solid #bae6fd; align-items:center; gap:5px;"></span>
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
@@ -1051,10 +1092,14 @@
                             <button type="button" id="btnCombineMode1" class="combine-mode-btn" onclick="setCombineMode(1)" style="padding: 5px 12px; border: none; cursor: pointer; font-size: 13px; font-weight: bold; background: #0078d4; color: #ffffff;" title="Chế độ 1: CSDL Gốc (Biểu 31 & 35)">
                                 1 (CSDL Gốc)
                             </button>
-                            <button type="button" id="btnCombineMode2" class="combine-mode-btn" onclick="setCombineMode(2)" ondblclick="openExtraSalesWithAuth()" style="padding: 5px 12px; border: none; cursor: pointer; font-size: 13px; font-weight: bold; background: #f8fafc; color: #64748b;" title="Chế độ 2: Gộp (CSDL Gốc + Doanh số & Thưởng bổ sung). Nhấp đúp để vào nhập bổ sung.">
+                            <button type="button" id="btnCombineMode2" class="combine-mode-btn" onclick="setCombineMode(2)" style="padding: 5px 12px; border: none; cursor: pointer; font-size: 13px; font-weight: bold; background: #f8fafc; color: #64748b;" title="Chế độ 2: Gộp (CSDL Gốc + Doanh số & Thưởng bổ sung)">
                                 2 (Gộp)
                             </button>
                         </div>
+                        <!-- NÚT VÀO NHẬP BỔ SUNG: Chỉ hiện khi ở quyền Admin/Super Admin và xem Chế độ Gộp, bình thường ẩn đi -->
+                        <button type="button" id="btnOpenExtraSales_Summary" onclick="openExtraSalesDirect()" style="display: none; padding: 5px 14px; font-size: 13px; font-weight: bold; background: #16a34a; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(22,163,74,0.3); align-items: center; gap: 5px;" title="Vào phân hệ nhập bổ sung doanh số & thưởng">
+                            📝 Nhập Bổ Sung
+                        </button>
                     </div>
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span id="combineModeStatusBadge" onclick="if(combineMode===2) openExtraSalesWithAuth()" style="font-size: 12px; font-weight: bold; color: #0078d4; padding: 3px 8px; background: #eff6ff; border-radius: 4px; border: 1px solid #bfdbfe; cursor: pointer;" title="Đang xem chế độ">
@@ -1174,10 +1219,14 @@
                             <button type="button" id="btnCombineMode1_Det" class="combine-mode-btn" onclick="setCombineMode(1)" style="padding: 5px 12px; border: none; cursor: pointer; font-size: 12.5px; font-weight: bold; background: #0078d4; color: #ffffff;" title="Chế độ 1: CSDL Gốc">
                                 1 (CSDL Gốc)
                             </button>
-                            <button type="button" id="btnCombineMode2_Det" class="combine-mode-btn" onclick="setCombineMode(2)" ondblclick="openExtraSalesWithAuth()" style="padding: 5px 12px; border: none; cursor: pointer; font-size: 12.5px; font-weight: bold; background: #f8fafc; color: #64748b;" title="Chế độ 2: Gộp. Nhấp đúp để vào nhập bổ sung.">
+                            <button type="button" id="btnCombineMode2_Det" class="combine-mode-btn" onclick="setCombineMode(2)" style="padding: 5px 12px; border: none; cursor: pointer; font-size: 12.5px; font-weight: bold; background: #f8fafc; color: #64748b;" title="Chế độ 2: Gộp">
                                 2 (Gộp)
                             </button>
                         </div>
+                        <!-- NÚT VÀO NHẬP BỔ SUNG: Chỉ hiện khi ở quyền Admin/Super Admin và xem Chế độ Gộp, bình thường ẩn đi -->
+                        <button type="button" id="btnOpenExtraSales_Det" onclick="openExtraSalesDirect()" style="display: none; padding: 5px 14px; font-size: 12.5px; font-weight: bold; background: #16a34a; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(22,163,74,0.3); align-items: center; gap: 5px;" title="Vào phân hệ nhập bổ sung doanh số & thưởng">
+                            📝 Nhập Bổ Sung
+                        </button>
                     </div>
                     <div id="combineModeStatusBadge_Det" onclick="if(combineMode===2) openExtraSalesWithAuth()" style="font-size: 12px; font-weight: bold; color: #0078d4; padding: 3px 8px; background: #eff6ff; border-radius: 4px; border: 1px solid #bfdbfe; cursor: pointer;" title="Đang xem chế độ">
                         Đang xem: 1 - CSDL Gốc
@@ -1303,8 +1352,9 @@
 
         <!-- 4. PHÂN HỆ QUẢN LÝ CẤU HÌNH & CƠ SỞ DỮ LIỆU FIREBASE -->
         <div id="configSection" class="main-section" style="display: none;">
-            <div class="nav-header">
+            <div class="nav-header" style="display:flex; justify-content:space-between; align-items:center;">
                 <button class="back-btn" onclick="showSection('homePage')">⬅ Về Trang Chủ</button>
+                <span class="auth-session-badge" style="display:none; font-size:12px; font-weight:bold; background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:4px; border:1px solid #bae6fd; align-items:center; gap:5px;"></span>
             </div>
             
             <h3 style="color: var(--primary-color); margin-top: 5px;">⚙️ QUẢN LÝ CẤU HÌNH & CƠ SỞ DỮ LIỆU</h3>
@@ -1315,7 +1365,10 @@
                     📋 Cấu Hình Danh Mục
                 </button>
                 <button id="btnTabConfigDb" onclick="switchConfigTab('db')" class="secondary" style="flex: 1; padding: 10px; font-weight: bold; border-radius: 8px; font-size: 13.5px;">
-                    🗄️ Quản Lý CSDL Firebase (Backup/Restore/Xóa)
+                    🗄️ Quản Lý CSDL (Backup/Xóa)
+                </button>
+                <button id="btnTabConfigAuth" onclick="switchConfigTab('auth')" class="secondary" style="flex: 1; padding: 10px; font-weight: bold; border-radius: 8px; font-size: 13.5px;">
+                    🔑 Phân Quyền & Mật Khẩu
                 </button>
             </div>
 
@@ -1467,6 +1520,57 @@
                             🗑️ XÓA DỮ LIỆU ĐÃ CHỌN
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: QUẢN LÝ PHÂN QUYỀN & MẬT KHẨU FIREBASE -->
+            <div id="configTabAuthContent" style="display: none;">
+                <div class="cfg-card" style="background: #f8fafc; border: 1.5px solid #cbd5e1; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <div>
+                            <h4 style="margin: 0; color: #0f172a; font-size: 15px; text-align: left;">
+                                🔑 DANH SÁCH MẬT KHẨU PHÂN QUYỀN (LƯU TRÊN FIREBASE)
+                            </h4>
+                            <div id="authCurrentUserRoleNotice" style="font-size: 12.5px; color: #475569; margin-top: 4px; text-align: left;">
+                                Đang tải thông tin phân quyền...
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 6px;">
+                            <button type="button" onclick="loadAppPasswordsFromFirebase().then(renderAuthPasswordsManager)" class="secondary" style="padding: 7px 12px; font-size: 12.5px;">
+                                🔄 Tải Lại
+                            </button>
+                            <button type="button" id="btnOpenAddPasswordModal" onclick="openAddPasswordModal()" class="success" style="padding: 7px 14px; font-size: 13px; font-weight: bold;">
+                                ➕ Thêm Mật Khẩu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bảng danh sách mật khẩu -->
+                <div class="cfg-card" style="padding: 0; overflow-x: auto; border: 1px solid #cbd5e1;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
+                        <thead>
+                            <tr style="background: #f1f5f9; color: #334155; border-bottom: 2px solid #cbd5e1;">
+                                <th style="padding: 10px; width: 45px; text-align: center;">STT</th>
+                                <th style="padding: 10px;">Tên / Nhãn Người Dùng</th>
+                                <th style="padding: 10px; width: 140px; text-align: center;">Phân Quyền</th>
+                                <th style="padding: 10px; width: 200px;">Mật Khẩu</th>
+                                <th style="padding: 10px;">Ghi Chú</th>
+                                <th style="padding: 10px; width: 130px; text-align: center;">Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="authPasswordsTableBody">
+                            <tr><td colspan="6" style="padding: 20px; text-align: center; color: #64748b;">Đang tải danh sách mật khẩu...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Ghi chú giải thích phân quyền -->
+                <div class="cfg-card" style="margin-top: 12px; background: #fffbeb; border: 1px solid #fef3c7; font-size: 12.5px; color: #92400e; line-height: 1.6;">
+                    <div style="font-weight: bold; margin-bottom: 4px;">📌 Quy định phân quyền hệ thống:</div>
+                    <div>• <b>👑 Super Admin:</b> Xem, thêm, sửa, xóa tất cả các mật khẩu. Có quyền vào mọi tính năng: Nạp dữ liệu, Quản trị cấu hình, Gộp (Bổ sung doanh số & thưởng).</div>
+                    <div>• <b>🛡️ Admin:</b> Xem, thêm, sửa, xóa các mật khẩu phân quyền <b>USER</b> (không xem/sửa Super Admin). Vào được Nạp dữ liệu, Quản trị cấu hình, Gộp.</div>
+                    <div>• <b>👤 User:</b> Chỉ có thể Nạp dữ liệu. Không vào được Quản trị cấu hình, không vào được Gộp bổ sung, và <b>không được xem doanh số chế độ Gộp</b>.</div>
                 </div>
             </div>
         </div>
@@ -1741,28 +1845,391 @@
     }
 
     // ==========================================================
-    // Mật khẩu đã mã hóa Hash SHA-256 (Tương đương "Zeng6986")
-    const CONFIG_PASS_HASH = "59c82ad7d25a4c0ab0dc7f2e4f3ef99e163b17bf6ee06b772847b12ed054b941";
-    const CONFIG_PASS_ENC = "WmVuZzY5ODY=";
+    // HỆ THỐNG MẬT KHẨU & PHÂN QUYỀN LƯU TRÊN FIREBASE FIRESTORE
+    // 1- super_admin: Xem, thêm, sửa, xóa tất cả mật khẩu. Vào tất cả tính năng: Nạp DL, Quản trị cấu hình, Gộp.
+    // 2- admin: Xem, thêm, sửa, xóa mật khẩu user. Vào: Nạp DL, Quản trị cấu hình, Gộp.
+    // 3- user: Chỉ có thể Nạp dữ liệu. Không vào Quản trị cấu hình, Gộp. Không xem doanh số chế độ gộp.
     // ==========================================================
+    let appPasswordsList = [];
+    let currentUserRole = null; // 'super_admin' | 'admin' | 'user' | null
+    let currentUserName = '';
+    let pendingAuthRequiredRoles = null;
 
-    async function sha256(str) {
-        if (window.crypto && window.crypto.subtle && window.crypto.subtle.digest) {
+    // Tải danh sách mật khẩu từ Firestore collection "app_passwords"
+    async function loadAppPasswordsFromFirebase() {
+        await ensureAdminAuth();
+        try {
+            const snap = await db.collection("app_passwords").get();
+            if (snap.empty) {
+                console.log("Khởi tạo danh sách mật khẩu mặc định ban đầu lên Firebase...");
+                const defaultPasswords = [
+                    {
+                        name: "Super Admin",
+                        role: "super_admin",
+                        password: "Zeng6986",
+                        note: "Toàn quyền hệ thống",
+                        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                    },
+                    {
+                        name: "Admin Quản Trị",
+                        role: "admin",
+                        password: "1986",
+                        note: "Quản trị cấu hình, nạp dữ liệu & xem gộp",
+                        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                    },
+                    {
+                        name: "User Nạp Liệu",
+                        role: "user",
+                        password: "123456",
+                        note: "Chỉ nạp dữ liệu",
+                        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                    }
+                ];
+                const seeded = [];
+                for (const item of defaultPasswords) {
+                    const docRef = await db.collection("app_passwords").add(item);
+                    seeded.push({ id: docRef.id, ...item });
+                }
+                appPasswordsList = seeded;
+            } else {
+                const list = [];
+                snap.forEach(doc => {
+                    list.push({ id: doc.id, ...doc.data() });
+                });
+                appPasswordsList = list;
+            }
             try {
-                const msgBuffer = new TextEncoder().encode(str);
-                const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
-                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            } catch (e) {
-                console.warn("Crypto API error, fallback to obfuscated token check", e);
+                localStorage.setItem('cached_app_passwords', JSON.stringify(appPasswordsList));
+            } catch(_) {}
+        } catch(err) {
+            console.warn("Lỗi tải app_passwords từ Firebase, dùng cache/dự phòng:", err);
+            const cached = localStorage.getItem('cached_app_passwords');
+            if (cached) {
+                try { appPasswordsList = JSON.parse(cached); } catch(_) {}
+            }
+            if (!appPasswordsList || appPasswordsList.length === 0) {
+                appPasswordsList = [
+                    { id: "seed_super", name: "Super Admin", role: "super_admin", password: "Zeng6986", note: "Mặc định hệ thống" },
+                    { id: "seed_admin", name: "Admin Quản Trị", role: "admin", password: "1986", note: "Mặc định hệ thống" },
+                    { id: "seed_user", name: "User Nạp Liệu", role: "user", password: "123456", note: "Mặc định hệ thống" }
+                ];
             }
         }
-        try {
-            return btoa(str) === CONFIG_PASS_ENC ? CONFIG_PASS_HASH : 'invalid';
-        } catch(e) {
-            return 'invalid';
-        }
+        return appPasswordsList;
     }
+    window.loadAppPasswordsFromFirebase = loadAppPasswordsFromFirebase;
+
+    // Tìm bản ghi tài khoản theo mật khẩu nhập vào
+    function findAuthRecord(inputPass) {
+        if (!inputPass) return null;
+        const trimmed = String(inputPass).trim();
+        if (appPasswordsList && appPasswordsList.length > 0) {
+            const found = appPasswordsList.find(p => String(p.password || '').trim() === trimmed);
+            if (found) return found;
+        }
+        if (trimmed === "Zeng6986") return { id: "fallback_super", name: "Super Admin", role: "super_admin", password: "Zeng6986" };
+        if (trimmed === "1986") return { id: "fallback_admin", name: "Admin", role: "admin", password: "1986" };
+        if (trimmed === "123456") return { id: "fallback_user", name: "User", role: "user", password: "123456" };
+        return null;
+    }
+
+    // Kiểm tra quyền hạn theo vai trò
+    function checkRolePermission(userRole, requiredRoles) {
+        if (!requiredRoles || requiredRoles.length === 0) return true;
+        if (userRole === 'super_admin') return true;
+        if (userRole === 'admin' && (requiredRoles.includes('admin') || requiredRoles.includes('user'))) return true;
+        if (userRole === 'user' && requiredRoles.includes('user')) return true;
+        return false;
+    }
+
+    function getRoleLabel(role) {
+        if (role === 'super_admin') return 'Super Admin';
+        if (role === 'admin') return 'Admin';
+        if (role === 'user') return 'User (Nạp Liệu)';
+        return 'Chưa xác thực';
+    }
+
+    function getRoleBadge(role) {
+        if (role === 'super_admin') {
+            return '<span style="background:#fee2e2; color:#991b1b; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:11.5px; border:1px solid #fca5a5;">👑 Super Admin</span>';
+        }
+        if (role === 'admin') {
+            return '<span style="background:#dbeafe; color:#1e40af; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:11.5px; border:1px solid #93c5fd;">🛡️ Admin</span>';
+        }
+        return '<span style="background:#dcfce7; color:#166534; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:11.5px; border:1px solid #86efac;">👤 User</span>';
+    }
+
+    function updateUserSessionBadge() {
+        const notices = document.querySelectorAll('.auth-session-badge');
+        notices.forEach(el => {
+            if (currentUserRole) {
+                el.style.display = 'inline-flex';
+                el.innerHTML = `👤 <b>${escapeHTML(currentUserName || getRoleLabel(currentUserRole))}</b> (${getRoleLabel(currentUserRole)}) <button type="button" onclick="logoutAuthSession()" style="background:none; border:none; color:#e11d48; cursor:pointer; font-size:11px; font-weight:bold; margin-left:4px;" title="Đăng xuất / Khóa quyền">[Thoát]</button>`;
+            } else {
+                el.style.display = 'none';
+            }
+        });
+    }
+
+    window.logoutAuthSession = function() {
+        currentUserRole = null;
+        currentUserName = '';
+        updateUserSessionBadge();
+        if (combineMode === 2) {
+            executeSetCombineMode(1);
+        }
+        showNotification("Đã đăng xuất phiên làm việc!", "info");
+    };
+
+    // Render giao diện quản lý mật khẩu trong Tab 3 Cấu Hình
+    window.renderAuthPasswordsManager = async function() {
+        const tbody = document.getElementById('authPasswordsTableBody');
+        const noticeEl = document.getElementById('authCurrentUserRoleNotice');
+        if (!tbody) return;
+
+        if (currentUserRole !== 'super_admin' && currentUserRole !== 'admin') {
+            tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:#e11d48; font-weight:bold;">⚠️ Bạn cần đăng nhập với quyền Admin hoặc Super Admin để xem mục này!</td></tr>`;
+            return;
+        }
+
+        if (noticeEl) {
+            if (currentUserRole === 'super_admin') {
+                noticeEl.innerHTML = `👑 Bạn đang đăng nhập: <b>${escapeHTML(currentUserName || 'Super Admin')}</b> (<span style="color:#b91c1c; font-weight:bold;">Super Admin - Toàn Quyền</span>) &bull; Có thể xem, thêm, sửa, xóa <b>tất cả các mật khẩu</b>.`;
+            } else {
+                noticeEl.innerHTML = `🛡️ Bạn đang đăng nhập: <b>${escapeHTML(currentUserName || 'Admin')}</b> (<span style="color:#1d4ed8; font-weight:bold;">Admin Quản Trị</span>) &bull; Có thể xem, thêm, sửa, xóa các mật khẩu phân quyền <b>USER</b>.`;
+            }
+        }
+
+        if (!appPasswordsList || appPasswordsList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:#64748b;">⏳ Đang tải danh sách mật khẩu từ Firebase...</td></tr>`;
+            await loadAppPasswordsFromFirebase();
+        }
+
+        const visibleList = appPasswordsList.filter(item => {
+            if (currentUserRole === 'super_admin') return true;
+            if (currentUserRole === 'admin') return item.role === 'user';
+            return false;
+        });
+
+        if (visibleList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="padding:25px; text-align:center; color:#64748b;">Chưa có mật khẩu nào trong danh mục. Bấm <b>➕ Thêm Mật Khẩu</b> để tạo.</td></tr>`;
+            return;
+        }
+
+        let html = '';
+        visibleList.forEach((item, idx) => {
+            const roleBadge = getRoleBadge(item.role);
+            const passDisplay = escapeHTML(item.password || '');
+            const passId = `pwd_disp_${item.id || idx}`;
+            const canManage = (currentUserRole === 'super_admin') || (currentUserRole === 'admin' && item.role === 'user');
+
+            html += `
+            <tr style="border-bottom: 1px solid #e2e8f0; background: ${idx % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+                <td style="padding: 10px; text-align: center; color: #64748b; font-weight: bold;">${idx + 1}</td>
+                <td style="padding: 10px; font-weight: bold; color: #1e293b;">${escapeHTML(item.name || 'Không tên')}</td>
+                <td style="padding: 10px; text-align: center;">${roleBadge}</td>
+                <td style="padding: 10px; font-family: monospace; font-size: 13.5px;">
+                    <span id="${passId}" style="font-weight: bold; color: #0f172a;">${passDisplay}</span>
+                    <button type="button" onclick="copyPasswordToClipboard('${passDisplay}')" style="margin-left: 6px; padding: 2px 6px; font-size: 11px; background: #e2e8f0; border: 1px solid #cbd5e1; border-radius: 3px; cursor: pointer;" title="Sao chép mật khẩu">📋</button>
+                </td>
+                <td style="padding: 10px; color: #64748b; font-size: 12.5px;">${escapeHTML(item.note || '—')}</td>
+                <td style="padding: 10px; text-align: center;">
+                    ${canManage ? `
+                        <button type="button" onclick="openEditPasswordModal('${item.id}')" style="padding: 4px 8px; font-size: 12px; background: #0284c7; color: white; border: none; border-radius: 3px; cursor: pointer; margin-right: 4px;" title="Sửa mật khẩu">✏️ Sửa</button>
+                        <button type="button" onclick="deleteAuthPasswordFromFirebase('${item.id}')" style="padding: 4px 8px; font-size: 12px; background: #dc2626; color: white; border: none; border-radius: 3px; cursor: pointer;" title="Xóa mật khẩu">🗑️ Xóa</button>
+                    ` : `<span style="font-size: 11.5px; color: #94a3b8; font-style: italic;">Đã bảo vệ</span>`}
+                </td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+    };
+
+    window.openAddPasswordModal = function() {
+        if (currentUserRole !== 'super_admin' && currentUserRole !== 'admin') {
+            return showNotification("Bạn không có quyền thêm mật khẩu!", "error");
+        }
+        document.getElementById('authPasswordModalTitle').textContent = "➕ Thêm Mật Khẩu Mới";
+        document.getElementById('authEditDocId').value = "";
+        document.getElementById('authEditName').value = "";
+        document.getElementById('authEditPassword').value = "";
+        document.getElementById('authEditNote').value = "";
+
+        const roleSelect = document.getElementById('authEditRole');
+        const explainEl = document.getElementById('authRoleExplain');
+        if (roleSelect) {
+            roleSelect.innerHTML = "";
+            if (currentUserRole === 'super_admin') {
+                roleSelect.innerHTML = `
+                    <option value="user">👤 User (Chỉ Nạp Dữ Liệu)</option>
+                    <option value="admin">🛡️ Admin (Quản Trị, Xem Gộp & Bổ Sung)</option>
+                    <option value="super_admin">👑 Super Admin (Toàn Quyền Hệ Thống)</option>
+                `;
+                roleSelect.disabled = false;
+                if (explainEl) explainEl.textContent = "Super Admin có thể tạo tài khoản cho bất kỳ phân quyền nào.";
+            } else {
+                roleSelect.innerHTML = `
+                    <option value="user" selected>👤 User (Chỉ Nạp Dữ Liệu)</option>
+                `;
+                roleSelect.disabled = true;
+                if (explainEl) explainEl.textContent = "Admin chỉ có quyền tạo tài khoản phân quyền USER.";
+            }
+        }
+
+        const modal = document.getElementById('authPasswordEditModal');
+        if (modal) modal.style.display = 'flex';
+        setTimeout(() => document.getElementById('authEditName')?.focus(), 100);
+    };
+
+    window.openEditPasswordModal = function(docId) {
+        const item = appPasswordsList.find(p => p.id === docId);
+        if (!item) return showNotification("Không tìm thấy thông tin tài khoản!", "error");
+
+        if (currentUserRole === 'admin' && item.role !== 'user') {
+            return showNotification("Admin chỉ có quyền sửa mật khẩu của phân quyền USER!", "error");
+        }
+
+        document.getElementById('authPasswordModalTitle').textContent = `✏️ Sửa Mật Khẩu: ${item.name || ''}`;
+        document.getElementById('authEditDocId').value = item.id;
+        document.getElementById('authEditName').value = item.name || '';
+        document.getElementById('authEditPassword').value = item.password || '';
+        document.getElementById('authEditNote').value = item.note || '';
+
+        const roleSelect = document.getElementById('authEditRole');
+        const explainEl = document.getElementById('authRoleExplain');
+        if (roleSelect) {
+            roleSelect.innerHTML = "";
+            if (currentUserRole === 'super_admin') {
+                roleSelect.innerHTML = `
+                    <option value="user" ${item.role === 'user' ? 'selected' : ''}>👤 User (Chỉ Nạp Dữ Liệu)</option>
+                    <option value="admin" ${item.role === 'admin' ? 'selected' : ''}>🛡️ Admin (Quản Trị, Xem Gộp & Bổ Sung)</option>
+                    <option value="super_admin" ${item.role === 'super_admin' ? 'selected' : ''}>👑 Super Admin (Toàn Quyền Hệ Thống)</option>
+                `;
+                roleSelect.disabled = false;
+                if (explainEl) explainEl.textContent = "Super Admin có thể thay đổi phân quyền.";
+            } else {
+                roleSelect.innerHTML = `
+                    <option value="user" selected>👤 User (Chỉ Nạp Dữ Liệu)</option>
+                `;
+                roleSelect.disabled = true;
+                if (explainEl) explainEl.textContent = "Admin chỉ có quyền quản lý phân quyền USER.";
+            }
+        }
+
+        const modal = document.getElementById('authPasswordEditModal');
+        if (modal) modal.style.display = 'flex';
+        setTimeout(() => document.getElementById('authEditPassword')?.focus(), 100);
+    };
+
+    window.closeAuthPasswordEditModal = function() {
+        const modal = document.getElementById('authPasswordEditModal');
+        if (modal) modal.style.display = 'none';
+    };
+
+    window.generateRandomPass = function() {
+        const chars = '23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ';
+        let pass = '';
+        for (let i = 0; i < 8; i++) {
+            pass += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        const inp = document.getElementById('authEditPassword');
+        if (inp) {
+            inp.value = pass;
+            inp.select();
+        }
+    };
+
+    window.copyPasswordToClipboard = function(pass) {
+        if (!pass) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(pass).then(() => {
+                showNotification(`Đã sao chép mật khẩu: ${pass}`, "info");
+            }).catch(() => {
+                showNotification(`Mật khẩu: ${pass}`, "info");
+            });
+        } else {
+            prompt("Mật khẩu (Ctrl+C để sao chép):", pass);
+        }
+    };
+
+    window.saveAuthPasswordToFirebase = async function() {
+        const docId = document.getElementById('authEditDocId')?.value?.trim();
+        const name = document.getElementById('authEditName')?.value?.trim();
+        let role = document.getElementById('authEditRole')?.value?.trim() || 'user';
+        const password = document.getElementById('authEditPassword')?.value?.trim();
+        const note = document.getElementById('authEditNote')?.value?.trim() || '';
+
+        if (!name) return showNotification("Vui lòng nhập tên người dùng!", "warning");
+        if (!password || password.length < 3) return showNotification("Mật khẩu phải có ít nhất 3 ký tự!", "warning");
+
+        if (currentUserRole === 'admin') {
+            role = 'user';
+        }
+
+        showLoading();
+        try {
+            await ensureAdminAuth();
+            const dataToSave = {
+                name: name,
+                role: role,
+                password: password,
+                note: note,
+                updated_at: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            if (docId && !docId.startsWith("seed_") && !docId.startsWith("fallback_")) {
+                await db.collection("app_passwords").doc(docId).set(dataToSave, { merge: true });
+                showNotification(`✅ Đã cập nhật mật khẩu cho ${name} thành công!`, "success");
+            } else {
+                await db.collection("app_passwords").add(dataToSave);
+                showNotification(`✅ Đã thêm mật khẩu mới cho ${name} vào Firebase!`, "success");
+            }
+
+            closeAuthPasswordEditModal();
+            await loadAppPasswordsFromFirebase();
+            renderAuthPasswordsManager();
+        } catch(err) {
+            console.error("Lỗi lưu mật khẩu Firebase:", err);
+            showNotification("Lỗi lưu Firebase: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
+
+    window.deleteAuthPasswordFromFirebase = async function(docId) {
+        const item = appPasswordsList.find(p => p.id === docId);
+        if (!item) return showNotification("Không tìm thấy tài khoản!", "error");
+
+        if (currentUserRole === 'admin' && item.role !== 'user') {
+            return showNotification("Admin chỉ có quyền xóa mật khẩu của phân quyền USER!", "error");
+        }
+
+        if (item.role === 'super_admin') {
+            const superCount = appPasswordsList.filter(p => p.role === 'super_admin').length;
+            if (superCount <= 1) {
+                return showNotification("❌ Không thể xóa tài khoản Super Admin duy nhất của hệ thống!", "error");
+            }
+        }
+
+        if (!confirm(`Bạn có chắc chắn muốn xóa mật khẩu của [${item.name || item.password}] khỏi Firebase?`)) {
+            return;
+        }
+
+        showLoading();
+        try {
+            await ensureAdminAuth();
+            if (docId && !docId.startsWith("seed_") && !docId.startsWith("fallback_")) {
+                await db.collection("app_passwords").doc(docId).delete();
+            }
+            showNotification(`Đã xóa mật khẩu của ${item.name} thành công!`, "info");
+            await loadAppPasswordsFromFirebase();
+            renderAuthPasswordsManager();
+        } catch(err) {
+            console.error("Lỗi xóa mật khẩu Firebase:", err);
+            showNotification("Lỗi xóa: " + err.message, "error");
+        } finally {
+            hideLoading();
+        }
+    };
 
     let currentDbData = [];
     let excelData1 = [], excelData2 = [];
@@ -2035,13 +2502,19 @@ H. Nam Trực: 400_449`;
         return res.charAt(0).toUpperCase() + res.slice(1);
     }
 
-    // ==================== XỬ LÝ MẬT KHẨU CẤU HÌNH ====================
+    // ==================== XỬ LÝ MẬT KHẨU CẤU HÌNH & XÁC THỰC PHÂN QUYỀN ====================
     window.openConfigWithAuth = function() {
+        if (currentUserRole === 'super_admin' || currentUserRole === 'admin') {
+            showSection('configSection');
+            loadFirebaseConfigTable();
+            return;
+        }
         DOM.txtAdminPassword.value = '';
         const t = document.getElementById('authModalTitle');
         const st = document.getElementById('authModalSubTitle');
         if (t) t.textContent = 'Quản Trị Cấu Hình';
-        if (st) st.textContent = 'Nhập mật khẩu để truy cập trang cấu hình';
+        if (st) st.textContent = 'Nhập mật khẩu Admin hoặc Super Admin để truy cập trang cấu hình:';
+        pendingAuthRequiredRoles = ['super_admin', 'admin'];
         pendingAuthCallback = () => {
             showSection('configSection');
             loadFirebaseConfigTable();
@@ -2052,43 +2525,50 @@ H. Nam Trực: 400_449`;
 
     window.closeAdminAuthModal = function() {
         DOM.authConfigModal.style.display = 'none';
+        pendingAuthCallback = null;
+        pendingAuthRequiredRoles = null;
     };
 
     window.verifyAdminPassword = async function() {
         const inputVal = DOM.txtAdminPassword.value.trim();
         if (!inputVal) return showNotification("Vui lòng nhập mật khẩu!", "warning");
         
-        try {
-            const inputHash = await sha256(inputVal);
-            const isEncMatch = (typeof btoa === 'function') && (btoa(inputVal) === CONFIG_PASS_ENC);
-            if (inputHash === CONFIG_PASS_HASH || isEncMatch) {
-                // Đăng nhập Firebase Auth bằng tài khoản quản trị
-                if (firebase.auth) {
-                    try {
-                        if (!firebase.auth().currentUser || firebase.auth().currentUser.email !== ADMIN_EMAIL) {
-                            await firebase.auth().signInWithEmailAndPassword(ADMIN_EMAIL, inputVal);
-                            console.log("✅ Đã đăng nhập Firebase Auth:", ADMIN_EMAIL);
-                        }
-                    } catch (authErr) {
-                        console.warn("Firebase Auth signIn:", authErr.code, authErr.message);
-                    }
-                }
-
-                closeAdminAuthModal();
-                if (typeof pendingAuthCallback === 'function') {
-                    const cb = pendingAuthCallback;
-                    pendingAuthCallback = null;
-                    await cb();
-                }
-                return;
-            }
-        } catch (err) {
-            console.error("Auth verification error:", err);
+        const matched = findAuthRecord(inputVal);
+        if (!matched) {
+            showNotification("Mật khẩu không chính xác!", "error");
+            DOM.txtAdminPassword.value = '';
+            DOM.txtAdminPassword.focus();
+            return;
         }
 
-        showNotification("Mật khẩu không chính xác!", "error");
-        DOM.txtAdminPassword.value = '';
-        DOM.txtAdminPassword.focus();
+        const requiredRoles = pendingAuthRequiredRoles || ['super_admin', 'admin'];
+        if (!checkRolePermission(matched.role, requiredRoles)) {
+            if (matched.role === 'user') {
+                showNotification("❌ Mật khẩu quyền User chỉ được phép Nạp dữ liệu, không có quyền truy cập chức năng này!", "error");
+            } else {
+                showNotification("❌ Bạn không có quyền truy cập chức năng này!", "error");
+            }
+            DOM.txtAdminPassword.value = '';
+            DOM.txtAdminPassword.focus();
+            return;
+        }
+
+        currentUserRole = matched.role;
+        currentUserName = matched.name;
+        updateUserSessionBadge();
+
+        await ensureAdminAuth();
+
+        const cb = pendingAuthCallback;
+        pendingAuthCallback = null;
+        pendingAuthRequiredRoles = null;
+        DOM.authConfigModal.style.display = 'none';
+
+        showNotification(`Đã xác thực: ${matched.name} (${getRoleLabel(matched.role)})`, "success");
+
+        if (typeof cb === 'function') {
+            await cb();
+        }
     };
 
     DOM.txtAdminPassword.addEventListener('keydown', function(e) {
@@ -2609,11 +3089,17 @@ H. Nam Trực: 400_449`;
     DOM.btnLoadData.onclick = () => {
         if (!excelData1.length && !excelData2.length) return showNotification("Hãy chọn file Excel Biểu 31 hoặc Biểu 35 trước!", 'error');
         
+        if (currentUserRole) {
+            executeDirectWebUpload();
+            return;
+        }
+
         DOM.txtAdminPassword.value = '';
         const t = document.getElementById('authModalTitle');
         const st = document.getElementById('authModalSubTitle');
         if (t) t.textContent = '🔐 Xác Nhận Nạp CSDL';
-        if (st) st.textContent = 'Nhập mật khẩu quản trị để nạp dữ liệu lên Firebase';
+        if (st) st.textContent = 'Nhập mật khẩu để nạp dữ liệu lên Firebase (Chấp nhận Super Admin, Admin, User):';
+        pendingAuthRequiredRoles = ['super_admin', 'admin', 'user'];
         pendingAuthCallback = async () => {
             await executeDirectWebUpload();
         };
@@ -2912,7 +3398,7 @@ H. Nam Trực: 400_449`;
     }
 
     if (DOM.btnLoadRawData) {
-        DOM.btnLoadRawData.onclick = () => {
+        DOM.btnLoadRawData.onclick = async () => {
             const text = DOM.txtRawDataInput ? DOM.txtRawDataInput.value.trim() : '';
             if (!text) return showNotification("Vui lòng dán dữ liệu thô vào khung trước!", 'warning');
 
@@ -2921,11 +3407,17 @@ H. Nam Trực: 400_449`;
                 return showNotification("Không trích xuất được bản ghi hợp lệ nào! Vui lòng kiểm tra lại định dạng.", 'error');
             }
 
+            if (currentUserRole) {
+                await executeRawDataWebUpload(parseResult.parsedMap);
+                return;
+            }
+
             DOM.txtAdminPassword.value = '';
             const t = document.getElementById('authModalTitle');
             const st = document.getElementById('authModalSubTitle');
             if (t) t.textContent = '🔐 Xác Nhận Nạp CSDL';
-            if (st) st.textContent = `Nhập mật khẩu quản trị để nạp ${parseResult.parsedMap.size} đại lý dữ liệu thô lên Firebase`;
+            if (st) st.textContent = `Nhập mật khẩu để nạp ${parseResult.parsedMap.size} đại lý dữ liệu thô lên Firebase (Chấp nhận Super Admin, Admin, User):`;
+            pendingAuthRequiredRoles = ['super_admin', 'admin', 'user'];
             pendingAuthCallback = async () => {
                 await executeRawDataWebUpload(parseResult.parsedMap);
             };
@@ -5963,6 +6455,9 @@ H. Nam Trực: 400_449`;
 
         // Tải dữ liệu bổ sung doanh số & thưởng từ Firebase
         await loadAllExtraSalesFromFirebase();
+
+        // Tải danh sách tài khoản & mật khẩu phân quyền từ Firebase
+        await loadAppPasswordsFromFirebase();
     }
 
     DOM.btnClearRevenueFilter.onclick = () => {
@@ -6013,20 +6508,23 @@ H. Nam Trực: 400_449`;
     window.switchConfigTab = function(tab) {
         const btnTable = document.getElementById('btnTabConfigTable');
         const btnDb = document.getElementById('btnTabConfigDb');
+        const btnAuth = document.getElementById('btnTabConfigAuth');
         const contentTable = document.getElementById('configTabTableContent');
         const contentDb = document.getElementById('configTabDbContent');
+        const contentAuth = document.getElementById('configTabAuthContent');
 
-        if (tab === 'table') {
-            btnTable.className = 'success';
-            btnDb.className = 'secondary';
-            contentTable.style.display = 'block';
-            contentDb.style.display = 'none';
-        } else {
-            btnTable.className = 'secondary';
-            btnDb.className = 'success';
-            contentTable.style.display = 'none';
-            contentDb.style.display = 'block';
+        if (btnTable) btnTable.className = (tab === 'table') ? 'success' : 'secondary';
+        if (btnDb) btnDb.className = (tab === 'db') ? 'success' : 'secondary';
+        if (btnAuth) btnAuth.className = (tab === 'auth') ? 'success' : 'secondary';
+
+        if (contentTable) contentTable.style.display = (tab === 'table') ? 'block' : 'none';
+        if (contentDb) contentDb.style.display = (tab === 'db') ? 'block' : 'none';
+        if (contentAuth) contentAuth.style.display = (tab === 'auth') ? 'block' : 'none';
+
+        if (tab === 'db') {
             fetchDatabaseStats();
+        } else if (tab === 'auth') {
+            renderAuthPasswordsManager();
         }
     };
 
@@ -6575,7 +7073,7 @@ H. Nam Trực: 400_449`;
         }
     };
 
-    window.promptSaveAgentRecordsEdit = function() {
+    window.promptSaveAgentRecordsEdit = async function() {
         const tbody = document.getElementById('manageAgentTableBody');
         const rows = tbody ? tbody.querySelectorAll('tr') : [];
         if (!rows || rows.length === 0) return showNotification("Không có dữ liệu nào trong bảng để lưu!", "warning");
@@ -6583,11 +7081,17 @@ H. Nam Trực: 400_449`;
         const inputCode = document.getElementById('txtManageAgentCode') || document.getElementById('txtDeleteSpecificAgentCode');
         const code = inputCode ? inputCode.value.trim().toUpperCase() : '';
 
+        if (currentUserRole === 'super_admin' || currentUserRole === 'admin') {
+            await executeSaveAgentRecordsEdit();
+            return;
+        }
+
         DOM.txtAdminPassword.value = '';
         const t = document.getElementById('authModalTitle');
         const st = document.getElementById('authModalSubTitle');
         if (t) t.textContent = '💾 Lưu Dữ Liệu Đại Lý';
-        if (st) st.textContent = `Lưu các thay đổi dữ liệu của đại lý ${code} vào CSDL Firebase. Nhập mật khẩu quản trị:`;
+        if (st) st.textContent = `Lưu các thay đổi dữ liệu của đại lý ${code} vào CSDL Firebase. Nhập mật khẩu Admin hoặc Super Admin:`;
+        pendingAuthRequiredRoles = ['super_admin', 'admin'];
         pendingAuthCallback = async () => {
             await executeSaveAgentRecordsEdit();
         };
@@ -6790,11 +7294,19 @@ H. Nam Trực: 400_449`;
 
         if (targetDates.length === 0) return showNotification("Không tìm thấy ngày dữ liệu nào trong phạm vi đã chọn!", "warning");
 
+        if (currentUserRole === 'super_admin' || currentUserRole === 'admin') {
+            await executeDeleteAgentFromFirebase([code], targetDates);
+            const editorCont = document.getElementById('manageAgentEditorContainer');
+            if (editorCont) editorCont.style.display = 'none';
+            return;
+        }
+
         DOM.txtAdminPassword.value = '';
         const t = document.getElementById('authModalTitle');
         const st = document.getElementById('authModalSubTitle');
         if (t) t.textContent = '🗑️ Xóa Đại Lý Khỏi CSDL';
-        if (st) st.textContent = `Xóa vĩnh viễn đại lý ${code} trong ${targetDates.length} ngày khỏi Firebase. Nhập mật khẩu quản trị:`;
+        if (st) st.textContent = `Xóa vĩnh viễn đại lý ${code} trong ${targetDates.length} ngày khỏi Firebase. Nhập mật khẩu Admin hoặc Super Admin:`;
+        pendingAuthRequiredRoles = ['super_admin', 'admin'];
         pendingAuthCallback = async () => {
             await executeDeleteAgentFromFirebase([code], targetDates);
             const editorCont = document.getElementById('manageAgentEditorContainer');
@@ -6896,11 +7408,27 @@ H. Nam Trực: 400_449`;
 
     // ==================== QUẢN LÝ DOANH SỐ & THƯỞNG BỔ SUNG ====================
     function setCombineMode(mode) {
-        if (combineMode === 2 && mode === 2) {
-            // Khi đang ở Chế độ 2 mà click tiếp vào nút 2 (Gộp) -> mở hộp thoại mật khẩu nhập bổ sung
-            openExtraSalesWithAuth();
+        if (mode === 2) {
+            // Dù là đã đăng nhập super admin và admin thì cũng phải nhập mật khẩu thì mới xem được chế độ gộp
+            DOM.txtAdminPassword.value = '';
+            const t = document.getElementById('authModalTitle');
+            const st = document.getElementById('authModalSubTitle');
+            if (t) t.textContent = '🔐 Xác Nhận Xem Chế Độ Gộp';
+            if (st) st.textContent = 'Nhập mật khẩu Admin hoặc Super Admin để xem doanh số chế độ Gộp:';
+            pendingAuthRequiredRoles = ['super_admin', 'admin'];
+            pendingAuthCallback = () => {
+                executeSetCombineMode(2);
+                showNotification("✅ Đã mở khóa xem Chế độ Gộp!", "success");
+            };
+            DOM.authConfigModal.style.display = 'block';
+            setTimeout(() => DOM.txtAdminPassword.focus(), 100);
             return;
         }
+        executeSetCombineMode(1);
+    }
+    window.setCombineMode = setCombineMode;
+
+    function executeSetCombineMode(mode) {
         combineMode = mode;
         const b1 = document.getElementById('btnCombineMode1');
         const b2 = document.getElementById('btnCombineMode2');
@@ -6908,6 +7436,8 @@ H. Nam Trực: 400_449`;
         const b2Det = document.getElementById('btnCombineMode2_Det');
         const badge = document.getElementById('combineModeStatusBadge');
         const badgeDet = document.getElementById('combineModeStatusBadge_Det');
+        const btnExtraSum = document.getElementById('btnOpenExtraSales_Summary');
+        const btnExtraDet = document.getElementById('btnOpenExtraSales_Det');
 
         if (mode === 1) {
             if (b1) { b1.style.background = '#0078d4'; b1.style.color = '#ffffff'; }
@@ -6926,6 +7456,9 @@ H. Nam Trực: 400_449`;
                 badgeDet.style.background = '#eff6ff';
                 badgeDet.style.borderColor = '#bfdbfe';
             }
+            // Bình thường thì ẩn nút Nhập Bổ Sung đi
+            if (btnExtraSum) btnExtraSum.style.display = 'none';
+            if (btnExtraDet) btnExtraDet.style.display = 'none';
         } else {
             if (b1) { b1.style.background = '#f8fafc'; b1.style.color = '#64748b'; }
             if (b2) { b2.style.background = '#107c41'; b2.style.color = '#ffffff'; }
@@ -6943,6 +7476,9 @@ H. Nam Trực: 400_449`;
                 badgeDet.style.background = '#f0fdf4';
                 badgeDet.style.borderColor = '#bbf7d0';
             }
+            // Chỉ khi ở quyền admin và super admin (đã mở khóa chế độ gộp) thì nút nhập bổ sung mới hiện
+            if (btnExtraSum) btnExtraSum.style.display = 'inline-flex';
+            if (btnExtraDet) btnExtraDet.style.display = 'inline-flex';
         }
 
         generateSummaryView();
@@ -6950,34 +7486,62 @@ H. Nam Trực: 400_449`;
             createReport(true);
         }
     }
-    window.setCombineMode = setCombineMode;
+    window.executeSetCombineMode = executeSetCombineMode;
 
-    function openExtraSalesWithAuth() {
-        if (DOM.extraSalesAuthModal) {
-            DOM.extraSalesAuthModal.style.display = 'flex';
-            if (DOM.txtExtraSalesPassword) {
-                DOM.txtExtraSalesPassword.value = '';
-                setTimeout(() => DOM.txtExtraSalesPassword.focus(), 150);
-            }
-        }
-    }
-    window.openExtraSalesWithAuth = openExtraSalesWithAuth;
-
-    function verifyExtraSalesPassword() {
-        const pass = DOM.txtExtraSalesPassword ? DOM.txtExtraSalesPassword.value.trim() : '';
-        if (pass === 'vungoimora') {
-            if (DOM.extraSalesAuthModal) DOM.extraSalesAuthModal.style.display = 'none';
+    function openExtraSalesDirect() {
+        // Dù là đã đăng nhập super admin và admin thì cũng phải nhập mật khẩu thì mới vào nhập bổ sung
+        DOM.txtAdminPassword.value = '';
+        const t = document.getElementById('authModalTitle');
+        const st = document.getElementById('authModalSubTitle');
+        if (t) t.textContent = '🔐 Xác Nhận Vào Nhập Bổ Sung';
+        if (st) st.textContent = 'Nhập mật khẩu Admin hoặc Super Admin để vào Nhập bổ sung:';
+        pendingAuthRequiredRoles = ['super_admin', 'admin'];
+        pendingAuthCallback = () => {
             initExtraSalesDateInputs();
             loadSelectedExtraSalesEditor();
             renderSavedExtraList();
             showSection('extraSalesSection');
-            showNotification('Đã mở phân hệ bổ sung doanh số!', 'success');
-        } else {
-            showNotification('Mật khẩu không đúng! Vui lòng thử lại.', 'error');
-            if (DOM.txtExtraSalesPassword) {
-                DOM.txtExtraSalesPassword.value = '';
-                DOM.txtExtraSalesPassword.focus();
+            showNotification("✅ Đã mở phân hệ Nhập bổ sung doanh số & thưởng!", "success");
+        };
+        DOM.authConfigModal.style.display = 'block';
+        setTimeout(() => DOM.txtAdminPassword.focus(), 100);
+    }
+    window.openExtraSalesDirect = openExtraSalesDirect;
+    window.openExtraSalesWithAuth = openExtraSalesDirect;
+
+    async function verifyExtraSalesPassword() {
+        const pass = DOM.txtExtraSalesPassword ? DOM.txtExtraSalesPassword.value.trim() : '';
+        if (!pass) return showNotification("Vui lòng nhập mật khẩu!", "warning");
+        
+        const matched = findAuthRecord(pass);
+        if (matched) {
+            if (matched.role === 'super_admin' || matched.role === 'admin') {
+                currentUserRole = matched.role;
+                currentUserName = matched.name;
+                updateUserSessionBadge();
+                await ensureAdminAuth();
+
+                if (DOM.extraSalesAuthModal) DOM.extraSalesAuthModal.style.display = 'none';
+                initExtraSalesDateInputs();
+                loadSelectedExtraSalesEditor();
+                renderSavedExtraList();
+                showSection('extraSalesSection');
+                showNotification(`Đã mở phân hệ bổ sung doanh số (${matched.name})!`, 'success');
+                return;
+            } else {
+                showNotification("❌ Quyền User không được phép vào Gộp (bổ sung doanh số & thưởng)!", "error");
+                if (DOM.txtExtraSalesPassword) {
+                    DOM.txtExtraSalesPassword.value = '';
+                    DOM.txtExtraSalesPassword.focus();
+                }
+                return;
             }
+        }
+
+        showNotification("Mật khẩu không chính xác!", "error");
+        if (DOM.txtExtraSalesPassword) {
+            DOM.txtExtraSalesPassword.value = '';
+            DOM.txtExtraSalesPassword.focus();
         }
     }
     window.verifyExtraSalesPassword = verifyExtraSalesPassword;
