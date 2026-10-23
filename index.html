@@ -1096,13 +1096,16 @@
                                 2 (Gộp)
                             </button>
                         </div>
-                        <!-- NÚT VÀO NHẬP BỔ SUNG: Chỉ hiện khi ở quyền Admin/Super Admin và xem Chế độ Gộp, bình thường ẩn đi -->
-                        <button type="button" id="btnOpenExtraSales_Summary" onclick="openExtraSalesDirect()" style="display: none; padding: 5px 14px; font-size: 13px; font-weight: bold; background: #16a34a; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(22,163,74,0.3); align-items: center; gap: 5px;" title="Vào phân hệ nhập bổ sung doanh số & thưởng">
-                            📝 Nhập Bổ Sung
+                        <!-- NÚT VÀO NHẬP THÊM & NÚT XEM THÊM: Chỉ hiện khi ở quyền Admin/Super Admin và xem Chế độ Gộp / Xem thêm, bình thường ẩn đi -->
+                        <button type="button" id="btnOpenExtraSales_Summary" onclick="openExtraSalesDirect()" style="display: none; padding: 5px 14px; font-size: 13px; font-weight: bold; background: #16a34a; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(22,163,74,0.3); align-items: center; gap: 5px;" title="Vào phân hệ nhập thêm doanh số & thưởng">
+                            📝 Nhập thêm
+                        </button>
+                        <button type="button" id="btnViewExtraOnly_Summary" onclick="toggleViewExtraOnly()" style="display: none; padding: 5px 14px; font-size: 13px; font-weight: bold; background: #0284c7; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(2,132,199,0.3); align-items: center; gap: 5px;" title="Xem dữ liệu khi đã bỏ phần CSDL gốc (chỉ xem số bổ sung)">
+                            👁️ Xem thêm
                         </button>
                     </div>
                     <div style="display: flex; align-items: center; gap: 6px;">
-                        <span id="combineModeStatusBadge" onclick="if(combineMode===2) openExtraSalesWithAuth()" style="font-size: 12px; font-weight: bold; color: #0078d4; padding: 3px 8px; background: #eff6ff; border-radius: 4px; border: 1px solid #bfdbfe; cursor: pointer;" title="Đang xem chế độ">
+                        <span id="combineModeStatusBadge" onclick="if(combineMode>=2) openExtraSalesWithAuth()" style="font-size: 12px; font-weight: bold; color: #0078d4; padding: 3px 8px; background: #eff6ff; border-radius: 4px; border: 1px solid #bfdbfe; cursor: pointer;" title="Đang xem chế độ">
                             Đang xem: 1 - CSDL Gốc
                         </span>
                     </div>
@@ -1223,12 +1226,15 @@
                                 2 (Gộp)
                             </button>
                         </div>
-                        <!-- NÚT VÀO NHẬP BỔ SUNG: Chỉ hiện khi ở quyền Admin/Super Admin và xem Chế độ Gộp, bình thường ẩn đi -->
-                        <button type="button" id="btnOpenExtraSales_Det" onclick="openExtraSalesDirect()" style="display: none; padding: 5px 14px; font-size: 12.5px; font-weight: bold; background: #16a34a; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(22,163,74,0.3); align-items: center; gap: 5px;" title="Vào phân hệ nhập bổ sung doanh số & thưởng">
-                            📝 Nhập Bổ Sung
+                        <!-- NÚT VÀO NHẬP THÊM & NÚT XEM THÊM: Chỉ hiện khi ở quyền Admin/Super Admin và xem Chế độ Gộp / Xem thêm, bình thường ẩn đi -->
+                        <button type="button" id="btnOpenExtraSales_Det" onclick="openExtraSalesDirect()" style="display: none; padding: 5px 14px; font-size: 12.5px; font-weight: bold; background: #16a34a; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(22,163,74,0.3); align-items: center; gap: 5px;" title="Vào phân hệ nhập thêm doanh số & thưởng">
+                            📝 Nhập thêm
+                        </button>
+                        <button type="button" id="btnViewExtraOnly_Det" onclick="toggleViewExtraOnly()" style="display: none; padding: 5px 14px; font-size: 12.5px; font-weight: bold; background: #0284c7; color: #ffffff; border: none; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(2,132,199,0.3); align-items: center; gap: 5px;" title="Xem dữ liệu khi đã bỏ phần CSDL gốc (chỉ xem số bổ sung)">
+                            👁️ Xem thêm
                         </button>
                     </div>
-                    <div id="combineModeStatusBadge_Det" onclick="if(combineMode===2) openExtraSalesWithAuth()" style="font-size: 12px; font-weight: bold; color: #0078d4; padding: 3px 8px; background: #eff6ff; border-radius: 4px; border: 1px solid #bfdbfe; cursor: pointer;" title="Đang xem chế độ">
+                    <div id="combineModeStatusBadge_Det" onclick="if(combineMode>=2) openExtraSalesWithAuth()" style="font-size: 12px; font-weight: bold; color: #0078d4; padding: 3px 8px; background: #eff6ff; border-radius: 4px; border: 1px solid #bfdbfe; cursor: pointer;" title="Đang xem chế độ">
                         Đang xem: 1 - CSDL Gốc
                     </div>
                 </div>
@@ -1975,7 +1981,7 @@
         currentUserRole = null;
         currentUserName = '';
         updateUserSessionBadge();
-        if (combineMode === 2) {
+        if (combineMode >= 2) {
             executeSetCombineMode(1);
         }
         showNotification("Đã đăng xuất phiên làm việc!", "info");
@@ -3568,22 +3574,25 @@ H. Nam Trực: 400_449`;
         let totals = {rev:0, com:0, th:0, debt:0, final:0, lotoDB:0, lotoCap:0, c227:0, c323:0, xskt:0};
         const map = new Map();
 
-        currentDbData.forEach(r => {
-            if (globalSelectedDates.length > 0 && !globalSelectedDates.includes(r.ngay)) return;
-            const c = String(r.ma_dl || '').trim();
-            if (!c) return;
+        // NẾU KHÔNG PHẢI CHẾ ĐỘ 3 (XEM THÊM - BỎ CSDL GỐC): DUYỆT CSDL GỐC
+        if (combineMode !== 3) {
+            currentDbData.forEach(r => {
+                if (globalSelectedDates.length > 0 && !globalSelectedDates.includes(r.ngay)) return;
+                const c = String(r.ma_dl || '').trim();
+                if (!c) return;
 
-            if (!map.has(c)) map.set(c, {totRev:0, totCom:0, lotoDB:0, lotoCap:0, c227:0, c323:0, xskt:0, thuong:0, debt:0});
-            const d = map.get(c);
-            const ldb = parseFloat(r.loto_db)||0, lc = parseFloat(r.loto_cap)||0, c2 = parseFloat(r.loto_2_27)||0, c3 = parseFloat(r.loto_3_23)||0, x = parseFloat(r.xskt)||0, th = parseFloat(r.thuong)||0;
-            
-            d.lotoDB += ldb; d.lotoCap += lc; d.c227 += c2; d.c323 += c3; d.xskt += x; d.thuong += th;
-            d.totRev += ldb + lc + c2 + c3 + x;
-            d.totCom += (ldb * 0.08) + (lc * 0.1) + (c2 * 0.1) + (c3 * 0.1) + (x * 0.1);
-        });
+                if (!map.has(c)) map.set(c, {totRev:0, totCom:0, lotoDB:0, lotoCap:0, c227:0, c323:0, xskt:0, thuong:0, debt:0});
+                const d = map.get(c);
+                const ldb = parseFloat(r.loto_db)||0, lc = parseFloat(r.loto_cap)||0, c2 = parseFloat(r.loto_2_27)||0, c3 = parseFloat(r.loto_3_23)||0, x = parseFloat(r.xskt)||0, th = parseFloat(r.thuong)||0;
+                
+                d.lotoDB += ldb; d.lotoCap += lc; d.c227 += c2; d.c323 += c3; d.xskt += x; d.thuong += th;
+                d.totRev += ldb + lc + c2 + c3 + x;
+                d.totCom += (ldb * 0.08) + (lc * 0.1) + (c2 * 0.1) + (c3 * 0.1) + (x * 0.1);
+            });
+        }
 
-        // NẾU ĐANG Ở CHẾ ĐỘ 2 (GỘP): CỘNG DOANH SỐ & THƯỞNG BỔ SUNG TỪ CSDL
-        if (combineMode === 2) {
+        // NẾU ĐANG Ở CHẾ ĐỘ 2 (GỘP) HOẶC CHẾ ĐỘ 3 (XEM THÊM - BỎ CSDL GỐC): CỘNG DOANH SỐ & THƯỞNG BỔ SUNG TỪ CSDL
+        if (combineMode === 2 || combineMode === 3) {
             const activeDates = globalSelectedDates.length > 0 
                 ? globalSelectedDates 
                 : Array.from(new Set(currentDbData.map(r => r.ngay))).filter(Boolean);
@@ -3727,7 +3736,7 @@ H. Nam Trực: 400_449`;
 
             g.agents.forEach((ag, idx) => {
                 const d = ag.data, final = (d.totRev - d.totCom - d.thuong);
-                const extraMark = (combineMode === 2 && d.hasExtra) 
+                const extraMark = (combineMode >= 2 && d.hasExtra) 
                     ? '<span class="extra-badge" style="color:#d97706; font-weight:bold; font-size:15px; vertical-align:super; line-height:0; margin-left:2px;" title="Có phát sinh số bổ sung">*</span>' 
                     : '';
                 htmlBody += `<tr class="${isGroup?'group-member-row':'single-agent-row'}">
@@ -3744,7 +3753,7 @@ H. Nam Trực: 400_449`;
                 </tr>`;
             });
             if (isGroup) {
-                const groupExtraMark = (combineMode === 2 && g.hasExtra) 
+                const groupExtraMark = (combineMode >= 2 && g.hasExtra) 
                     ? '<span class="extra-badge" style="color:#d97706; font-weight:bold; font-size:15px; vertical-align:super; line-height:0; margin-left:2px;" title="Có phát sinh số bổ sung">*</span>' 
                     : '';
                 htmlBody += `<tr class="group-total-row">
@@ -3930,7 +3939,7 @@ H. Nam Trực: 400_449`;
         // Kiểm tra xem có dữ liệu bổ sung cho đại lý này không trong chế độ 2
         let hasExtra = false;
         let matchingExtraRecords = [];
-        if (combineMode === 2) {
+        if (combineMode === 2 || combineMode === 3) {
             const activeDates = currentSearchSelectedDates.length > 0 
                 ? currentSearchSelectedDates 
                 : (globalSelectedDates.length > 0 ? globalSelectedDates : Array.from(new Set(currentDbData.map(r => r.ngay))).filter(Boolean));
@@ -3965,8 +3974,8 @@ H. Nam Trực: 400_449`;
         state.extraBonus = 0; state.extraDebt = 0; state.accountCodes = new Set();
         const t = {lotoDB: 0, loCap: 0, c227: 0, c323: 0, thuong: 0, xskt: 0};
 
-        // Tạo danh sách bản ghi gộp cho đại lý này (nhân bản từ filtered để không ảnh hưởng dữ liệu gốc)
-        let combinedRows = filtered.map(r => ({
+        // Tạo danh sách bản ghi gộp cho đại lý này (ở chế độ 3 thì bỏ CSDL gốc, bắt đầu từ mảng rỗng)
+        let combinedRows = (combineMode === 3) ? [] : filtered.map(r => ({
             ngay: r.ngay,
             ma_dl: r.ma_dl,
             loto_db: parseFloat(r.loto_db) || 0,
@@ -3977,8 +3986,8 @@ H. Nam Trực: 400_449`;
             thuong: parseFloat(r.thuong) || 0
         }));
 
-        // GỘP TRỰC TIẾP DỮ LIỆU BỔ SUNG VÀO CÁC LOẠI HÌNH VÀ THƯỞNG CỦA GỐC
-        if (combineMode === 2 && matchingExtraRecords.length > 0) {
+        // GỘP TRỰC TIẾP DỮ LIỆU BỔ SUNG VÀO CÁC LOẠI HÌNH VÀ THƯỞNG
+        if ((combineMode === 2 || combineMode === 3) && matchingExtraRecords.length > 0) {
             matchingExtraRecords.forEach(({ doc, rec }) => {
                 const c = String(rec.ma_dl || '').trim().toUpperCase();
                 state.accountCodes.add(c);
@@ -4183,7 +4192,7 @@ H. Nam Trực: 400_449`;
         }
 
         const agentName = escapeHTML([...state.accountCodes].join(', ') || state.currentSoSo);
-        const agentDisplay = (combineMode === 2 && d.hasExtra) 
+        const agentDisplay = (combineMode >= 2 && d.hasExtra) 
             ? `${agentName} <span class="extra-badge" style="color:#d97706; font-size:18px; vertical-align:super; font-weight:bold; margin-left:4px;" title="Có phát sinh số bổ sung">*</span>`
             : agentName;
         const reportDate = getFormattedDateRange(currentSearchSelectedDates);
@@ -5425,37 +5434,39 @@ H. Nam Trực: 400_449`;
         // Lọc và group theo ngày
         const dayMap = new Map();
 
-        currentDbData.forEach(r => {
-            if (globalSelectedDates.length > 0 && !globalSelectedDates.includes(r.ngay)) return;
-            const c = String(r.ma_dl || '').trim().toUpperCase();
-            if (!c) return;
-            if (selectedBranchMode !== 'all' && !branchPrefixes.some(pref => c.startsWith(pref))) return;
-            if (rules) {
-                const numMatch = c.match(/\d+$/);
-                if (!numMatch) return;
-                const agentNum = parseInt(numMatch[0], 10);
-                if (!rules.some(rule => agentNum >= rule.min && agentNum <= rule.max)) return;
-            }
-            if (isExcludeNumeric && /^\d+$/.test(c)) return;
+        if (combineMode !== 3) {
+            currentDbData.forEach(r => {
+                if (globalSelectedDates.length > 0 && !globalSelectedDates.includes(r.ngay)) return;
+                const c = String(r.ma_dl || '').trim().toUpperCase();
+                if (!c) return;
+                if (selectedBranchMode !== 'all' && !branchPrefixes.some(pref => c.startsWith(pref))) return;
+                if (rules) {
+                    const numMatch = c.match(/\d+$/);
+                    if (!numMatch) return;
+                    const agentNum = parseInt(numMatch[0], 10);
+                    if (!rules.some(rule => agentNum >= rule.min && agentNum <= rule.max)) return;
+                }
+                if (isExcludeNumeric && /^\d+$/.test(c)) return;
 
-            const ngay = r.ngay;
-            if (!ngay) return;
-            if (!dayMap.has(ngay)) dayMap.set(ngay, { lotoDB:0, lotoCap:0, c323:0, c227:0, xskt:0, thuong:0, totRev:0 });
-            const d = dayMap.get(ngay);
-            const ldb = parseFloat(r.loto_db)||0, lc = parseFloat(r.loto_cap)||0,
-                  c2  = parseFloat(r.loto_2_27)||0, c3 = parseFloat(r.loto_3_23)||0,
-                  x   = parseFloat(r.xskt)||0, th = parseFloat(r.thuong)||0;
-            d.lotoDB += ldb; d.lotoCap += lc; d.c323 += c3; d.c227 += c2;
-            d.xskt  += x;   d.thuong  += th;
-            if (isExcludeXSKT) {
-                d.totRev += ldb + lc + c3 + c2;
-            } else {
-                d.totRev += ldb + lc + c3 + c2 + x;
-            }
-        });
+                const ngay = r.ngay;
+                if (!ngay) return;
+                if (!dayMap.has(ngay)) dayMap.set(ngay, { lotoDB:0, lotoCap:0, c323:0, c227:0, xskt:0, thuong:0, totRev:0 });
+                const d = dayMap.get(ngay);
+                const ldb = parseFloat(r.loto_db)||0, lc = parseFloat(r.loto_cap)||0,
+                      c2  = parseFloat(r.loto_2_27)||0, c3 = parseFloat(r.loto_3_23)||0,
+                      x   = parseFloat(r.xskt)||0, th = parseFloat(r.thuong)||0;
+                d.lotoDB += ldb; d.lotoCap += lc; d.c323 += c3; d.c227 += c2;
+                d.xskt  += x;   d.thuong  += th;
+                if (isExcludeXSKT) {
+                    d.totRev += ldb + lc + c3 + c2;
+                } else {
+                    d.totRev += ldb + lc + c3 + c2 + x;
+                }
+            });
+        }
 
-        // NẾU Ở CHẾ ĐỘ 2 (GỘP): CỘNG DỮ LIỆU BỔ SUNG THEO NGÀY VÀO TỪNG NGÀY TƯƠNG ỨNG
-        if (combineMode === 2) {
+        // NẾU Ở CHẾ ĐỘ 2 (GỘP) HOẶC CHẾ ĐỘ 3 (XEM THÊM): CỘNG DỮ LIỆU BỔ SUNG THEO NGÀY VÀO TỪNG NGÀY TƯƠNG ỨNG
+        if (combineMode === 2 || combineMode === 3) {
             extraSalesMap.forEach(docData => {
                 if (docData.time_type === 'date') {
                     const ngay = docData.time_key;
@@ -7407,18 +7418,33 @@ H. Nam Trực: 400_449`;
     }
 
     // ==================== QUẢN LÝ DOANH SỐ & THƯỞNG BỔ SUNG ====================
+    function toggleViewExtraOnly() {
+        if (combineMode === 3) {
+            executeSetCombineMode(2);
+        } else {
+            setCombineMode(3);
+        }
+    }
+    window.toggleViewExtraOnly = toggleViewExtraOnly;
+
     function setCombineMode(mode) {
-        if (mode === 2) {
-            // Dù là đã đăng nhập super admin và admin thì cũng phải nhập mật khẩu thì mới xem được chế độ gộp
+        if (mode === 2 || mode === 3) {
+            // Nếu đã ở chế độ 2 hoặc 3 (đã xác thực quyền admin) thì chuyển chế độ trực tiếp
+            if (combineMode === 2 || combineMode === 3) {
+                executeSetCombineMode(mode);
+                return;
+            }
             DOM.txtAdminPassword.value = '';
             const t = document.getElementById('authModalTitle');
             const st = document.getElementById('authModalSubTitle');
-            if (t) t.textContent = '🔐 Xác Nhận Xem Chế Độ Gộp';
-            if (st) st.textContent = 'Nhập mật khẩu Admin hoặc Super Admin để xem doanh số chế độ Gộp:';
+            if (t) t.textContent = mode === 3 ? '🔐 Xác Nhận Xem Thêm' : '🔐 Xác Nhận Xem Chế Độ Gộp';
+            if (st) st.textContent = mode === 3
+                ? 'Nhập mật khẩu Admin hoặc Super Admin để xem dữ liệu (Bỏ CSDL gốc):'
+                : 'Nhập mật khẩu Admin hoặc Super Admin để xem doanh số chế độ Gộp:';
             pendingAuthRequiredRoles = ['super_admin', 'admin'];
             pendingAuthCallback = () => {
-                executeSetCombineMode(2);
-                showNotification("✅ Đã mở khóa xem Chế độ Gộp!", "success");
+                executeSetCombineMode(mode);
+                showNotification(mode === 3 ? "✅ Đã mở khóa Xem Thêm (Bỏ CSDL gốc)!" : "✅ Đã mở khóa xem Chế độ Gộp!", "success");
             };
             DOM.authConfigModal.style.display = 'block';
             setTimeout(() => DOM.txtAdminPassword.focus(), 100);
@@ -7438,6 +7464,8 @@ H. Nam Trực: 400_449`;
         const badgeDet = document.getElementById('combineModeStatusBadge_Det');
         const btnExtraSum = document.getElementById('btnOpenExtraSales_Summary');
         const btnExtraDet = document.getElementById('btnOpenExtraSales_Det');
+        const btnViewExtraSum = document.getElementById('btnViewExtraOnly_Summary');
+        const btnViewExtraDet = document.getElementById('btnViewExtraOnly_Det');
 
         if (mode === 1) {
             if (b1) { b1.style.background = '#0078d4'; b1.style.color = '#ffffff'; }
@@ -7456,29 +7484,80 @@ H. Nam Trực: 400_449`;
                 badgeDet.style.background = '#eff6ff';
                 badgeDet.style.borderColor = '#bfdbfe';
             }
-            // Bình thường thì ẩn nút Nhập Bổ Sung đi
+            // Ẩn nút Nhập thêm và nút Xem thêm
             if (btnExtraSum) btnExtraSum.style.display = 'none';
             if (btnExtraDet) btnExtraDet.style.display = 'none';
-        } else {
+            if (btnViewExtraSum) btnViewExtraSum.style.display = 'none';
+            if (btnViewExtraDet) btnViewExtraDet.style.display = 'none';
+        } else if (mode === 2) {
             if (b1) { b1.style.background = '#f8fafc'; b1.style.color = '#64748b'; }
             if (b2) { b2.style.background = '#107c41'; b2.style.color = '#ffffff'; }
             if (b1Det) { b1Det.style.background = '#f8fafc'; b1Det.style.color = '#64748b'; }
             if (b2Det) { b2Det.style.background = '#107c41'; b2Det.style.color = '#ffffff'; }
             if (badge) {
-                badge.textContent = 'Đang xem: 2 - Gộp CSDL + Bổ sung';
+                badge.textContent = 'Đang xem: 2 - Gộp CSDL + Thêm';
                 badge.style.color = '#107c41';
                 badge.style.background = '#f0fdf4';
                 badge.style.borderColor = '#bbf7d0';
             }
             if (badgeDet) {
-                badgeDet.textContent = 'Đang xem: 2 - Gộp CSDL + Bổ sung';
+                badgeDet.textContent = 'Đang xem: 2 - Gộp CSDL + Thêm';
                 badgeDet.style.color = '#107c41';
                 badgeDet.style.background = '#f0fdf4';
                 badgeDet.style.borderColor = '#bbf7d0';
             }
-            // Chỉ khi ở quyền admin và super admin (đã mở khóa chế độ gộp) thì nút nhập bổ sung mới hiện
+            // Hiện nút Nhập thêm và Xem thêm
             if (btnExtraSum) btnExtraSum.style.display = 'inline-flex';
             if (btnExtraDet) btnExtraDet.style.display = 'inline-flex';
+            if (btnViewExtraSum) {
+                btnViewExtraSum.style.display = 'inline-flex';
+                btnViewExtraSum.style.background = '#0284c7';
+                btnViewExtraSum.style.boxShadow = '0 2px 4px rgba(2,132,199,0.3)';
+                btnViewExtraSum.innerHTML = '👁️ Xem thêm';
+                btnViewExtraSum.title = 'Xem dữ liệu khi đã bỏ phần CSDL gốc (chỉ xem số bổ sung)';
+            }
+            if (btnViewExtraDet) {
+                btnViewExtraDet.style.display = 'inline-flex';
+                btnViewExtraDet.style.background = '#0284c7';
+                btnViewExtraDet.style.boxShadow = '0 2px 4px rgba(2,132,199,0.3)';
+                btnViewExtraDet.innerHTML = '👁️ Xem thêm';
+                btnViewExtraDet.title = 'Xem dữ liệu khi đã bỏ phần CSDL gốc (chỉ xem số bổ sung)';
+            }
+        } else if (mode === 3) {
+            // Chế độ 3: Xem thêm (Bỏ CSDL gốc)
+            if (b1) { b1.style.background = '#f8fafc'; b1.style.color = '#64748b'; }
+            if (b2) { b2.style.background = '#f8fafc'; b2.style.color = '#64748b'; }
+            if (b1Det) { b1Det.style.background = '#f8fafc'; b1Det.style.color = '#64748b'; }
+            if (b2Det) { b2Det.style.background = '#f8fafc'; b2Det.style.color = '#64748b'; }
+            if (badge) {
+                badge.textContent = 'Đang xem: Xem thêm (Bỏ CSDL gốc)';
+                badge.style.color = '#c2410c';
+                badge.style.background = '#fff7ed';
+                badge.style.borderColor = '#fdba74';
+            }
+            if (badgeDet) {
+                badgeDet.textContent = 'Đang xem: Xem thêm (Bỏ CSDL gốc)';
+                badgeDet.style.color = '#c2410c';
+                badgeDet.style.background = '#fff7ed';
+                badgeDet.style.borderColor = '#fdba74';
+            }
+            // Hiện nút Nhập thêm và Xem thêm (Xem thêm ở trạng thái active)
+            if (btnExtraSum) btnExtraSum.style.display = 'inline-flex';
+            if (btnExtraDet) btnExtraDet.style.display = 'inline-flex';
+            if (btnViewExtraSum) {
+                btnViewExtraSum.style.display = 'inline-flex';
+                btnViewExtraSum.style.background = '#ea580c';
+                btnViewExtraSum.style.boxShadow = '0 0 0 2px #ffedd5, 0 2px 6px rgba(234,88,12,0.4)';
+                btnViewExtraSum.innerHTML = '👁️ Đang Xem thêm [Bỏ Gốc]';
+                btnViewExtraSum.title = 'Đang xem dữ liệu thêm (đã bỏ CSDL gốc). Bấm lại để về chế độ Gộp';
+            }
+            if (btnViewExtraDet) {
+                btnViewExtraDet.style.display = 'inline-flex';
+                btnViewExtraDet.style.background = '#ea580c';
+                btnViewExtraDet.style.boxShadow = '0 0 0 2px #ffedd5, 0 2px 6px rgba(234,88,12,0.4)';
+                btnViewExtraDet.innerHTML = '👁️ Đang Xem thêm [Bỏ Gốc]';
+                btnViewExtraDet.title = 'Đang xem dữ liệu thêm (đã bỏ CSDL gốc). Bấm lại để về chế độ Gộp';
+            }
         }
 
         generateSummaryView();
@@ -7489,19 +7568,19 @@ H. Nam Trực: 400_449`;
     window.executeSetCombineMode = executeSetCombineMode;
 
     function openExtraSalesDirect() {
-        // Dù là đã đăng nhập super admin và admin thì cũng phải nhập mật khẩu thì mới vào nhập bổ sung
+        // Dù là đã đăng nhập super admin và admin thì cũng phải nhập mật khẩu thì mới vào nhập thêm
         DOM.txtAdminPassword.value = '';
         const t = document.getElementById('authModalTitle');
         const st = document.getElementById('authModalSubTitle');
-        if (t) t.textContent = '🔐 Xác Nhận Vào Nhập Bổ Sung';
-        if (st) st.textContent = 'Nhập mật khẩu Admin hoặc Super Admin để vào Nhập bổ sung:';
+        if (t) t.textContent = '🔐 Xác Nhận Vào Nhập Thêm';
+        if (st) st.textContent = 'Nhập mật khẩu Admin hoặc Super Admin để vào Nhập thêm:';
         pendingAuthRequiredRoles = ['super_admin', 'admin'];
         pendingAuthCallback = () => {
             initExtraSalesDateInputs();
             loadSelectedExtraSalesEditor();
             renderSavedExtraList();
             showSection('extraSalesSection');
-            showNotification("✅ Đã mở phân hệ Nhập bổ sung doanh số & thưởng!", "success");
+            showNotification("✅ Đã mở phân hệ Nhập thêm doanh số & thưởng!", "success");
         };
         DOM.authConfigModal.style.display = 'block';
         setTimeout(() => DOM.txtAdminPassword.focus(), 100);
@@ -7559,7 +7638,9 @@ H. Nam Trực: 400_449`;
             'btnCombineMode2',
             'btnCombineMode2_Det',
             'combineModeStatusBadge',
-            'combineModeStatusBadge_Det'
+            'combineModeStatusBadge_Det',
+            'btnViewExtraOnly_Summary',
+            'btnViewExtraOnly_Det'
         ];
 
         triggerIds.forEach(id => {
@@ -8050,6 +8131,7 @@ H. Nam Trực: 400_449`;
         }
     }
     window.removeExtraRow = removeExtraRow;
+    window.removeExtraRow = removeExtraRow;
 
     function togglePasteExcelBox() {
         if (!DOM.pasteExcelContainer) return;
@@ -8184,7 +8266,7 @@ H. Nam Trực: 400_449`;
             renderSavedExtraList();
             showNotification(`✅ Đã lưu thành công ${validRows.length} đại lý bổ sung cho ${info.label}!`, 'success');
 
-            if (combineMode === 2) {
+            if (combineMode >= 2) {
                 generateSummaryView();
                 if (state.currentSoSo) createReport(true);
             }
@@ -8216,7 +8298,7 @@ H. Nam Trực: 400_449`;
             renderSavedExtraList();
             showNotification(`Đã xóa dữ liệu bổ sung của ${info.label}!`, 'info');
 
-            if (combineMode === 2) {
+            if (combineMode >= 2) {
                 generateSummaryView();
                 if (state.currentSoSo) createReport(true);
             }
@@ -8336,7 +8418,7 @@ H. Nam Trực: 400_449`;
             if (info.docId === docId) {
                 loadSelectedExtraSalesEditor();
             }
-            if (combineMode === 2) {
+            if (combineMode >= 2) {
                 generateSummaryView();
                 if (state.currentSoSo) createReport(true);
             }
