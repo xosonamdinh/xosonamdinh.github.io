@@ -4456,11 +4456,27 @@ H. Nam Trực: 400_449`;
         const oldTxt = btn ? btn.textContent : ''; 
         if (btn) btn.textContent = 'Đang copy...';
 
+        // QUAN TRỌNG (iPhone/Safari): phải gọi clipboard.write() NGAY lúc bấm nút (đồng bộ), truyền Promise ảnh
+        // sẽ hoàn tất sau khi vẽ xong. Nếu chờ vẽ xong mới ghi clipboard thì Safari từ chối -> phải nhấn giữ ảnh.
+        let _resolveBlob, _rejectBlob;
+        const _imgBlobPromise = new Promise((res, rej) => { _resolveBlob = res; _rejectBlob = rej; });
+        _imgBlobPromise.catch(() => {});
+        let clipWritePromise = null;
+        if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
+            try {
+                clipWritePromise = navigator.clipboard.write([new ClipboardItem({ 'image/png': _imgBlobPromise })]);
+                clipWritePromise.catch(() => {});
+            } catch (e0) {
+                clipWritePromise = null;
+            }
+        }
+
         // 1. SAO CHÉP BÁO CÁO CHI TIẾT / CÔNG NỢ ĐẠI LÝ (KHỔ DI ĐỘNG 365PX)
         if (sel === '#reportContainer') {
             const reportTable = document.querySelector('#reportContainer table');
             if (!reportTable || !reportTable.innerHTML.trim()) {
                 if (btn) btn.textContent = oldTxt;
+                _rejectBlob(new Error('empty'));
                 return showNotification("Chưa có nội dung!", 'info');
             }
 
@@ -4550,10 +4566,10 @@ H. Nam Trực: 400_449`;
                 const finalCanvas = trimCanvasBottom(rawCanvas, 6);
 
                 let copied = false;
-                if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
+                if (clipWritePromise) {
                     try {
-                        const blobPromise = new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
-                        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise })]);
+                        finalCanvas.toBlob(blob => blob ? _resolveBlob(blob) : _rejectBlob(new Error('toBlob failed')), 'image/png');
+                        await clipWritePromise;
                         copied = true;
                         showNotification('✅ Đã copy ảnh vừa màn hình! Dán (Ctrl+V) vào Zalo ngay.', 'success');
                     } catch (clipErr) {
@@ -4566,6 +4582,7 @@ H. Nam Trực: 400_449`;
                 }
             } catch (err) {
                 console.error("Lỗi tạo ảnh:", err);
+                _rejectBlob(err);
                 showNotification("Lỗi tạo ảnh: " + err.message, "error");
             } finally {
                 if (cloneWrapper && cloneWrapper.parentNode) cloneWrapper.parentNode.removeChild(cloneWrapper);
@@ -4577,7 +4594,7 @@ H. Nam Trực: 400_449`;
         // 2. SAO CHÉP BẢNG TỔNG HỢP (THEO ĐẠI LÝ HOẶC THEO NGÀY)
         const isDayTab = (currentSummaryTab === 'day') || (DOM.dailySummaryWrapper && DOM.dailySummaryWrapper.style.display !== 'none');
         const summaryElem = isDayTab ? document.querySelector('#dailySummaryWrapper') : document.querySelector('#summaryPrintContainer');
-        if (!summaryElem) return;
+        if (!summaryElem) { _rejectBlob(new Error('empty')); if (btn) btn.textContent = oldTxt; return; }
 
         const TARGET_SUMMARY_WIDTH = 460; 
         const colWidths = ['6%', '10%', '11%', '10%', '10%', '10%', '10%', '11%', '10%', '12%'];
@@ -4802,10 +4819,10 @@ H. Nam Trực: 400_449`;
             const finalCanvas = trimCanvasBottom(canvas, 6);
 
             let copied = false;
-            if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
+            if (clipWritePromise) {
                 try {
-                    const blobPromise = new Promise(resolve => finalCanvas.toBlob(resolve, 'image/png'));
-                    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise })]);
+                    finalCanvas.toBlob(blob => blob ? _resolveBlob(blob) : _rejectBlob(new Error('toBlob failed')), 'image/png');
+                    await clipWritePromise;
                     copied = true;
                     showNotification(isDayTab ? '✅ Đã copy ảnh Bảng Tổng Hợp Theo Ngày! Dán (Ctrl+V) vào Zalo ngay.' : '✅ Đã copy 1 ảnh Bảng Tổng Hợp vừa màn hình! Dán (Ctrl+V) vào Zalo ngay.', 'success');
                 } catch (clipErr) {
@@ -4817,6 +4834,7 @@ H. Nam Trực: 400_449`;
             }
         } catch (e) {
             console.error("Lỗi tạo ảnh tổng hợp:", e);
+            _rejectBlob(e);
             showNotification("Lỗi tạo ảnh: " + e.message, "error");
         } finally {
             if (cloneSummaryWrapper.parentNode) cloneSummaryWrapper.parentNode.removeChild(cloneSummaryWrapper);
