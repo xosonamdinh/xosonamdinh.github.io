@@ -8395,8 +8395,9 @@ H. Nam Trực: 400_449`;
                 currentExtraRows[existingIdx].thuong = th;
                 if (note) currentExtraRows[existingIdx].ghi_chu = note;
             } else {
-                if (currentExtraRows.length === 1 && !currentExtraRows[0].ma_dl) {
-                    currentExtraRows[0] = { ma_dl: code, loto_db: ldb, loto_cap: lc, loto_2_27: c2, loto_3_23: c3, xskt: x, thuong: th, ghi_chu: note };
+                const firstEmptyIdx = currentExtraRows.findIndex(r => !r.ma_dl && !r.loto_db && !r.loto_cap && !r.loto_2_27 && !r.loto_3_23 && !r.xskt && !r.thuong);
+                if (firstEmptyIdx !== -1) {
+                    currentExtraRows[firstEmptyIdx] = { ma_dl: code, loto_db: ldb, loto_cap: lc, loto_2_27: c2, loto_3_23: c3, xskt: x, thuong: th, ghi_chu: note };
                 } else {
                     currentExtraRows.push({ ma_dl: code, loto_db: ldb, loto_cap: lc, loto_2_27: c2, loto_3_23: c3, xskt: x, thuong: th, ghi_chu: note });
                 }
@@ -8404,6 +8405,9 @@ H. Nam Trực: 400_449`;
             addedCount++;
         });
 
+        while (currentExtraRows.length < 30) {
+            currentExtraRows.push({ ma_dl: '', loto_db: 0, loto_cap: 0, loto_2_27: 0, loto_3_23: 0, xskt: 0, thuong: 0, ghi_chu: '' });
+        }
         DOM.txtPasteExcelExtra.value = '';
         DOM.pasteExcelContainer.style.display = 'none';
         renderExtraSalesRows();
