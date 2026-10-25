@@ -2291,7 +2291,7 @@ body:has(.classic-loto-page) #main-content {
   <!-- ═══════════════════════════════════════════════
        LOADING OVERLAY
   ═══════════════════════════════════════════════ -->
-  <div id="loading-overlay">
+  <div id="loading-overlay" class="hidden" style="display:none;">
     <div class="loading-spinner"></div>
     <p class="loading-text">Đang tải...</p>
   </div>
@@ -3962,7 +3962,7 @@ async function saveVeLoTo(data) {
  */
 async function getVeLoToByNgayDaiLy(ngay, daiLyId, daiLyMa = '') {
   if (!daiLyId && !daiLyMa) return [];
-  const list = await getDocs(COLLECTIONS.VE_LOTO);
+  const list = await (DbModule.getDocs || getDocs)(COLLECTIONS.VE_LOTO);
   return list
     .filter(d => {
       const matchNgay = !ngay || d.ngay === ngay;
@@ -3982,7 +3982,7 @@ async function getVeLoToByNgayDaiLy(ngay, daiLyId, daiLyMa = '') {
  * @returns {Promise<Array<{id: string, [key: string]: any}>>}
  */
 async function getVeLoToByNgay(ngay) {
-  const list = await getDocs(COLLECTIONS.VE_LOTO);
+  const list = await (DbModule.getDocs || getDocs)(COLLECTIONS.VE_LOTO);
   return list.filter(d => !ngay || d.ngay === ngay);
 }
 
@@ -7503,8 +7503,192 @@ function hideTongHopPanel() {
   focusFirstCell();
 }
 
+let _currentTongHopMode = 'day'; // 'day' | 'month'
+let _currentTongHopMonth = null; // 'YYYY-MM'
+
+function _formatMonthYM(ym) {
+  if (!ym) return '';
+  const parts = String(ym).split('-');
+  if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
+  return ym;
+}
+
+function _parseMonthInput(val) {
+  if (!val) return null;
+  val = String(val).trim();
+  if (/^\d{4}-\d{2}$/.test(val)) return val;
+  if (/^\d{1,2}\/\d{4}$/.test(val)) {
+    const [m, y] = val.split('/');
+    return `${y}-${m.padStart(2, '0')}`;
+  }
+  if (/^\d{1,2}-\d{4}$/.test(val)) {
+    const [m, y] = val.split('-');
+    return `${y}-${m.padStart(2, '0')}`;
+  }
+  if (/^\d{1,2}$/.test(val)) {
+    const now = new Date();
+    return `${now.getFullYear()}-${val.padStart(2, '0')}`;
+  }
+  return null;
+}
+
+async function promptMonthTongHop() {
+  const currentYm = (currentNgay || '').slice(0, 7) || new Date().toISOString().slice(0, 7);
+  const currentMmYyyy = _formatMonthYM(_currentTongHopMonth || currentYm);
+
+  let modal = document.getElementById('modal-th-month-picker');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-th-month-picker';
+    modal.className = 'modal-overlay hidden';
+    modal.style.zIndex = '99999';
+    modal.innerHTML = `
+      <div class="modal-box" style="width:330px;max-width:92%;padding:18px 20px;background:#f0f4f8;border:2px solid #0054e3;border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,0.45);font-family:Tahoma,'Segoe UI',Arial,sans-serif;">
+        <div style="font-weight:bold;font-size:15px;color:#000080;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+          <span>📅 NẠP DỮ LIỆU THEO THÁNG</span>
+        </div>
+        <div style="font-size:12.5px;color:#334155;margin-bottom:12px;line-height:1.4;">
+          Nhập tháng cần nạp & tổng hợp doanh số tất cả đại lý:
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px;">
+          <label style="font-weight:bold;color:#000080;font-size:14px;">Tháng:</label>
+          <input type="text" id="input-th-month-picker-val" placeholder="MM/YYYY" maxlength="7" style="width:130px;height:32px;padding:2px 8px;font-size:16px;font-weight:bold;letter-spacing:1px;color:#000080;background:#ffffff;border:1.5px solid #0054e3;border-radius:3px;text-align:center;">
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;">
+          <button type="button" id="btn-th-month-picker-cancel" class="classic-btn" style="padding:5px 14px;background:#e2e8f0;color:#334155;border:1px solid #94a3b8;font-weight:600;">Hủy</button>
+          <button type="button" id="btn-th-month-picker-submit" class="classic-btn" style="padding:5px 16px;background:#0054e3;color:#ffffff;border:1px solid #003db3;font-weight:700;">⚡ Nạp Dữ Liệu</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  const input = modal.querySelector('#input-th-month-picker-val');
+  input.value = currentMmYyyy;
+  modal.classList.remove('hidden');
+  input.focus();
+  input.select();
+
+  return new Promise((resolve) => {
+    const closeModal = () => modal.classList.add('hidden');
+    modal.querySelector('#btn-th-month-picker-cancel').onclick = () => {
+      closeModal();
+      resolve(null);
+    };
+    modal.querySelector('#btn-th-month-picker-submit').onclick = () => {
+      const parsed = _parseMonthInput(input.value);
+      if (!parsed) {
+        showToast('Vui lòng nhập tháng hợp lệ (ví dụ: 10/2026)!', 'warning');
+        return;
+      }
+      closeModal();
+      resolve(parsed);
+    };
+    input.onkeydown = (e) => {
+      if (e.key === 'Enter') {
+        modal.querySelector('#btn-th-month-picker-submit').click();
+      } else if (e.key === 'Escape') {
+        closeModal();
+        resolve(null);
+      }
+    };
+  });
+}
+
+async function getTongHopRecordsOfMonth(targetMonth) {
+  try {
+    if (typeof window.__triggerXsktSync === 'function') {
+      await window.__triggerXsktSync(null);
+    }
+  } catch (e) { console.warn(e); }
+
+  const agg = new Map();
+  const ensureAgg = (ngay, ma) => {
+    const key = `${ngay}_${ma}`;
+    if (!agg.has(key)) {
+      agg.set(key, { ngay: ngay, ma_dl: ma, loto_db: 0, loto_cap: 0, loto_2_27: 0, loto_3_23: 0, xskt: 0, thuong: 0 });
+    }
+    return agg.get(key);
+  };
+
+  // 1. Quét từ window.__xsktLastDays
+  if (window.__xsktLastDays && typeof window.__xsktLastDays === 'object') {
+    Object.keys(window.__xsktLastDays).forEach(dayKey => {
+      if (dayKey && dayKey.startsWith(targetMonth)) {
+        const dayRecs = window.__xsktLastDays[dayKey] || [];
+        dayRecs.forEach(r => {
+          const ma = String(r.ma_dl || '').trim().toUpperCase();
+          if (!ma) return;
+          const a = ensureAgg(dayKey, ma);
+          a.loto_db += Number(r.loto_db) || 0;
+          a.loto_cap += Number(r.loto_cap) || 0;
+          a.loto_2_27 += Number(r.loto_2_27) || 0;
+          a.loto_3_23 += Number(r.loto_3_23) || 0;
+          a.xskt += Number(r.xskt) || 0;
+          a.thuong += Number(r.thuong) || 0;
+        });
+      }
+    });
+  }
+
+  // 2. Quét từ vé chi tiết trong Firestore VE_LOTO của tháng
+  const dls = await getDaiLyList().catch(() => []);
+  const allTickets = await (DbModule.getDocs || getDocs)(COLLECTIONS.VE_LOTO).catch(() => []);
+  const monthTickets = allTickets.filter(t => t.ngay && t.ngay.startsWith(targetMonth));
+  
+  if (agg.size === 0) {
+    monthTickets.forEach(t => {
+      const ma = _resolveMaTicket(t, dls);
+      if (!ma) return;
+      const r = ensureAgg(t.ngay, ma);
+      if (t.loaiHinh === 'cap_so') {
+        const sum = (a, p) => (a || []).reduce((s, i) => s + (Number(i.sl) || 1) * p, 0);
+        r.loto_cap += sum(t.cap10k, 10000) + sum(t.cap20k, 20000);
+        r.loto_2_27 += sum(t['2x27'], 20000);
+        r.loto_3_23 += sum(t['3x23'], 20000);
+      } else {
+        r.loto_db += Number(t.tongTien) || 0;
+      }
+    });
+  }
+
+  // 3. Quét các bản ghi bổ sung trong Firestore extra_records thuộc tháng này
+  try {
+    const { db } = FirebaseConfigModule;
+    const extraSnap = await fbGetDocs(fbCollection(db, 'extra_records')).catch(() => null);
+    if (extraSnap && extraSnap.docs) {
+      extraSnap.docs.forEach(docSnap => {
+        const data = docSnap.data();
+        if (!data) return;
+        const isTargetMonth = (data.time_type === 'month' && data.time_key === targetMonth) ||
+                              (data.time_type === 'date' && typeof data.time_key === 'string' && data.time_key.startsWith(targetMonth)) ||
+                              (docSnap.id && (docSnap.id === 'month_' + targetMonth || docSnap.id.startsWith('date_' + targetMonth)));
+        if (!isTargetMonth) return;
+
+        if (Array.isArray(data.records)) {
+          const recNgay = data.time_type === 'date' ? (data.time_key || data.date) : (data.date || targetMonth);
+          data.records.forEach(r => {
+            const ma = String(r.ma_dl || '').trim().toUpperCase();
+            if (!ma) return;
+            const a = ensureAgg(recNgay, ma);
+            a.loto_db += Number(r.loto_db) || 0;
+            a.loto_cap += Number(r.loto_cap) || 0;
+            a.loto_2_27 += Number(r.loto_2_27) || 0;
+            a.loto_3_23 += Number(r.loto_3_23) || 0;
+            a.xskt += Number(r.xskt) || 0;
+            a.thuong += Number(r.thuong) || 0;
+          });
+        }
+      });
+    }
+  } catch (err) {
+    console.warn('Lỗi đọc extra_records tháng:', err);
+  }
+
+  return Array.from(agg.values()).filter(r => r.loto_db + r.loto_cap + r.loto_2_27 + r.loto_3_23 + r.xskt + r.thuong > 0);
+}
+
 async function getTongHopRecordsOfDay() {
-  // Ưu tiên dùng kết quả tính của bộ đồng bộ (đã gồm tiền thưởng)
   try {
     if (typeof window.__triggerXsktSync === 'function') {
       await window.__triggerXsktSync(currentNgay);
@@ -7512,7 +7696,6 @@ async function getTongHopRecordsOfDay() {
       if (Array.isArray(recs)) return recs;
     }
   } catch (e) { console.warn(e); }
-  // Dự phòng (chạy độc lập): chỉ tính doanh số từ vé đã lưu
   const dls = await getDaiLyList().catch(() => []);
   const tickets = await getVeLoToByNgay(currentNgay);
   const agg = new Map();
@@ -7538,21 +7721,37 @@ async function renderTongHopPanel() {
   if (!panel) return;
   panel.innerHTML = '<div style="padding:20px;text-align:center;color:#334155;">Đang tổng hợp doanh thu các đại lý...</div>';
   let recs = [];
+  const isMonthMode = (_currentTongHopMode === 'month');
+  const targetMonth = _currentTongHopMonth || (currentNgay || '').slice(0, 7) || new Date().toISOString().slice(0, 7);
+  const monthDisplay = _formatMonthYM(targetMonth);
+
   try {
-    recs = await getTongHopRecordsOfDay();
+    if (isMonthMode) {
+      recs = await getTongHopRecordsOfMonth(targetMonth);
+      try { await fillMasterWithAllAgents(targetMonth); } catch (e) { console.warn(e); }
+    } else {
+      recs = await getTongHopRecordsOfDay();
+      try { await fillMasterWithAllAgents(); } catch (e) { console.warn(e); }
+    }
   } catch (err) {
     console.error(err);
     panel.innerHTML = '<div style="padding:20px;text-align:center;color:#b91c1c;">Lỗi tổng hợp: ' + _escTh(err.message) + '</div>';
     return;
   }
-  try { await fillMasterWithAllAgents(); } catch (e) { console.warn(e); }
+
   const num = v => Number(v) || 0;
   const k = v => formatCurrency(Math.round(v / 1000));
+
   recs = recs.slice().sort((a, b) => {
+    if (isMonthMode) {
+      const dComp = String(a.ngay || '').localeCompare(String(b.ngay || ''));
+      if (dComp !== 0) return dComp;
+    }
     const na = parseInt(String(a.ma_dl).replace(/\D/g, ''), 10), nb = parseInt(String(b.ma_dl).replace(/\D/g, ''), 10);
     if (!isNaN(na) && !isNaN(nb) && na !== nb) return na - nb;
     return String(a.ma_dl).localeCompare(String(b.ma_dl));
   });
+
   const tot = { db: 0, cap: 0, l323: 0, l227: 0, rev: 0, th: 0, nop: 0 };
   const rowsHtml = recs.map((r, idx) => {
     const db = num(r.loto_db), cap = num(r.loto_cap), l323 = num(r.loto_3_23), l227 = num(r.loto_2_27), x = num(r.xskt);
@@ -7562,9 +7761,14 @@ async function renderTongHopPanel() {
     const nop = rev - com - th;
     tot.db += db; tot.cap += cap; tot.l323 += l323; tot.l227 += l227; tot.rev += rev; tot.th += th; tot.nop += nop;
     const td = 'padding:5px 8px;border:1px solid #7a889b;text-align:center;';
+    const dateTd = isMonthMode
+      ? `<td style="${td}font-weight:700;color:#1e3a8a;background:#f8fafc;white-space:nowrap;">${_escTh(formatDate(r.ngay) || r.ngay || '')}</td>`
+      : '';
+
     return '<tr style="background:#fff;">' +
-      '<td style="' + td + '"><input type="checkbox" class="chk-th-dl" data-ma="' + _escTh(r.ma_dl) + '" aria-label="Chọn đại lý ' + _escTh(r.ma_dl) + '" style="width:15px;height:15px;cursor:pointer;"></td>' +
+      '<td style="' + td + '"><input type="checkbox" class="chk-th-dl" data-ma="' + _escTh(r.ma_dl) + '" data-ngay="' + _escTh(r.ngay || '') + '" aria-label="Chọn đại lý ' + _escTh(r.ma_dl) + '" style="width:15px;height:15px;cursor:pointer;"></td>' +
       '<td style="' + td + '">' + (idx + 1) + '</td>' +
+      dateTd +
       '<td style="' + td + 'font-weight:700;color:#1e3a8a;">' + _escTh(r.ma_dl) + ' <span style="color:#f97316;">*</span></td>' +
       '<td style="' + td + '">' + k(db) + '</td>' +
       '<td style="' + td + '">' + k(cap) + '</td>' +
@@ -7577,9 +7781,16 @@ async function renderTongHopPanel() {
   }).join('');
 
   const th = 'padding:6px 8px;border:1px solid #7a889b;background:#0d2a6b;color:#fff;font-weight:700;text-align:center;';
-  const empty = '<tr><td colspan="10" style="padding:24px;text-align:center;color:#64748b;background:#fff;border:1px solid #7a889b;">Chưa có đại lý nào nhập dữ liệu trong ngày ' + _escTh(formatDate(currentNgay)) + '</td></tr>';
+  const totalCols = isMonthMode ? 11 : 10;
+  const emptyMsg = isMonthMode
+    ? ('Chưa có đại lý nào có dữ liệu trong tháng ' + _escTh(monthDisplay))
+    : ('Chưa có đại lý nào nhập dữ liệu trong ngày ' + _escTh(formatDate(currentNgay)));
+  const empty = '<tr><td colspan="' + totalCols + '" style="padding:24px;text-align:center;color:#64748b;background:#fff;border:1px solid #7a889b;">' + emptyMsg + '</td></tr>';
+  
+  const totalRowLabel = isMonthMode ? ('TỔNG THÁNG ' + _escTh(monthDisplay)) : 'TỔNG';
+  const totalColSpan = isMonthMode ? 4 : 3;
   const totalRow = recs.length ? '<tr style="background:#5d4037;color:#fff;font-weight:700;">' +
-    '<td colspan="3" style="padding:6px 8px;border:1px solid #7a889b;text-align:center;">TỔNG</td>' +
+    '<td colspan="' + totalColSpan + '" style="padding:6px 8px;border:1px solid #7a889b;text-align:center;">' + totalRowLabel + '</td>' +
     '<td style="padding:6px 8px;border:1px solid #7a889b;text-align:center;">' + k(tot.db) + '</td>' +
     '<td style="padding:6px 8px;border:1px solid #7a889b;text-align:center;">' + k(tot.cap) + '</td>' +
     '<td style="padding:6px 8px;border:1px solid #7a889b;text-align:center;">' + k(tot.l323) + '</td>' +
@@ -7589,11 +7800,22 @@ async function renderTongHopPanel() {
     '<td style="padding:6px 8px;border:1px solid #7a889b;text-align:center;background:#1e3a8a;">' + k(tot.nop) + '</td>' +
   '</tr>' : '';
 
+  const titleHeader = isMonthMode
+    ? ('<span style="font-weight:700;">📊 TỔNG HỢP DOANH THU CÁC ĐẠI LÝ - Tháng ' + _escTh(monthDisplay) + ' <span style="color:#fde047;font-weight:600;">(đơn vị: nghìn đồng)</span></span>')
+    : ('<span style="font-weight:700;">📊 TỔNG HỢP DOANH THU CÁC ĐẠI LÝ - Ngày ' + _escTh(formatDate(currentNgay)) + ' <span style="color:#fde047;font-weight:600;">(đơn vị: nghìn đồng)</span></span>');
+
+  const monthActionBtn = isMonthMode
+    ? '<button type="button" id="btn-th-day-mode" class="classic-btn" style="padding:3px 10px;font-weight:700;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;">🔙 Về xem theo ngày (' + _escTh(formatDate(currentNgay)) + ')</button>'
+    : '<button type="button" id="btn-th-month" class="classic-btn" style="padding:3px 10px;font-weight:700;background:#e0f2fe;color:#0369a1;border:1px solid #38bdf8;">📅 Nạp dữ liệu theo tháng</button>';
+
+  const dateTh = isMonthMode ? ('<th style="' + th + 'width:85px;background:#1e3a8a;">Ngày</th>') : '';
+
   panel.innerHTML =
     '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:6px 8px;background:#10346e;color:#fff;">' +
-      '<span style="font-weight:700;">📊 TỔNG HỢP DOANH THU CÁC ĐẠI LÝ - Ngày ' + _escTh(formatDate(currentNgay)) + ' <span style="color:#fde047;font-weight:600;">(đơn vị: nghìn đồng)</span></span>' +
-      '<span style="display:flex;gap:6px;">' +
+      titleHeader +
+      '<span style="display:flex;gap:6px;flex-wrap:wrap;">' +
         '<button type="button" id="btn-th-refresh" class="classic-btn" style="padding:3px 10px;">↻ Làm mới</button>' +
+        monthActionBtn +
         '<button type="button" id="btn-th-delete" class="classic-btn" style="padding:3px 10px;font-weight:700;color:#b91c1c;">🗑 Xóa đại lý đã chọn</button>' +
         '<button type="button" id="btn-th-back" class="classic-btn" style="padding:3px 10px;font-weight:700;">← Quay lại bảng nhập</button>' +
       '</span>' +
@@ -7602,7 +7824,9 @@ async function renderTongHopPanel() {
       '<table style="width:100%;border-collapse:collapse;font-size:12px;">' +
         '<thead><tr>' +
           '<th style="' + th + 'width:36px;"><input type="checkbox" id="chk-th-all" aria-label="Chọn tất cả đại lý" style="width:15px;height:15px;cursor:pointer;"></th>' +
-          '<th style="' + th + 'width:46px;">STT</th><th style="' + th + '">ĐL</th><th style="' + th + '">LTô</th><th style="' + th + '">LCặp</th>' +
+          '<th style="' + th + 'width:46px;">STT</th>' +
+          dateTh +
+          '<th style="' + th + '">ĐL</th><th style="' + th + '">LTô</th><th style="' + th + '">LCặp</th>' +
           '<th style="' + th + '">Lô 3/23</th><th style="' + th + '">Lô 2/27</th><th style="' + th + '">Dsố</th><th style="' + th + '">Thưởng</th><th style="' + th + '">Tiền nộp</th>' +
         '</tr></thead>' +
         '<tbody>' + (rowsHtml || empty) + totalRow + '</tbody>' +
@@ -7614,8 +7838,23 @@ async function renderTongHopPanel() {
   });
   panel.querySelector('#btn-th-back')?.addEventListener('click', hideTongHopPanel);
   panel.querySelector('#btn-th-refresh')?.addEventListener('click', renderTongHopPanel);
+  panel.querySelector('#btn-th-month')?.addEventListener('click', async () => {
+    const selectedMonth = await promptMonthTongHop();
+    if (selectedMonth) {
+      _currentTongHopMode = 'month';
+      _currentTongHopMonth = selectedMonth;
+      showToast('Đang nạp dữ liệu tháng ' + _formatMonthYM(selectedMonth) + '...', 'info');
+      renderTongHopPanel();
+    }
+  });
+  panel.querySelector('#btn-th-day-mode')?.addEventListener('click', () => {
+    _currentTongHopMode = 'day';
+    showToast('Đang quay lại xem ngày ' + formatDate(currentNgay), 'info');
+    renderTongHopPanel();
+  });
   panel.querySelector('#btn-th-delete')?.addEventListener('click', deleteSelectedTongHop);
 }
+
 
 async function showTongHopPanel() {
   const panel = document.getElementById('tonghop-dl-panel');
@@ -7635,38 +7874,224 @@ async function showTongHopPanel() {
 async function deleteSelectedTongHop() {
   const panel = document.getElementById('tonghop-dl-panel');
   if (!panel) return;
-  const selected = Array.from(panel.querySelectorAll('.chk-th-dl:checked')).map(c => c.dataset.ma);
-  if (selected.length === 0) {
-    showToast('Hãy tích chọn ít nhất một đại lý cần xóa!', 'warning');
+  const checkboxes = Array.from(panel.querySelectorAll('.chk-th-dl:checked'));
+  if (checkboxes.length === 0) {
+    showToast('Hãy tích chọn ít nhất một bản ghi đại lý cần xóa!', 'warning');
     return;
   }
-  if (!confirm('CẢNH BÁO: Xóa toàn bộ dữ liệu ngày ' + formatDate(currentNgay) + ' của ' + selected.length + ' đại lý: ' + selected.join(', ') + ' ?\nHành động này không thể hoàn tác.')) return;
-  const stop = showLoading('Đang xóa dữ liệu đại lý đã chọn...');
+  const isMonthMode = (_currentTongHopMode === 'month');
+  const targetMonth = _currentTongHopMonth || (currentNgay || '').slice(0, 7);
+  const timeLabel = isMonthMode
+    ? ('tháng ' + (typeof _formatMonthYM === 'function' ? _formatMonthYM(targetMonth) : targetMonth))
+    : ('ngày ' + formatDate(currentNgay));
+
+  const deleteByNgay = new Map();
+  const allDealersSet = new Set();
+  checkboxes.forEach(c => {
+    const ma = String(c.dataset.ma || '').trim().toUpperCase();
+    const ngay = String(c.dataset.ngay || (isMonthMode ? '' : currentNgay)).trim();
+    if (!ma) return;
+    allDealersSet.add(ma);
+    const dateKey = ngay || currentNgay;
+    if (!deleteByNgay.has(dateKey)) deleteByNgay.set(dateKey, new Set());
+    deleteByNgay.get(dateKey).add(ma);
+  });
+
+  if (!confirm('CẢNH BÁO: Xóa ' + checkboxes.length + ' bản ghi đại lý đã chọn trong ' + timeLabel + ' ?\nHành động này không thể hoàn tác.')) return;
+  const stop = showLoading('Đang xóa dữ liệu đã chọn...');
   try {
-    if (_autoSaveTimer) { clearTimeout(_autoSaveTimer); _autoSaveTimer = null; }
-    const dls = await getDaiLyList().catch(() => daiLyList);
-    const tickets = await getVeLoToByNgay(currentNgay);
-    const set = new Set(selected);
-    let count = 0;
+    const timer = (typeof _autoSaveTimerCap !== 'undefined' ? _autoSaveTimerCap : (typeof _autoSaveTimer !== 'undefined' ? _autoSaveTimer : null));
+    if (timer) {
+      clearTimeout(timer);
+      if (typeof _autoSaveTimerCap !== 'undefined') _autoSaveTimerCap = null;
+      if (typeof _autoSaveTimer !== 'undefined') _autoSaveTimer = null;
+    }
+
+    const dls = await getDaiLyList().catch(() => (typeof daiLyList !== 'undefined' ? daiLyList : []));
+    let deletedTicketsCount = 0;
     let currentDeleted = false;
-    for (const t of tickets) {
-      const ma = _resolveMaTicket(t, dls);
-      if (!set.has(ma)) continue;
-      await deleteDoc(COLLECTIONS.VE_LOTO, t.id);
-      count++;
-      if (t.daiLyId === currentDaiLyId) currentDeleted = true;
+
+    // 1. Xóa vé trong Firestore VE_LOTO
+    try {
+      const getDocsFn = (typeof getDocs === 'function' ? getDocs : (typeof DbModule !== 'undefined' && DbModule?.getDocs ? DbModule.getDocs : null));
+      const deleteDocFn = (typeof deleteDoc === 'function' ? deleteDoc : (typeof DbModule !== 'undefined' && DbModule?.deleteDoc ? DbModule.deleteDoc : null));
+      if (getDocsFn && deleteDocFn) {
+        const allTickets = await getDocsFn(COLLECTIONS.VE_LOTO).catch(() => []);
+        for (const t of allTickets) {
+          if (!t || !t.id) continue;
+          const tNgay = String(t.ngay || '').trim();
+          if (!deleteByNgay.has(tNgay)) continue;
+          const targetDealSet = deleteByNgay.get(tNgay);
+          const ma = _resolveMaTicket(t, dls);
+          if (!targetDealSet.has(ma)) continue;
+
+          await deleteDocFn(COLLECTIONS.VE_LOTO, t.id);
+          deletedTicketsCount++;
+          if (t.daiLyId === currentDaiLyId && tNgay === currentNgay) currentDeleted = true;
+        }
+      }
+    } catch (eVe) {
+      console.warn('Lỗi khi xóa veLoTo:', eVe);
     }
-    if (typeof window.__triggerXsktSync === 'function') {
-      await window.__triggerXsktSync(currentNgay);
+
+    // 2. Xóa và cập nhật extra_records, cache bộ nhớ, và parent host
+    const affectedDaysPayload = [];
+    for (const [ngay, dealSet] of deleteByNgay.entries()) {
+      const docId = 'date_' + ngay;
+
+      // 2a. Cập nhật window.__xsktLastDays và window.parent.__xsktLastDays
+      let remainingLastDays = [];
+      if (window.__xsktLastDays && Array.isArray(window.__xsktLastDays[ngay])) {
+        window.__xsktLastDays[ngay] = window.__xsktLastDays[ngay].filter(r => !dealSet.has(String(r.ma_dl || '').trim().toUpperCase()));
+        remainingLastDays = window.__xsktLastDays[ngay];
+        if (remainingLastDays.length === 0) delete window.__xsktLastDays[ngay];
+      }
+      if (window.parent && window.parent.__xsktLastDays && Array.isArray(window.parent.__xsktLastDays[ngay])) {
+        window.parent.__xsktLastDays[ngay] = window.parent.__xsktLastDays[ngay].filter(r => !dealSet.has(String(r.ma_dl || '').trim().toUpperCase()));
+        if (window.parent.__xsktLastDays[ngay].length === 0) delete window.parent.__xsktLastDays[ngay];
+      }
+
+      // 2b. Cập nhật parent.extraSalesMap & window.extraSalesMap
+      let parentDoc = null;
+      const getExtraDocFromMap = (m) => m ? (m.get(docId) || m.get(ngay)) : null;
+      parentDoc = getExtraDocFromMap(window.parent?.extraSalesMap) || getExtraDocFromMap(window.extraSalesMap);
+
+      // 2c. Đọc từ Firestore extra_records nếu chưa có dữ liệu cấu trúc
+      let fsDocData = null;
+      try {
+        const { db: fireDb } = (typeof FirebaseConfigModule !== 'undefined' ? FirebaseConfigModule : { db: (typeof db !== 'undefined' ? db : null) });
+        if (fireDb && typeof fbGetDoc === 'function' && typeof fbDoc === 'function') {
+          const s1 = await fbGetDoc(fbDoc(fireDb, 'extra_records', docId)).catch(() => null);
+          if (s1 && s1.exists()) fsDocData = s1.data();
+          else {
+            const s2 = await fbGetDoc(fbDoc(fireDb, 'extra_records', ngay)).catch(() => null);
+            if (s2 && s2.exists()) fsDocData = s2.data();
+          }
+        }
+      } catch (_) {}
+
+      const sourceDoc = fsDocData || parentDoc;
+      let remainingRecords = [];
+      if (sourceDoc && Array.isArray(sourceDoc.records)) {
+        remainingRecords = sourceDoc.records.filter(r => !dealSet.has(String(r.ma_dl || '').trim().toUpperCase()));
+      }
+
+      // 2d. Xóa hoặc ghi đè Firestore extra_records
+      try {
+        const { db: fireDb } = (typeof FirebaseConfigModule !== 'undefined' ? FirebaseConfigModule : { db: (typeof db !== 'undefined' ? db : null) });
+        if (fireDb && typeof fbDeleteDoc === 'function' && typeof fbDoc === 'function') {
+          if (remainingRecords.length === 0) {
+            await fbDeleteDoc(fbDoc(fireDb, 'extra_records', docId)).catch(() => {});
+            await fbDeleteDoc(fbDoc(fireDb, 'extra_records', ngay)).catch(() => {});
+          } else {
+            await fbSetDoc(fbDoc(fireDb, 'extra_records', docId), {
+              ...sourceDoc,
+              docId,
+              doc_id: docId,
+              time_type: 'date',
+              time_key: ngay,
+              records: remainingRecords,
+              updated_at: (typeof fbServerTimestamp === 'function' ? fbServerTimestamp() : new Date())
+            }, { merge: true }).catch(() => {});
+          }
+        }
+      } catch (eFs) {
+        console.warn('Lỗi Firestore extra_records:', eFs);
+      }
+
+      // 2e. Xóa / ghi đè trực tiếp qua parent.firebase nếu có
+      if (window.parent && window.parent.firebase && window.parent.firebase.firestore) {
+        try {
+          const parentFs = window.parent.firebase.firestore();
+          if (remainingRecords.length === 0) {
+            await parentFs.collection('extra_records').doc(docId).delete().catch(() => {});
+            await parentFs.collection('extra_records').doc(ngay).delete().catch(() => {});
+          } else {
+            await parentFs.collection('extra_records').doc(docId).set({
+              ...sourceDoc,
+              docId,
+              doc_id: docId,
+              time_type: 'date',
+              time_key: ngay,
+              records: remainingRecords
+            }, { merge: true }).catch(() => {});
+          }
+        } catch (_) {}
+      }
+
+      // 2f. Cập nhật Map trong bộ nhớ
+      if (window.parent && window.parent.extraSalesMap) {
+        if (remainingRecords.length === 0) {
+          window.parent.extraSalesMap.delete(docId);
+          window.parent.extraSalesMap.delete(ngay);
+        } else {
+          window.parent.extraSalesMap.set(docId, {
+            ...sourceDoc,
+            docId,
+            doc_id: docId,
+            time_type: 'date',
+            time_key: ngay,
+            records: remainingRecords
+          });
+        }
+      }
+      if (window.extraSalesMap) {
+        if (remainingRecords.length === 0) {
+          window.extraSalesMap.delete(docId);
+          window.extraSalesMap.delete(ngay);
+        } else {
+          window.extraSalesMap.set(docId, {
+            ...sourceDoc,
+            docId,
+            doc_id: docId,
+            time_type: 'date',
+            time_key: ngay,
+            records: remainingRecords
+          });
+        }
+      }
+
+      const [yyyy, mm, dd] = ngay.split('-');
+      affectedDaysPayload.push({
+        docId,
+        doc_id: docId,
+        time_type: 'date',
+        time_key: ngay,
+        label: 'Ngày ' + dd + '/' + mm + '/' + yyyy,
+        records: remainingRecords
+      });
+
+      // 2g. Trigger sync cho ngày này
+      if (typeof window.__triggerXsktSync === 'function') {
+        try { await window.__triggerXsktSync(ngay); } catch (_) {}
+      }
     }
+
+    // 3. Báo cho parent host cập nhật
+    if (window.parent && window.parent !== window) {
+      try {
+        window.parent.postMessage({
+          type: 'XSKT_SYNC_EXTRA_RECORDS',
+          daysPayload: affectedDaysPayload
+        }, '*');
+        if (typeof window.parent.generateSummaryView === 'function') {
+          window.parent.generateSummaryView();
+        }
+      } catch (_) {}
+    }
+
     if (currentDeleted) {
-      isSheetLocked = false;
-      await loadExistingData();
+      if (typeof clearTable === 'function') clearTable();
+      if (typeof renderCurrentTo === 'function') renderCurrentTo();
+      if (typeof updateInfoBar === 'function') updateInfoBar();
+      if (typeof isSheetLocked !== 'undefined') isSheetLocked = false;
+      if (typeof loadExistingData === 'function') await loadExistingData();
     }
-    showToast('Đã xóa ' + count + ' tờ của ' + selected.length + ' đại lý trong ngày ' + formatDate(currentNgay), 'success');
-    await showTongHopPanel();
+
+    showToast('Đã xóa thành công ' + (deletedTicketsCount > 0 ? (deletedTicketsCount + ' vé của ') : '') + checkboxes.length + ' bản ghi đại lý đã chọn!', 'success');
+    await renderTongHopPanel();
   } catch (err) {
-    console.error(err);
+    console.error('Lỗi deleteSelectedTongHop:', err);
     showToast('Lỗi xóa dữ liệu: ' + err.message, 'danger');
   } finally {
     stop?.();
@@ -7674,9 +8099,12 @@ async function deleteSelectedTongHop() {
 }
 
 // Điền "BẢNG TỔNG HỢP SỐ LIỆU" bằng tổng doanh số của TẤT CẢ đại lý đã nhập trong ngày
-async function fillMasterWithAllAgents() {
+async function fillMasterWithAllAgents(monthTarget = null) {
   const dls = await getDaiLyList().catch(() => daiLyList);
-  const tickets = (await getVeLoToByNgay(currentNgay)).filter(t => {
+  const allTickets = await (DbModule.getDocs || getDocs)(COLLECTIONS.VE_LOTO).catch(() => []);
+  const tickets = allTickets.filter(t => {
+    const matchTime = monthTarget ? (t.ngay && t.ngay.startsWith(monthTarget)) : (t.ngay === currentNgay);
+    if (!matchTime) return false;
     const ma = _resolveMaTicket(t, dls);
     return !!ma;
   });
@@ -9880,8 +10308,192 @@ function hideTongHopPanel() {
   focusFirstCell();
 }
 
+let _currentTongHopMode = 'day'; // 'day' | 'month'
+let _currentTongHopMonth = null; // 'YYYY-MM'
+
+function _formatMonthYM(ym) {
+  if (!ym) return '';
+  const parts = String(ym).split('-');
+  if (parts.length === 2) return `${parts[1]}/${parts[0]}`;
+  return ym;
+}
+
+function _parseMonthInput(val) {
+  if (!val) return null;
+  val = String(val).trim();
+  if (/^\d{4}-\d{2}$/.test(val)) return val;
+  if (/^\d{1,2}\/\d{4}$/.test(val)) {
+    const [m, y] = val.split('/');
+    return `${y}-${m.padStart(2, '0')}`;
+  }
+  if (/^\d{1,2}-\d{4}$/.test(val)) {
+    const [m, y] = val.split('-');
+    return `${y}-${m.padStart(2, '0')}`;
+  }
+  if (/^\d{1,2}$/.test(val)) {
+    const now = new Date();
+    return `${now.getFullYear()}-${val.padStart(2, '0')}`;
+  }
+  return null;
+}
+
+async function promptMonthTongHop() {
+  const currentYm = (currentNgay || '').slice(0, 7) || new Date().toISOString().slice(0, 7);
+  const currentMmYyyy = _formatMonthYM(_currentTongHopMonth || currentYm);
+
+  let modal = document.getElementById('modal-th-month-picker');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-th-month-picker';
+    modal.className = 'modal-overlay hidden';
+    modal.style.zIndex = '99999';
+    modal.innerHTML = `
+      <div class="modal-box" style="width:330px;max-width:92%;padding:18px 20px;background:#f0f4f8;border:2px solid #0054e3;border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,0.45);font-family:Tahoma,'Segoe UI',Arial,sans-serif;">
+        <div style="font-weight:bold;font-size:15px;color:#000080;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+          <span>📅 NẠP DỮ LIỆU THEO THÁNG</span>
+        </div>
+        <div style="font-size:12.5px;color:#334155;margin-bottom:12px;line-height:1.4;">
+          Nhập tháng cần nạp & tổng hợp doanh số tất cả đại lý:
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px;">
+          <label style="font-weight:bold;color:#000080;font-size:14px;">Tháng:</label>
+          <input type="text" id="input-th-month-picker-val" placeholder="MM/YYYY" maxlength="7" style="width:130px;height:32px;padding:2px 8px;font-size:16px;font-weight:bold;letter-spacing:1px;color:#000080;background:#ffffff;border:1.5px solid #0054e3;border-radius:3px;text-align:center;">
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;">
+          <button type="button" id="btn-th-month-picker-cancel" class="classic-btn" style="padding:5px 14px;background:#e2e8f0;color:#334155;border:1px solid #94a3b8;font-weight:600;">Hủy</button>
+          <button type="button" id="btn-th-month-picker-submit" class="classic-btn" style="padding:5px 16px;background:#0054e3;color:#ffffff;border:1px solid #003db3;font-weight:700;">⚡ Nạp Dữ Liệu</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  const input = modal.querySelector('#input-th-month-picker-val');
+  input.value = currentMmYyyy;
+  modal.classList.remove('hidden');
+  input.focus();
+  input.select();
+
+  return new Promise((resolve) => {
+    const closeModal = () => modal.classList.add('hidden');
+    modal.querySelector('#btn-th-month-picker-cancel').onclick = () => {
+      closeModal();
+      resolve(null);
+    };
+    modal.querySelector('#btn-th-month-picker-submit').onclick = () => {
+      const parsed = _parseMonthInput(input.value);
+      if (!parsed) {
+        showToast('Vui lòng nhập tháng hợp lệ (ví dụ: 10/2026)!', 'warning');
+        return;
+      }
+      closeModal();
+      resolve(parsed);
+    };
+    input.onkeydown = (e) => {
+      if (e.key === 'Enter') {
+        modal.querySelector('#btn-th-month-picker-submit').click();
+      } else if (e.key === 'Escape') {
+        closeModal();
+        resolve(null);
+      }
+    };
+  });
+}
+
+async function getTongHopRecordsOfMonth(targetMonth) {
+  try {
+    if (typeof window.__triggerXsktSync === 'function') {
+      await window.__triggerXsktSync(null);
+    }
+  } catch (e) { console.warn(e); }
+
+  const agg = new Map();
+  const ensureAgg = (ngay, ma) => {
+    const key = `${ngay}_${ma}`;
+    if (!agg.has(key)) {
+      agg.set(key, { ngay: ngay, ma_dl: ma, loto_db: 0, loto_cap: 0, loto_2_27: 0, loto_3_23: 0, xskt: 0, thuong: 0 });
+    }
+    return agg.get(key);
+  };
+
+  // 1. Quét từ window.__xsktLastDays
+  if (window.__xsktLastDays && typeof window.__xsktLastDays === 'object') {
+    Object.keys(window.__xsktLastDays).forEach(dayKey => {
+      if (dayKey && dayKey.startsWith(targetMonth)) {
+        const dayRecs = window.__xsktLastDays[dayKey] || [];
+        dayRecs.forEach(r => {
+          const ma = String(r.ma_dl || '').trim().toUpperCase();
+          if (!ma) return;
+          const a = ensureAgg(dayKey, ma);
+          a.loto_db += Number(r.loto_db) || 0;
+          a.loto_cap += Number(r.loto_cap) || 0;
+          a.loto_2_27 += Number(r.loto_2_27) || 0;
+          a.loto_3_23 += Number(r.loto_3_23) || 0;
+          a.xskt += Number(r.xskt) || 0;
+          a.thuong += Number(r.thuong) || 0;
+        });
+      }
+    });
+  }
+
+  // 2. Quét từ vé chi tiết trong Firestore VE_LOTO của tháng
+  const dls = await getDaiLyList().catch(() => []);
+  const allTickets = await (DbModule.getDocs || getDocs)(COLLECTIONS.VE_LOTO).catch(() => []);
+  const monthTickets = allTickets.filter(t => t.ngay && t.ngay.startsWith(targetMonth));
+  
+  if (agg.size === 0) {
+    monthTickets.forEach(t => {
+      const ma = _resolveMaTicket(t, dls);
+      if (!ma) return;
+      const r = ensureAgg(t.ngay, ma);
+      if (t.loaiHinh === 'cap_so') {
+        const sum = (a, p) => (a || []).reduce((s, i) => s + (Number(i.sl) || 1) * p, 0);
+        r.loto_cap += sum(t.cap10k, 10000) + sum(t.cap20k, 20000);
+        r.loto_2_27 += sum(t['2x27'], 20000);
+        r.loto_3_23 += sum(t['3x23'], 20000);
+      } else {
+        r.loto_db += Number(t.tongTien) || 0;
+      }
+    });
+  }
+
+  // 3. Quét các bản ghi bổ sung trong Firestore extra_records thuộc tháng này
+  try {
+    const { db } = FirebaseConfigModule;
+    const extraSnap = await fbGetDocs(fbCollection(db, 'extra_records')).catch(() => null);
+    if (extraSnap && extraSnap.docs) {
+      extraSnap.docs.forEach(docSnap => {
+        const data = docSnap.data();
+        if (!data) return;
+        const isTargetMonth = (data.time_type === 'month' && data.time_key === targetMonth) ||
+                              (data.time_type === 'date' && typeof data.time_key === 'string' && data.time_key.startsWith(targetMonth)) ||
+                              (docSnap.id && (docSnap.id === 'month_' + targetMonth || docSnap.id.startsWith('date_' + targetMonth)));
+        if (!isTargetMonth) return;
+
+        if (Array.isArray(data.records)) {
+          const recNgay = data.time_type === 'date' ? (data.time_key || data.date) : (data.date || targetMonth);
+          data.records.forEach(r => {
+            const ma = String(r.ma_dl || '').trim().toUpperCase();
+            if (!ma) return;
+            const a = ensureAgg(recNgay, ma);
+            a.loto_db += Number(r.loto_db) || 0;
+            a.loto_cap += Number(r.loto_cap) || 0;
+            a.loto_2_27 += Number(r.loto_2_27) || 0;
+            a.loto_3_23 += Number(r.loto_3_23) || 0;
+            a.xskt += Number(r.xskt) || 0;
+            a.thuong += Number(r.thuong) || 0;
+          });
+        }
+      });
+    }
+  } catch (err) {
+    console.warn('Lỗi đọc extra_records tháng:', err);
+  }
+
+  return Array.from(agg.values()).filter(r => r.loto_db + r.loto_cap + r.loto_2_27 + r.loto_3_23 + r.xskt + r.thuong > 0);
+}
+
 async function getTongHopRecordsOfDay() {
-  // Ưu tiên dùng kết quả tính của bộ đồng bộ (đã gồm tiền thưởng)
   try {
     if (typeof window.__triggerXsktSync === 'function') {
       await window.__triggerXsktSync(currentNgay);
@@ -9889,7 +10501,6 @@ async function getTongHopRecordsOfDay() {
       if (Array.isArray(recs)) return recs;
     }
   } catch (e) { console.warn(e); }
-  // Dự phòng (chạy độc lập): chỉ tính doanh số từ vé đã lưu
   const dls = await getDaiLyList().catch(() => []);
   const tickets = await getVeLoToByNgay(currentNgay);
   const agg = new Map();
@@ -9915,21 +10526,37 @@ async function renderTongHopPanel() {
   if (!panel) return;
   panel.innerHTML = '<div style="padding:20px;text-align:center;color:#334155;">Đang tổng hợp doanh thu các đại lý...</div>';
   let recs = [];
+  const isMonthMode = (_currentTongHopMode === 'month');
+  const targetMonth = _currentTongHopMonth || (currentNgay || '').slice(0, 7) || new Date().toISOString().slice(0, 7);
+  const monthDisplay = _formatMonthYM(targetMonth);
+
   try {
-    recs = await getTongHopRecordsOfDay();
+    if (isMonthMode) {
+      recs = await getTongHopRecordsOfMonth(targetMonth);
+      try { await fillMasterWithAllAgents(targetMonth); } catch (e) { console.warn(e); }
+    } else {
+      recs = await getTongHopRecordsOfDay();
+      try { await fillMasterWithAllAgents(); } catch (e) { console.warn(e); }
+    }
   } catch (err) {
     console.error(err);
     panel.innerHTML = '<div style="padding:20px;text-align:center;color:#b91c1c;">Lỗi tổng hợp: ' + _escTh(err.message) + '</div>';
     return;
   }
-  try { await fillMasterWithAllAgents(); } catch (e) { console.warn(e); }
+
   const num = v => Number(v) || 0;
   const k = v => formatCurrency(Math.round(v / 1000));
+
   recs = recs.slice().sort((a, b) => {
+    if (isMonthMode) {
+      const dComp = String(a.ngay || '').localeCompare(String(b.ngay || ''));
+      if (dComp !== 0) return dComp;
+    }
     const na = parseInt(String(a.ma_dl).replace(/\D/g, ''), 10), nb = parseInt(String(b.ma_dl).replace(/\D/g, ''), 10);
     if (!isNaN(na) && !isNaN(nb) && na !== nb) return na - nb;
     return String(a.ma_dl).localeCompare(String(b.ma_dl));
   });
+
   const tot = { db: 0, cap: 0, l323: 0, l227: 0, rev: 0, th: 0, nop: 0 };
   const rowsHtml = recs.map((r, idx) => {
     const db = num(r.loto_db), cap = num(r.loto_cap), l323 = num(r.loto_3_23), l227 = num(r.loto_2_27), x = num(r.xskt);
@@ -9939,9 +10566,14 @@ async function renderTongHopPanel() {
     const nop = rev - com - th;
     tot.db += db; tot.cap += cap; tot.l323 += l323; tot.l227 += l227; tot.rev += rev; tot.th += th; tot.nop += nop;
     const td = 'padding:5px 8px;border:1px solid #7a889b;text-align:center;';
+    const dateTd = isMonthMode
+      ? `<td style="${td}font-weight:700;color:#1e3a8a;background:#f8fafc;white-space:nowrap;">${_escTh(formatDate(r.ngay) || r.ngay || '')}</td>`
+      : '';
+
     return '<tr style="background:#fff;">' +
-      '<td style="' + td + '"><input type="checkbox" class="chk-th-dl" data-ma="' + _escTh(r.ma_dl) + '" aria-label="Chọn đại lý ' + _escTh(r.ma_dl) + '" style="width:15px;height:15px;cursor:pointer;"></td>' +
+      '<td style="' + td + '"><input type="checkbox" class="chk-th-dl" data-ma="' + _escTh(r.ma_dl) + '" data-ngay="' + _escTh(r.ngay || '') + '" aria-label="Chọn đại lý ' + _escTh(r.ma_dl) + '" style="width:15px;height:15px;cursor:pointer;"></td>' +
       '<td style="' + td + '">' + (idx + 1) + '</td>' +
+      dateTd +
       '<td style="' + td + 'font-weight:700;color:#1e3a8a;">' + _escTh(r.ma_dl) + ' <span style="color:#f97316;">*</span></td>' +
       '<td style="' + td + '">' + k(db) + '</td>' +
       '<td style="' + td + '">' + k(cap) + '</td>' +
@@ -9954,9 +10586,16 @@ async function renderTongHopPanel() {
   }).join('');
 
   const th = 'padding:6px 8px;border:1px solid #7a889b;background:#0d2a6b;color:#fff;font-weight:700;text-align:center;';
-  const empty = '<tr><td colspan="10" style="padding:24px;text-align:center;color:#64748b;background:#fff;border:1px solid #7a889b;">Chưa có đại lý nào nhập dữ liệu trong ngày ' + _escTh(formatDate(currentNgay)) + '</td></tr>';
+  const totalCols = isMonthMode ? 11 : 10;
+  const emptyMsg = isMonthMode
+    ? ('Chưa có đại lý nào có dữ liệu trong tháng ' + _escTh(monthDisplay))
+    : ('Chưa có đại lý nào nhập dữ liệu trong ngày ' + _escTh(formatDate(currentNgay)));
+  const empty = '<tr><td colspan="' + totalCols + '" style="padding:24px;text-align:center;color:#64748b;background:#fff;border:1px solid #7a889b;">' + emptyMsg + '</td></tr>';
+  
+  const totalRowLabel = isMonthMode ? ('TỔNG THÁNG ' + _escTh(monthDisplay)) : 'TỔNG';
+  const totalColSpan = isMonthMode ? 4 : 3;
   const totalRow = recs.length ? '<tr style="background:#5d4037;color:#fff;font-weight:700;">' +
-    '<td colspan="3" style="padding:6px 8px;border:1px solid #7a889b;text-align:center;">TỔNG</td>' +
+    '<td colspan="' + totalColSpan + '" style="padding:6px 8px;border:1px solid #7a889b;text-align:center;">' + totalRowLabel + '</td>' +
     '<td style="padding:6px 8px;border:1px solid #7a889b;text-align:center;">' + k(tot.db) + '</td>' +
     '<td style="padding:6px 8px;border:1px solid #7a889b;text-align:center;">' + k(tot.cap) + '</td>' +
     '<td style="padding:6px 8px;border:1px solid #7a889b;text-align:center;">' + k(tot.l323) + '</td>' +
@@ -9966,11 +10605,22 @@ async function renderTongHopPanel() {
     '<td style="padding:6px 8px;border:1px solid #7a889b;text-align:center;background:#1e3a8a;">' + k(tot.nop) + '</td>' +
   '</tr>' : '';
 
+  const titleHeader = isMonthMode
+    ? ('<span style="font-weight:700;">📊 TỔNG HỢP DOANH THU CÁC ĐẠI LÝ - Tháng ' + _escTh(monthDisplay) + ' <span style="color:#fde047;font-weight:600;">(đơn vị: nghìn đồng)</span></span>')
+    : ('<span style="font-weight:700;">📊 TỔNG HỢP DOANH THU CÁC ĐẠI LÝ - Ngày ' + _escTh(formatDate(currentNgay)) + ' <span style="color:#fde047;font-weight:600;">(đơn vị: nghìn đồng)</span></span>');
+
+  const monthActionBtn = isMonthMode
+    ? '<button type="button" id="btn-th-day-mode" class="classic-btn" style="padding:3px 10px;font-weight:700;background:#fef3c7;color:#92400e;border:1px solid #f59e0b;">🔙 Về xem theo ngày (' + _escTh(formatDate(currentNgay)) + ')</button>'
+    : '<button type="button" id="btn-th-month" class="classic-btn" style="padding:3px 10px;font-weight:700;background:#e0f2fe;color:#0369a1;border:1px solid #38bdf8;">📅 Nạp dữ liệu theo tháng</button>';
+
+  const dateTh = isMonthMode ? ('<th style="' + th + 'width:85px;background:#1e3a8a;">Ngày</th>') : '';
+
   panel.innerHTML =
     '<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:6px 8px;background:#10346e;color:#fff;">' +
-      '<span style="font-weight:700;">📊 TỔNG HỢP DOANH THU CÁC ĐẠI LÝ - Ngày ' + _escTh(formatDate(currentNgay)) + ' <span style="color:#fde047;font-weight:600;">(đơn vị: nghìn đồng)</span></span>' +
-      '<span style="display:flex;gap:6px;">' +
+      titleHeader +
+      '<span style="display:flex;gap:6px;flex-wrap:wrap;">' +
         '<button type="button" id="btn-th-refresh" class="classic-btn" style="padding:3px 10px;">↻ Làm mới</button>' +
+        monthActionBtn +
         '<button type="button" id="btn-th-delete" class="classic-btn" style="padding:3px 10px;font-weight:700;color:#b91c1c;">🗑 Xóa đại lý đã chọn</button>' +
         '<button type="button" id="btn-th-back" class="classic-btn" style="padding:3px 10px;font-weight:700;">← Quay lại bảng nhập</button>' +
       '</span>' +
@@ -9979,7 +10629,9 @@ async function renderTongHopPanel() {
       '<table style="width:100%;border-collapse:collapse;font-size:12px;">' +
         '<thead><tr>' +
           '<th style="' + th + 'width:36px;"><input type="checkbox" id="chk-th-all" aria-label="Chọn tất cả đại lý" style="width:15px;height:15px;cursor:pointer;"></th>' +
-          '<th style="' + th + 'width:46px;">STT</th><th style="' + th + '">ĐL</th><th style="' + th + '">LTô</th><th style="' + th + '">LCặp</th>' +
+          '<th style="' + th + 'width:46px;">STT</th>' +
+          dateTh +
+          '<th style="' + th + '">ĐL</th><th style="' + th + '">LTô</th><th style="' + th + '">LCặp</th>' +
           '<th style="' + th + '">Lô 3/23</th><th style="' + th + '">Lô 2/27</th><th style="' + th + '">Dsố</th><th style="' + th + '">Thưởng</th><th style="' + th + '">Tiền nộp</th>' +
         '</tr></thead>' +
         '<tbody>' + (rowsHtml || empty) + totalRow + '</tbody>' +
@@ -9991,8 +10643,23 @@ async function renderTongHopPanel() {
   });
   panel.querySelector('#btn-th-back')?.addEventListener('click', hideTongHopPanel);
   panel.querySelector('#btn-th-refresh')?.addEventListener('click', renderTongHopPanel);
+  panel.querySelector('#btn-th-month')?.addEventListener('click', async () => {
+    const selectedMonth = await promptMonthTongHop();
+    if (selectedMonth) {
+      _currentTongHopMode = 'month';
+      _currentTongHopMonth = selectedMonth;
+      showToast('Đang nạp dữ liệu tháng ' + _formatMonthYM(selectedMonth) + '...', 'info');
+      renderTongHopPanel();
+    }
+  });
+  panel.querySelector('#btn-th-day-mode')?.addEventListener('click', () => {
+    _currentTongHopMode = 'day';
+    showToast('Đang quay lại xem ngày ' + formatDate(currentNgay), 'info');
+    renderTongHopPanel();
+  });
   panel.querySelector('#btn-th-delete')?.addEventListener('click', deleteSelectedTongHop);
 }
+
 
 async function showTongHopPanel() {
   const panel = document.getElementById('tonghop-dl-panel');
@@ -10012,38 +10679,224 @@ async function showTongHopPanel() {
 async function deleteSelectedTongHop() {
   const panel = document.getElementById('tonghop-dl-panel');
   if (!panel) return;
-  const selected = Array.from(panel.querySelectorAll('.chk-th-dl:checked')).map(c => c.dataset.ma);
-  if (selected.length === 0) {
-    showToast('Hãy tích chọn ít nhất một đại lý cần xóa!', 'warning');
+  const checkboxes = Array.from(panel.querySelectorAll('.chk-th-dl:checked'));
+  if (checkboxes.length === 0) {
+    showToast('Hãy tích chọn ít nhất một bản ghi đại lý cần xóa!', 'warning');
     return;
   }
-  if (!confirm('CẢNH BÁO: Xóa toàn bộ dữ liệu ngày ' + formatDate(currentNgay) + ' của ' + selected.length + ' đại lý: ' + selected.join(', ') + ' ?\nHành động này không thể hoàn tác.')) return;
-  const stop = showLoading('Đang xóa dữ liệu đại lý đã chọn...');
+  const isMonthMode = (_currentTongHopMode === 'month');
+  const targetMonth = _currentTongHopMonth || (currentNgay || '').slice(0, 7);
+  const timeLabel = isMonthMode
+    ? ('tháng ' + (typeof _formatMonthYM === 'function' ? _formatMonthYM(targetMonth) : targetMonth))
+    : ('ngày ' + formatDate(currentNgay));
+
+  const deleteByNgay = new Map();
+  const allDealersSet = new Set();
+  checkboxes.forEach(c => {
+    const ma = String(c.dataset.ma || '').trim().toUpperCase();
+    const ngay = String(c.dataset.ngay || (isMonthMode ? '' : currentNgay)).trim();
+    if (!ma) return;
+    allDealersSet.add(ma);
+    const dateKey = ngay || currentNgay;
+    if (!deleteByNgay.has(dateKey)) deleteByNgay.set(dateKey, new Set());
+    deleteByNgay.get(dateKey).add(ma);
+  });
+
+  if (!confirm('CẢNH BÁO: Xóa ' + checkboxes.length + ' bản ghi đại lý đã chọn trong ' + timeLabel + ' ?\nHành động này không thể hoàn tác.')) return;
+  const stop = showLoading('Đang xóa dữ liệu đã chọn...');
   try {
-    if (_autoSaveTimerCap) { clearTimeout(_autoSaveTimerCap); _autoSaveTimerCap = null; }
-    const dls = await getDaiLyList().catch(() => daiLyList);
-    const tickets = await getVeLoToByNgay(currentNgay);
-    const set = new Set(selected);
-    let count = 0;
+    const timer = (typeof _autoSaveTimerCap !== 'undefined' ? _autoSaveTimerCap : (typeof _autoSaveTimer !== 'undefined' ? _autoSaveTimer : null));
+    if (timer) {
+      clearTimeout(timer);
+      if (typeof _autoSaveTimerCap !== 'undefined') _autoSaveTimerCap = null;
+      if (typeof _autoSaveTimer !== 'undefined') _autoSaveTimer = null;
+    }
+
+    const dls = await getDaiLyList().catch(() => (typeof daiLyList !== 'undefined' ? daiLyList : []));
+    let deletedTicketsCount = 0;
     let currentDeleted = false;
-    for (const t of tickets) {
-      const ma = _resolveMaTicket(t, dls);
-      if (!set.has(ma)) continue;
-      await deleteDoc(COLLECTIONS.VE_LOTO, t.id);
-      count++;
-      if (t.daiLyId === currentDaiLyId) currentDeleted = true;
+
+    // 1. Xóa vé trong Firestore VE_LOTO
+    try {
+      const getDocsFn = (typeof getDocs === 'function' ? getDocs : (typeof DbModule !== 'undefined' && DbModule?.getDocs ? DbModule.getDocs : null));
+      const deleteDocFn = (typeof deleteDoc === 'function' ? deleteDoc : (typeof DbModule !== 'undefined' && DbModule?.deleteDoc ? DbModule.deleteDoc : null));
+      if (getDocsFn && deleteDocFn) {
+        const allTickets = await getDocsFn(COLLECTIONS.VE_LOTO).catch(() => []);
+        for (const t of allTickets) {
+          if (!t || !t.id) continue;
+          const tNgay = String(t.ngay || '').trim();
+          if (!deleteByNgay.has(tNgay)) continue;
+          const targetDealSet = deleteByNgay.get(tNgay);
+          const ma = _resolveMaTicket(t, dls);
+          if (!targetDealSet.has(ma)) continue;
+
+          await deleteDocFn(COLLECTIONS.VE_LOTO, t.id);
+          deletedTicketsCount++;
+          if (t.daiLyId === currentDaiLyId && tNgay === currentNgay) currentDeleted = true;
+        }
+      }
+    } catch (eVe) {
+      console.warn('Lỗi khi xóa veLoTo:', eVe);
     }
-    if (typeof window.__triggerXsktSync === 'function') {
-      await window.__triggerXsktSync(currentNgay);
+
+    // 2. Xóa và cập nhật extra_records, cache bộ nhớ, và parent host
+    const affectedDaysPayload = [];
+    for (const [ngay, dealSet] of deleteByNgay.entries()) {
+      const docId = 'date_' + ngay;
+
+      // 2a. Cập nhật window.__xsktLastDays và window.parent.__xsktLastDays
+      let remainingLastDays = [];
+      if (window.__xsktLastDays && Array.isArray(window.__xsktLastDays[ngay])) {
+        window.__xsktLastDays[ngay] = window.__xsktLastDays[ngay].filter(r => !dealSet.has(String(r.ma_dl || '').trim().toUpperCase()));
+        remainingLastDays = window.__xsktLastDays[ngay];
+        if (remainingLastDays.length === 0) delete window.__xsktLastDays[ngay];
+      }
+      if (window.parent && window.parent.__xsktLastDays && Array.isArray(window.parent.__xsktLastDays[ngay])) {
+        window.parent.__xsktLastDays[ngay] = window.parent.__xsktLastDays[ngay].filter(r => !dealSet.has(String(r.ma_dl || '').trim().toUpperCase()));
+        if (window.parent.__xsktLastDays[ngay].length === 0) delete window.parent.__xsktLastDays[ngay];
+      }
+
+      // 2b. Cập nhật parent.extraSalesMap & window.extraSalesMap
+      let parentDoc = null;
+      const getExtraDocFromMap = (m) => m ? (m.get(docId) || m.get(ngay)) : null;
+      parentDoc = getExtraDocFromMap(window.parent?.extraSalesMap) || getExtraDocFromMap(window.extraSalesMap);
+
+      // 2c. Đọc từ Firestore extra_records nếu chưa có dữ liệu cấu trúc
+      let fsDocData = null;
+      try {
+        const { db: fireDb } = (typeof FirebaseConfigModule !== 'undefined' ? FirebaseConfigModule : { db: (typeof db !== 'undefined' ? db : null) });
+        if (fireDb && typeof fbGetDoc === 'function' && typeof fbDoc === 'function') {
+          const s1 = await fbGetDoc(fbDoc(fireDb, 'extra_records', docId)).catch(() => null);
+          if (s1 && s1.exists()) fsDocData = s1.data();
+          else {
+            const s2 = await fbGetDoc(fbDoc(fireDb, 'extra_records', ngay)).catch(() => null);
+            if (s2 && s2.exists()) fsDocData = s2.data();
+          }
+        }
+      } catch (_) {}
+
+      const sourceDoc = fsDocData || parentDoc;
+      let remainingRecords = [];
+      if (sourceDoc && Array.isArray(sourceDoc.records)) {
+        remainingRecords = sourceDoc.records.filter(r => !dealSet.has(String(r.ma_dl || '').trim().toUpperCase()));
+      }
+
+      // 2d. Xóa hoặc ghi đè Firestore extra_records
+      try {
+        const { db: fireDb } = (typeof FirebaseConfigModule !== 'undefined' ? FirebaseConfigModule : { db: (typeof db !== 'undefined' ? db : null) });
+        if (fireDb && typeof fbDeleteDoc === 'function' && typeof fbDoc === 'function') {
+          if (remainingRecords.length === 0) {
+            await fbDeleteDoc(fbDoc(fireDb, 'extra_records', docId)).catch(() => {});
+            await fbDeleteDoc(fbDoc(fireDb, 'extra_records', ngay)).catch(() => {});
+          } else {
+            await fbSetDoc(fbDoc(fireDb, 'extra_records', docId), {
+              ...sourceDoc,
+              docId,
+              doc_id: docId,
+              time_type: 'date',
+              time_key: ngay,
+              records: remainingRecords,
+              updated_at: (typeof fbServerTimestamp === 'function' ? fbServerTimestamp() : new Date())
+            }, { merge: true }).catch(() => {});
+          }
+        }
+      } catch (eFs) {
+        console.warn('Lỗi Firestore extra_records:', eFs);
+      }
+
+      // 2e. Xóa / ghi đè trực tiếp qua parent.firebase nếu có
+      if (window.parent && window.parent.firebase && window.parent.firebase.firestore) {
+        try {
+          const parentFs = window.parent.firebase.firestore();
+          if (remainingRecords.length === 0) {
+            await parentFs.collection('extra_records').doc(docId).delete().catch(() => {});
+            await parentFs.collection('extra_records').doc(ngay).delete().catch(() => {});
+          } else {
+            await parentFs.collection('extra_records').doc(docId).set({
+              ...sourceDoc,
+              docId,
+              doc_id: docId,
+              time_type: 'date',
+              time_key: ngay,
+              records: remainingRecords
+            }, { merge: true }).catch(() => {});
+          }
+        } catch (_) {}
+      }
+
+      // 2f. Cập nhật Map trong bộ nhớ
+      if (window.parent && window.parent.extraSalesMap) {
+        if (remainingRecords.length === 0) {
+          window.parent.extraSalesMap.delete(docId);
+          window.parent.extraSalesMap.delete(ngay);
+        } else {
+          window.parent.extraSalesMap.set(docId, {
+            ...sourceDoc,
+            docId,
+            doc_id: docId,
+            time_type: 'date',
+            time_key: ngay,
+            records: remainingRecords
+          });
+        }
+      }
+      if (window.extraSalesMap) {
+        if (remainingRecords.length === 0) {
+          window.extraSalesMap.delete(docId);
+          window.extraSalesMap.delete(ngay);
+        } else {
+          window.extraSalesMap.set(docId, {
+            ...sourceDoc,
+            docId,
+            doc_id: docId,
+            time_type: 'date',
+            time_key: ngay,
+            records: remainingRecords
+          });
+        }
+      }
+
+      const [yyyy, mm, dd] = ngay.split('-');
+      affectedDaysPayload.push({
+        docId,
+        doc_id: docId,
+        time_type: 'date',
+        time_key: ngay,
+        label: 'Ngày ' + dd + '/' + mm + '/' + yyyy,
+        records: remainingRecords
+      });
+
+      // 2g. Trigger sync cho ngày này
+      if (typeof window.__triggerXsktSync === 'function') {
+        try { await window.__triggerXsktSync(ngay); } catch (_) {}
+      }
     }
+
+    // 3. Báo cho parent host cập nhật
+    if (window.parent && window.parent !== window) {
+      try {
+        window.parent.postMessage({
+          type: 'XSKT_SYNC_EXTRA_RECORDS',
+          daysPayload: affectedDaysPayload
+        }, '*');
+        if (typeof window.parent.generateSummaryView === 'function') {
+          window.parent.generateSummaryView();
+        }
+      } catch (_) {}
+    }
+
     if (currentDeleted) {
-      isSheetLocked = false;
-      await loadExistingData();
+      if (typeof clearTable === 'function') clearTable();
+      if (typeof renderCurrentTo === 'function') renderCurrentTo();
+      if (typeof updateInfoBar === 'function') updateInfoBar();
+      if (typeof isSheetLocked !== 'undefined') isSheetLocked = false;
+      if (typeof loadExistingData === 'function') await loadExistingData();
     }
-    showToast('Đã xóa ' + count + ' tờ của ' + selected.length + ' đại lý trong ngày ' + formatDate(currentNgay), 'success');
-    await showTongHopPanel();
+
+    showToast('Đã xóa thành công ' + (deletedTicketsCount > 0 ? (deletedTicketsCount + ' vé của ') : '') + checkboxes.length + ' bản ghi đại lý đã chọn!', 'success');
+    await renderTongHopPanel();
   } catch (err) {
-    console.error(err);
+    console.error('Lỗi deleteSelectedTongHop:', err);
     showToast('Lỗi xóa dữ liệu: ' + err.message, 'danger');
   } finally {
     stop?.();
@@ -10051,9 +10904,12 @@ async function deleteSelectedTongHop() {
 }
 
 // Điền "BẢNG TỔNG HỢP SỐ LIỆU" bằng tổng doanh số của TẤT CẢ đại lý đã nhập trong ngày
-async function fillMasterWithAllAgents() {
+async function fillMasterWithAllAgents(monthTarget = null) {
   const dls = await getDaiLyList().catch(() => daiLyList);
-  const tickets = (await getVeLoToByNgay(currentNgay)).filter(t => {
+  const allTickets = await (DbModule.getDocs || getDocs)(COLLECTIONS.VE_LOTO).catch(() => []);
+  const tickets = allTickets.filter(t => {
+    const matchTime = monthTarget ? (t.ngay && t.ngay.startsWith(monthTarget)) : (t.ngay === currentNgay);
+    if (!matchTime) return false;
     const ma = _resolveMaTicket(t, dls);
     return !!ma;
   });
@@ -12879,8 +13735,21 @@ function closeDeviceMaMayModal() {
 // ─────────────────────────────────────────────────────────
 // LOADING HELPERS
 // ─────────────────────────────────────────────────────────
-function showLoading() { $loadingOverlay.classList.remove('hidden'); }
-function hideLoading() { $loadingOverlay.classList.add('hidden'); }
+function showLoading() {
+  if ($loadingOverlay) {
+    $loadingOverlay.classList.remove('hidden');
+    $loadingOverlay.style.display = 'flex';
+    clearTimeout(window.__xskt_loading_timer);
+    window.__xskt_loading_timer = setTimeout(() => hideLoading(), 3000);
+  }
+}
+function hideLoading() {
+  clearTimeout(window.__xskt_loading_timer);
+  if ($loadingOverlay) {
+    $loadingOverlay.classList.add('hidden');
+    $loadingOverlay.style.display = 'none';
+  }
+}
 
 // ─────────────────────────────────────────────────────────
 // CLOCK
@@ -13478,6 +14347,8 @@ if (!startHash || startHash === '#/' || startHash === '#/dashboard' || startHash
 } else {
   navigate(startHash);
 }
+hideLoading();
+setTimeout(() => hideLoading(), 300);
 
 // Vừa vào trang chủ / mở ứng dụng: Popup chọn ngày làm việc nếu chưa xác nhận trong phiên (riêng trang Rút thưởng tự do chọn ngày không bị popup)
 const hasChosenDate = sessionStorage.getItem('xskt_ngay_chosen') === 'true';
@@ -13535,6 +14406,8 @@ onAuthStateChanged(auth, async (user) => {
 if (!window.__xskt_app_bootstrapped) {
   window.__xskt_app_bootstrapped = true;
   initApp();
+  $loadingOverlay?.addEventListener('click', () => hideLoading());
+  setTimeout(() => hideLoading(), 500);
 }
 
   setTimeout(() => syncXsktToParentHost(), 1500);
