@@ -4491,6 +4491,8 @@ syncXsktToParentHost = async function(specificNgay = null) {
         doc_id: 'date_' + ngay,
         time_type: 'date',
         time_key: ngay,
+        entry_type: 'replace',
+        source: 'xskt_sync',
         label: `Ngày ${dd}/${mm}/${yyyy}`,
         records: validRecords
       };
