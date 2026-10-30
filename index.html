@@ -6989,10 +6989,24 @@ H. Nam Trực: 400_449`;
             grid.innerHTML = '';
             snap.forEach(doc => {
                 const d = doc.data();
-                const countDL = Array.isArray(d.records) ? d.records.length : 0;
-                const totalSales = d.total_sales ? (d.total_sales / 1000).toLocaleString('vi-VN') + 'k' : '0';
-                const totalBonus = d.total_bonus ? (d.total_bonus / 1000).toLocaleString('vi-VN') + 'k' : '0';
+                const records = Array.isArray(d.records) ? d.records : [];
+                const countDL = records.length;
+                let sumSales = 0, sumBonus = 0;
+                records.forEach(r => {
+                    const ldb = parseFloat(r.loto_db) || 0;
+                    const lc = parseFloat(r.loto_cap) || 0;
+                    const c2 = parseFloat(r.loto_2_27) || 0;
+                    const c3 = parseFloat(r.loto_3_23) || 0;
+                    const x = parseFloat(r.xskt) || 0;
+                    const th = parseFloat(r.thuong) || 0;
+                    sumSales += (ldb + lc + c2 + c3 + x);
+                    sumBonus += th;
+                });
+                const totalSales = sumSales > 0 ? (Math.round(sumSales / 1000)).toLocaleString('vi-VN') + 'k' : (d.total_sales ? (d.total_sales / 1000).toLocaleString('vi-VN') + 'k' : '0');
+                const totalBonus = sumBonus > 0 ? (Math.round(sumBonus / 1000)).toLocaleString('vi-VN') + 'k' : (d.total_bonus ? (d.total_bonus / 1000).toLocaleString('vi-VN') + 'k' : '0');
                 const labelText = d.label || d.time_key || doc.id;
+                const timeType = d.time_type || d.type || (doc.id.startsWith('date_') ? 'date' : (doc.id.startsWith('month_') ? 'month' : 'date'));
+                const typeLabel = timeType === 'date' ? 'Theo Ngày' : (timeType === 'month' ? 'Theo Tháng' : 'Theo Năm');
 
                 const row = document.createElement('label');
                 row.style.cssText = "display:flex; align-items:center; justify-content:space-between; background:#fffbeb; border:1px solid #fde68a; padding:8px 12px; border-radius:6px; cursor:pointer;";
@@ -7004,7 +7018,7 @@ H. Nam Trực: 400_449`;
                             <div style="font-size:11.5px; color:#64748b;">Số đại lý: <b>${countDL}</b> | DSố: <b>${totalSales}</b> | Thưởng: <b>${totalBonus}</b></div>
                         </div>
                     </div>
-                    <span style="font-size:11px; background:#fef3c7; color:#92400e; padding:2px 6px; border-radius:4px; border:1px solid #fde68a;">${d.type === 'date' ? 'Theo Ngày' : (d.type === 'month' ? 'Theo Tháng' : 'Theo Năm')}</span>
+                    <span style="font-size:11px; background:#fef3c7; color:#92400e; padding:2px 6px; border-radius:4px; border:1px solid #fde68a;">${typeLabel}</span>
                 `;
                 grid.appendChild(row);
             });
@@ -7354,7 +7368,107 @@ H. Nam Trực: 400_449`;
                 const text = await file.text();
                 const parsed = JSON.parse(text);
 
-                // A. GÓI TỔNG HỢP TOÀN BỘ (all_package)
+                // 0. HỖ TRỢ FILE SAO LƯU TỪ TOOL NẠP DESKTOP (.EXE) CÓ data.documents (FIRESTORE REST API)
+                const rawDocs = (parsed.data && Array.isArray(parsed.data.documents)) 
+                    ? parsed.data.documents 
+                    : (Array.isArray(parsed.documents) ? parsed.documents : null);
+
+                if (rawDocs && rawDocs.length > 0) {
+                    const unwrapVal = (v) => {
+                        if (!v || typeof v !== 'object') return v;
+                        if ('stringValue' in v) return v.stringValue;
+                        if ('integerValue' in v) return parseInt(v.integerValue, 10);
+                        if ('doubleValue' in v) return parseFloat(v.doubleValue);
+                        if ('booleanValue' in v) return v.booleanValue;
+                        if ('timestampValue' in v) return v.timestampValue;
+                        if ('nullValue' in v) return null;
+                        if ('arrayValue' in v) return (v.arrayValue?.values || []).map(unwrapVal);
+                        if ('mapValue' in v) return unwrapFields(v.mapValue?.fields || {});
+                        return v;
+                    };
+                    const unwrapFields = (fields) => {
+                        const res = {};
+                        for (const [k, v] of Object.entries(fields || {})) {
+                            res[k] = unwrapVal(v);
+                        }
+                        return res;
+                    };
+
+                    const bType = parsed.backup_type || targetSelect;
+                    let totalRestored = 0;
+
+                    // Nếu là sao lưu extra_records
+                    if (bType === 'extra_records' || (rawDocs[0]?.name && rawDocs[0].name.includes('/extra_records/'))) {
+                        for (const rdoc of rawDocs) {
+                            const unwrapped = unwrapFields(rdoc.fields);
+                            const docId = unwrapped.doc_id || unwrapped.id || (rdoc.name ? rdoc.name.split('/').pop() : 'date_' + unwrapped.time_key);
+                            await db.collection("extra_records").doc(docId).set({
+                                ...unwrapped,
+                                updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                            }, { merge: true });
+                            totalRestored++;
+                        }
+                        await loadAllExtraSalesFromFirebase();
+                        showNotification('✅ Đã phục hồi thành công ' + totalRestored + ' đợt dữ liệu nhập thêm từ file Tool vào Firebase!', 'success');
+                        fetchDatabaseStats();
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    // Nếu là sao lưu config_kehoach
+                    if (bType === 'config_kehoach' || (rawDocs[0]?.name && rawDocs[0].name.includes('/config_kehoach/'))) {
+                        for (const rdoc of rawDocs) {
+                            const unwrapped = unwrapFields(rdoc.fields);
+                            const docId = (rdoc.name ? rdoc.name.split('/').pop() : (unwrapped.ten_to + '_' + unwrapped.nam + '_' + unwrapped.thang).replace(/[\/\s|]+/g, '_'));
+                            await db.collection("config_kehoach").doc(docId).set(unwrapped, { merge: true });
+                            totalRestored++;
+                        }
+                        await loadKeHoach();
+                        showNotification('✅ Đã phục hồi thành công ' + totalRestored + ' chỉ tiêu kế hoạch từ file Tool vào Firebase!', 'success');
+                        fetchDatabaseStats();
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    // Mặc định hoặc bType === 'daily_records': CSDL gốc theo từng ngày
+                    let totalDays = 0;
+                    let totalRecords = 0;
+                    for (const rdoc of rawDocs) {
+                        const unwrapped = unwrapFields(rdoc.fields);
+                        const docId = (rdoc.name ? rdoc.name.split('/').pop() : unwrapped.ngay);
+                        if (!docId) continue;
+
+                        const recs = Array.isArray(unwrapped.records) ? unwrapped.records.map(r => ({
+                            id: r.id !== undefined ? Number(r.id) : 0,
+                            ngay: String(r.ngay || unwrapped.ngay || docId).trim(),
+                            ma_dl: String(r.ma_dl || '').trim(),
+                            loto_db: parseFloat(r.loto_db || 0),
+                            loto_cap: parseFloat(r.loto_cap || 0),
+                            loto_2_27: parseFloat(r.loto_2_27 || 0),
+                            loto_3_23: parseFloat(r.loto_3_23 || 0),
+                            xskt: parseFloat(r.xskt || 0),
+                            thuong: parseFloat(r.thuong || 0)
+                        })).filter(r => r.ma_dl) : [];
+
+                        await db.collection("daily_records").doc(docId).set({
+                            ngay: unwrapped.ngay || docId,
+                            count: recs.length,
+                            records: recs,
+                            updated_at: firebase.firestore.FieldValue.serverTimestamp(),
+                            ...(unwrapped.is_monthly_summary !== undefined ? { is_monthly_summary: Boolean(unwrapped.is_monthly_summary) } : {})
+                        }, { merge: true });
+
+                        totalDays++;
+                        totalRecords += recs.length;
+                    }
+
+                    showNotification('✅ Đã phục hồi thành công ' + totalRecords + ' bản ghi CSDL gốc (' + totalDays + ' ngày) từ file Tool vào Firebase!', 'success');
+                    fetchDatabaseStats();
+                    fileInput.value = '';
+                    return;
+                }
+
+                // A. GÓI TỔNG HỢP TOÀN BỘ (all_package) (all_package)
                 if (parsed.backup_type === 'all_package' || (parsed.daily_records && parsed.extra_records)) {
                     let totalDaily = 0, totalExtra = 0, totalKH = 0;
 
@@ -8695,7 +8809,7 @@ H. Nam Trực: 400_449`;
             currentExtraRows = [];
         }
 
-        if (currentExtraRows.length === 0) {
+        while (currentExtraRows.length < 30) {
             currentExtraRows.push({
                 ma_dl: '',
                 loto_db: 0,
@@ -8997,15 +9111,23 @@ H. Nam Trực: 400_449`;
 
     function removeExtraRow(idx) {
         currentExtraRows.splice(idx, 1);
-        if (currentExtraRows.length === 0) {
-            addNewExtraRow();
-        } else {
-            renderExtraSalesRows();
-            const targetIdx = Math.min(idx, currentExtraRows.length - 1);
-            setTimeout(() => {
-                focusExtraGridCell(targetIdx, 0);
-            }, 30);
+        while (currentExtraRows.length < 30) {
+            currentExtraRows.push({
+                ma_dl: '',
+                loto_db: 0,
+                loto_cap: 0,
+                loto_2_27: 0,
+                loto_3_23: 0,
+                xskt: 0,
+                thuong: 0,
+                ghi_chu: ''
+            });
         }
+        renderExtraSalesRows();
+        const targetIdx = Math.min(idx, currentExtraRows.length - 1);
+        setTimeout(() => {
+            focusExtraGridCell(targetIdx, 0);
+        }, 30);
     }
     window.removeExtraRow = removeExtraRow;
     window.removeExtraRow = removeExtraRow;
@@ -9174,9 +9296,12 @@ H. Nam Trực: 400_449`;
             await db.collection("extra_records").doc(info.docId).delete();
             extraSalesMap.delete(info.docId);
 
-            currentExtraRows = [{
-                ma_dl: '', loto_db: 0, loto_cap: 0, loto_2_27: 0, loto_3_23: 0, xskt: 0, thuong: 0, ghi_chu: ''
-            }];
+            currentExtraRows = [];
+            while (currentExtraRows.length < 30) {
+                currentExtraRows.push({
+                    ma_dl: '', loto_db: 0, loto_cap: 0, loto_2_27: 0, loto_3_23: 0, xskt: 0, thuong: 0, ghi_chu: ''
+                });
+            }
             renderExtraSalesRows();
             renderSavedExtraList();
             showNotification(`Đã xóa dữ liệu bổ sung của ${info.label}!`, 'info');
@@ -9319,6 +9444,7 @@ H. Nam Trực: 400_449`;
     initFirebaseConfigs();
     initManageAgentDates();
     initExtraSalesDateInputs();
+    loadSelectedExtraSalesEditor();
 })();
 </script>
 </body>
