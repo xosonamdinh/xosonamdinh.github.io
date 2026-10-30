@@ -1,0 +1,20 @@
+{
+  "folder": "Y:/Dung/dataexcel",
+  "time_window": "6 Giờ",
+  "auto_close": false,
+  "auto_close_seconds": 5,
+  "auto_upload_on_new": true,
+  "autostart": false,
+  "backup_month": 10,
+  "backup_year": 2026,
+  "backup_scope": "Theo Tháng & Năm",
+  "db_config": {
+    "id": "yyen",
+    "name": "XỔ SỐ Ý YÊN (CHI NHÁNH)",
+    "short_name": "Ý Yên",
+    "firebase_id": "xosoyyen-50f80",
+    "api_key": "AIzaSyBV5cjV3YL0qkbbGL_6dCrTsTF1vbWGnYE",
+    "email": "apeo.d3@gmail.com",
+    "password": "Zeng6986"
+  }
+}
