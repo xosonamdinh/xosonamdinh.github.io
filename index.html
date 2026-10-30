@@ -1437,12 +1437,22 @@
                                 <h5 style="margin: 0 0 10px 0; color: #107c41; font-size: 14px;">📥 SAO LƯU DỮ LIỆU (BACKUP)</h5>
                                 <div style="display: flex; flex-direction: column; gap: 10px;">
                                     <div>
-                                        <label style="font-size: 12.5px; font-weight: bold; color: #475569;">Chọn phạm vi sao lưu:</label>
-                                        <select id="dbBackupScope" onchange="toggleBackupInputs()" style="padding: 8px; font-weight: bold; width: 100%; border: 1px solid #cbd5e1; border-radius: 6px;">
-                                            <option value="all">Tất cả dữ liệu trong CSDL</option>
-                                            <option value="range">Theo khoảng ngày (Từ ngày... Đến ngày...)</option>
+                                        <label style="font-size: 12.5px; font-weight: bold; color: #15803d;">1. Chọn loại dữ liệu sao lưu:</label>
+                                        <select id="dbBackupTarget" onchange="toggleBackupTargetChange()" style="padding: 8px; font-weight: bold; width: 100%; border: 1.5px solid #16a34a; border-radius: 6px; margin-top: 4px; background: #f0fdf4;">
+                                            <option value="daily_records">📁 CSDL Gốc (Các file Excel đã nạp - daily_records)</option>
+                                            <option value="extra_records">➕ Dữ liệu Bổ sung & Nhập thêm (extra_records)</option>
+                                            <option value="config_kehoach">🎯 Kế hoạch Doanh số (config_kehoach)</option>
+                                            <option value="all_package">📦 Toàn bộ hệ thống (Gộp CSDL Gốc + Bổ sung + Kế hoạch)</option>
+                                        </select>
+                                    </div>
 
-                                            <option value="year">Theo Cả Năm (2026...)</option>
+                                    <div id="dbBackupScopeContainer">
+                                        <label style="font-size: 12.5px; font-weight: bold; color: #475569;">2. Chọn phạm vi sao lưu:</label>
+                                        <select id="dbBackupScope" onchange="toggleBackupInputs()" style="padding: 8px; font-weight: bold; width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; margin-top: 4px;">
+                                            <option value="all">Tất cả dữ liệu</option>
+                                            <option value="range">Theo khoảng ngày (Từ ngày... Đến ngày...)</option>
+                                            <option value="month">Theo Tháng & Năm</option>
+                                            <option value="year">Theo Cả Năm</option>
                                         </select>
                                     </div>
 
@@ -1453,7 +1463,7 @@
                                     </div>
 
                                     <div id="dbBackupMonthContainer" style="display: none; gap: 8px; align-items: center;">
-                                        <input type="month" id="dbBackupMonthSelect" value="2026-08" style="padding: 6px; font-weight: bold; width: 100%;">
+                                        <input type="month" id="dbBackupMonthSelect" value="2026-10" style="padding: 6px; font-weight: bold; width: 100%;">
                                     </div>
 
                                     <div id="dbBackupYearContainer" style="display: none; gap: 8px; align-items: center;">
@@ -1475,8 +1485,20 @@
                             <div style="background: white; padding: 12px; border-radius: 8px; border: 1.5px solid #0284c7;">
                                 <h5 style="margin: 0 0 10px 0; color: #0284c7; font-size: 14px;">📤 PHỤC HỒI DỮ LIỆU TỪ FILE (RESTORE)</h5>
                                 <div style="display: flex; flex-direction: column; gap: 10px;">
-                                    <label style="font-size: 12.5px; color: #475569;">Chọn file sao lưu (.JSON hoặc .XLSX) để nạp phục hồi vào CSDL:</label>
-                                    <input type="file" id="dbRestoreFileInput" accept=".json, .xlsx, .xls" style="padding: 8px; border: 1px dashed #0284c7; background: #f0f9ff; border-radius: 6px;">
+                                    <div>
+                                        <label style="font-size: 12.5px; font-weight: bold; color: #0369a1;">Chọn loại dữ liệu phục hồi:</label>
+                                        <select id="dbRestoreTarget" style="padding: 8px; font-weight: bold; width: 100%; border: 1px solid #0284c7; border-radius: 6px; margin-top: 4px; background: #f0f9ff;">
+                                            <option value="auto">⚡ Tự động nhận diện từ file (Khuyến nghị)</option>
+                                            <option value="daily_records">📁 CSDL Gốc (daily_records)</option>
+                                            <option value="extra_records">➕ Dữ liệu Bổ sung & Nhập thêm (extra_records)</option>
+                                            <option value="config_kehoach">🎯 Kế hoạch Doanh số (config_kehoach)</option>
+                                            <option value="all_package">📦 Toàn bộ gói sao lưu (Gộp tất cả)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 12.5px; color: #475569;">Chọn file sao lưu (.JSON hoặc .XLSX) để nạp phục hồi vào CSDL:</label>
+                                        <input type="file" id="dbRestoreFileInput" accept=".json, .xlsx, .xls" style="padding: 8px; border: 1px dashed #0284c7; background: #f0f9ff; border-radius: 6px; width: 100%; box-sizing: border-box; margin-top: 4px;">
+                                    </div>
                                     <button onclick="executeDatabaseRestore()" class="success" style="padding: 10px; font-size: 13.5px; font-weight: bold; background: #0284c7;">
                                         📤 NẠP PHỤC HỒI VÀO FIREBASE
                                     </button>
@@ -1486,39 +1508,77 @@
                     </details>
                 </div>
 
-                <!-- 3. XÓA DỮ LIỆU CHỌN THEO THÁNG & CHECKBOX NGÀY -->
+                <!-- 3. QUẢN LÝ & XÓA DỮ LIỆU CSDL THEO NGUỒN -->
                 <div class="cfg-card" style="border: 1.5px solid #c42b1c; background: #fff5f5;">
-                    <h4 style="margin: 0 0 10px 0; color: #c42b1c; font-size: 14.5px;">🗑️ XÓA DỮ LIỆU THEO THÁNG & CHECKBOX NGÀY</h4>
+                    <h4 style="margin: 0 0 10px 0; color: #c42b1c; font-size: 14.5px;">🗑️ QUẢN LÝ & XÓA DỮ LIỆU CSDL THEO NGUỒN</h4>
                     
                     <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <!-- CHỌN THÁNG -->
+                        <!-- CHỌN NGUỒN DỮ LIỆU CẦN QUẢN LÝ / XÓA -->
                         <div>
-                            <label style="font-size: 13px; font-weight: bold; color: #991b1b;">1. Chọn Tháng/Năm có dữ liệu:</label>
-                            <select id="dbDeleteMonthSelect" onchange="loadDaysForSelectedMonth()" style="padding: 8px; font-weight: bold; width: 100%; border: 1.5px solid #ef4444; border-radius: 6px; margin-top: 4px; background: white;">
-                                <option value="">-- Đang tải danh sách tháng --</option>
+                            <label style="font-size: 13px; font-weight: bold; color: #991b1b;">1. Chọn nguồn dữ liệu cần quản lý & xóa:</label>
+                            <select id="dbDeleteDataSource" onchange="switchDeleteDataSource()" style="padding: 8px; font-weight: bold; width: 100%; border: 1.5px solid #ef4444; border-radius: 6px; margin-top: 4px; background: white;">
+                                <option value="daily_records">📁 CSDL Gốc (Các file Excel đã nạp - daily_records)</option>
+                                <option value="extra_records">➕ Dữ liệu Bổ sung & Nhập thêm (extra_records)</option>
+                                <option value="config_kehoach">🎯 Kế hoạch Doanh số (config_kehoach)</option>
                             </select>
                         </div>
 
-                        <!-- CHECKBOX XÓA CẢ THÁNG -->
-                        <div style="background: #fee2e2; padding: 10px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #fca5a5;">
-                            <label style="font-size: 13.5px; font-weight: bold; color: #991b1b; cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0;">
-                                <input type="checkbox" id="cbDeleteFullMonth" onchange="toggleFullMonthDelete()" style="width: 18px; height: 18px; cursor: pointer;">
-                                <span>XÓA TOÀN BỘ DỮ LIỆU CẢ THÁNG NÀY</span>
-                            </label>
-                        </div>
+                        <!-- KHU VỰC CSDL GỐC (daily_records) -->
+                        <div id="delSection_daily_records">
+                            <div style="margin-bottom: 8px;">
+                                <label style="font-size: 13px; font-weight: bold; color: #991b1b;">2. Chọn Tháng/Năm có dữ liệu CSDL gốc:</label>
+                                <select id="dbDeleteMonthSelect" onchange="loadDaysForSelectedMonth()" style="padding: 8px; font-weight: bold; width: 100%; border: 1.5px solid #ef4444; border-radius: 6px; margin-top: 4px; background: white;">
+                                    <option value="">-- Đang tải danh sách tháng --</option>
+                                </select>
+                            </div>
 
-                        <!-- DANH SÁCH CHECKBOX CÁC NGÀY TRONG THÁNG -->
-                        <div id="dbDaysListContainer" style="display: block;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                <label style="font-size: 12.5px; font-weight: bold; color: #475569;">2. Chọn các ngày cụ thể cần xóa trong tháng:</label>
-                                <div style="font-size: 12px;">
-                                    <a href="javascript:void(0)" onclick="selectAllDeleteDays(true)" style="color: #0284c7; font-weight: bold; margin-right: 10px; text-decoration: none;">✓ Chọn tất cả</a>
-                                    <a href="javascript:void(0)" onclick="selectAllDeleteDays(false)" style="color: #64748b; text-decoration: none;">✕ Bỏ chọn tất cả</a>
+                            <div style="background: #fee2e2; padding: 10px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #fca5a5; margin-bottom: 8px;">
+                                <label style="font-size: 13.5px; font-weight: bold; color: #991b1b; cursor: pointer; display: flex; align-items: center; gap: 8px; margin: 0;">
+                                    <input type="checkbox" id="cbDeleteFullMonth" onchange="toggleFullMonthDelete()" style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span>XÓA TOÀN BỘ DỮ LIỆU CẢ THÁNG NÀY</span>
+                                </label>
+                            </div>
+
+                            <div id="dbDaysListContainer" style="display: block;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                    <label style="font-size: 12.5px; font-weight: bold; color: #475569;">3. Chọn các ngày cụ thể cần xóa trong tháng:</label>
+                                    <div style="font-size: 12px;">
+                                        <a href="javascript:void(0)" onclick="selectAllDeleteDays(true)" style="color: #0284c7; font-weight: bold; margin-right: 10px; text-decoration: none;">✓ Chọn tất cả</a>
+                                        <a href="javascript:void(0)" onclick="selectAllDeleteDays(false)" style="color: #64748b; text-decoration: none;">✕ Bỏ chọn tất cả</a>
+                                    </div>
+                                </div>
+                                
+                                <div id="dbDaysCheckboxGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; max-height: 200px; overflow-y: auto; background: white; padding: 10px; border: 1px solid #fca5a5; border-radius: 6px;">
+                                    <div style="font-size: 12.5px; color: #64748b;">Đang tải ngày...</div>
                                 </div>
                             </div>
-                            
-                            <div id="dbDaysCheckboxGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; max-height: 200px; overflow-y: auto; background: white; padding: 10px; border: 1px solid #fca5a5; border-radius: 6px;">
-                                <div style="font-size: 12.5px; color: #64748b;">Đang tải ngày...</div>
+                        </div>
+
+                        <!-- KHU VỰC DỮ LIỆU BỔ SUNG & NHẬP THÊM (extra_records) -->
+                        <div id="delSection_extra_records" style="display: none;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label style="font-size: 12.5px; font-weight: bold; color: #92400e;">2. Danh sách các đợt Bổ sung doanh số & thưởng có trong CSDL:</label>
+                                <div style="font-size: 12px;">
+                                    <a href="javascript:void(0)" onclick="selectAllExtraDelete(true)" style="color: #0284c7; font-weight: bold; margin-right: 10px; text-decoration: none;">✓ Chọn tất cả</a>
+                                    <a href="javascript:void(0)" onclick="selectAllExtraDelete(false)" style="color: #64748b; text-decoration: none;">✕ Bỏ chọn tất cả</a>
+                                </div>
+                            </div>
+                            <div id="dbExtraDeleteGrid" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; background: white; padding: 10px; border: 1px solid #f59e0b; border-radius: 6px;">
+                                <div style="font-size: 12.5px; color: #64748b;">Đang tải danh sách đợt bổ sung...</div>
+                            </div>
+                        </div>
+
+                        <!-- KHU VỰC KẾ HOẠCH DOANH SỐ (config_kehoach) -->
+                        <div id="delSection_config_kehoach" style="display: none;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label style="font-size: 12.5px; font-weight: bold; color: #1e3a8a;">2. Danh sách Kế hoạch doanh số theo Tổ & Năm:</label>
+                                <div style="font-size: 12px;">
+                                    <a href="javascript:void(0)" onclick="selectAllKeHoachDelete(true)" style="color: #0284c7; font-weight: bold; margin-right: 10px; text-decoration: none;">✓ Chọn tất cả</a>
+                                    <a href="javascript:void(0)" onclick="selectAllKeHoachDelete(false)" style="color: #64748b; text-decoration: none;">✕ Bỏ chọn tất cả</a>
+                                </div>
+                            </div>
+                            <div id="dbKeHoachDeleteGrid" style="display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; background: white; padding: 10px; border: 1px solid #3b82f6; border-radius: 6px;">
+                                <div style="font-size: 12.5px; color: #64748b;">Đang tải danh sách kế hoạch...</div>
                             </div>
                         </div>
 
@@ -6751,32 +6811,58 @@ H. Nam Trực: 400_449`;
         if (!statsBox) return;
         statsBox.innerHTML = "⏳ Đang kết nối CSDL Firebase Firestore...";
         try {
-            const snapshot = await db.collection("daily_records").get();
-            if (snapshot.empty) {
-                statsBox.innerHTML = "⚠️ Cơ sở dữ liệu Firebase hiện đang trống (0 bản ghi).";
-                await loadDeleteMonthsAndDays([]);
-                return;
-            }
+            const [snapDaily, snapExtra, snapKeHoach] = await Promise.all([
+                db.collection("daily_records").get().catch(e => ({ empty: true, docs: [] })),
+                db.collection("extra_records").get().catch(e => ({ empty: true, docs: [] })),
+                db.collection("config_kehoach").get().catch(e => ({ empty: true, docs: [] }))
+            ]);
 
             let totalCount = 0;
             const dates = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const cnt = data.count || (Array.isArray(data.records) ? data.records.length : 1);
-                totalCount += cnt;
-                dates.push(doc.id);
-            });
+            if (!snapDaily.empty && snapDaily.docs) {
+                snapDaily.docs.forEach(doc => {
+                    const data = doc.data();
+                    const cnt = data.count || (Array.isArray(data.records) ? data.records.length : 1);
+                    totalCount += cnt;
+                    dates.push(doc.id);
+                });
+            }
 
             dates.sort();
             const minDate = dates[0] || '---';
             const maxDate = dates[dates.length - 1] || '---';
 
+            // Extra records count
+            let extraDocCount = 0;
+            let extraRecCount = 0;
+            if (!snapExtra.empty && snapExtra.docs) {
+                extraDocCount = snapExtra.docs.length;
+                snapExtra.docs.forEach(doc => {
+                    const d = doc.data();
+                    if (d && Array.isArray(d.records)) extraRecCount += d.records.length;
+                });
+            }
+
+            // Ke hoach count
+            let keHoachDocCount = 0;
+            if (!snapKeHoach.empty && snapKeHoach.docs) {
+                keHoachDocCount = snapKeHoach.docs.length;
+            }
+
             statsBox.innerHTML = `
-                📌 <b>Tổng số bản ghi:</b> <b style="color: #107c41; font-size: 15px;">${totalCount.toLocaleString('vi-VN')}</b> bản ghi (${dates.length} ngày)<br>
-                📅 <b>Dải ngày dữ liệu hiện tại:</b> từ <b style="color: #0284c7; font-size: 14.5px;">${minDate}</b> đến <b style="color: #0284c7; font-size: 14.5px;">${maxDate}</b>
+                📌 <b>1. CSDL Gốc (Các file Excel - daily_records):</b> <b style="color: #107c41; font-size: 14.5px;">${totalCount.toLocaleString('vi-VN')}</b> bản ghi (${dates.length} ngày)<br>
+                📅 <i>Dải ngày CSDL gốc:</i> từ <b style="color: #0284c7;">${minDate}</b> đến <b style="color: #0284c7;">${maxDate}</b><br>
+                ➕ <b>2. Dữ liệu Bổ sung & Nhập thêm (extra_records):</b> <b style="color: #d97706; font-size: 14.5px;">${extraDocCount}</b> đợt bổ sung (${extraRecCount} bản ghi đại lý)<br>
+                🎯 <b>3. Kế hoạch Doanh số (config_kehoach):</b> <b style="color: #2563eb; font-size: 14.5px;">${keHoachDocCount}</b> chỉ tiêu kế hoạch tháng
             `;
 
             await loadDeleteMonthsAndDays(dates);
+            if (document.getElementById('delSection_extra_records')?.style.display !== 'none') {
+                loadExtraDeleteList();
+            }
+            if (document.getElementById('delSection_config_kehoach')?.style.display !== 'none') {
+                loadKeHoachDeleteList();
+            }
         } catch(e) {
             console.error(e);
             statsBox.innerHTML = `❌ Lỗi kết nối Firebase: ${e.message}`;
@@ -6800,7 +6886,7 @@ H. Nam Trực: 400_449`;
         const months = Object.keys(dbDatesByMonth).sort().reverse();
 
         if (months.length === 0) {
-            monthSelect.innerHTML = '<option value="">(Không có dữ liệu)</option>';
+            monthSelect.innerHTML = '<option value="">(Không có dữ liệu CSDL gốc)</option>';
             daysGrid.innerHTML = '<div style="font-size: 12.5px; color: #64748b;">Không có ngày nào trong CSDL Firebase</div>';
             return;
         }
@@ -6875,11 +6961,322 @@ H. Nam Trực: 400_449`;
         dayCheckboxes.forEach(cb => cb.checked = checkState);
     };
 
+    // ==================== ĐỔI NGUỒN DỮ LIỆU CẦN XÓA ====================
+    window.switchDeleteDataSource = function() {
+        const src = document.getElementById('dbDeleteDataSource').value;
+        const secDaily = document.getElementById('delSection_daily_records');
+        const secExtra = document.getElementById('delSection_extra_records');
+        const secKH = document.getElementById('delSection_config_kehoach');
+
+        if (secDaily) secDaily.style.display = (src === 'daily_records') ? 'block' : 'none';
+        if (secExtra) secExtra.style.display = (src === 'extra_records') ? 'block' : 'none';
+        if (secKH) secKH.style.display = (src === 'config_kehoach') ? 'block' : 'none';
+
+        if (src === 'extra_records') loadExtraDeleteList();
+        if (src === 'config_kehoach') loadKeHoachDeleteList();
+    };
+
+    window.loadExtraDeleteList = async function() {
+        const grid = document.getElementById('dbExtraDeleteGrid');
+        if (!grid) return;
+        grid.innerHTML = '<div style="font-size:12.5px; color:#64748b; padding:6px;">⏳ Đang tải danh sách các đợt bổ sung...</div>';
+        try {
+            const snap = await db.collection("extra_records").get();
+            if (snap.empty) {
+                grid.innerHTML = '<div style="font-size:12.5px; color:#64748b; font-style:italic; padding:6px;">Chưa có dữ liệu bổ sung nào trong CSDL.</div>';
+                return;
+            }
+            grid.innerHTML = '';
+            snap.forEach(doc => {
+                const d = doc.data();
+                const countDL = Array.isArray(d.records) ? d.records.length : 0;
+                const totalSales = d.total_sales ? (d.total_sales / 1000).toLocaleString('vi-VN') + 'k' : '0';
+                const totalBonus = d.total_bonus ? (d.total_bonus / 1000).toLocaleString('vi-VN') + 'k' : '0';
+                const labelText = d.label || d.time_key || doc.id;
+
+                const row = document.createElement('label');
+                row.style.cssText = "display:flex; align-items:center; justify-content:space-between; background:#fffbeb; border:1px solid #fde68a; padding:8px 12px; border-radius:6px; cursor:pointer;";
+                row.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" class="db-extra-cb" value="${doc.id}" style="width:17px; height:17px; cursor:pointer;">
+                        <div>
+                            <div style="font-weight:bold; font-size:13px; color:#92400e;">${labelText} <span style="font-size:11px; color:#b45309; font-weight:normal;">[${doc.id}]</span></div>
+                            <div style="font-size:11.5px; color:#64748b;">Số đại lý: <b>${countDL}</b> | DSố: <b>${totalSales}</b> | Thưởng: <b>${totalBonus}</b></div>
+                        </div>
+                    </div>
+                    <span style="font-size:11px; background:#fef3c7; color:#92400e; padding:2px 6px; border-radius:4px; border:1px solid #fde68a;">${d.type === 'date' ? 'Theo Ngày' : (d.type === 'month' ? 'Theo Tháng' : 'Theo Năm')}</span>
+                `;
+                grid.appendChild(row);
+            });
+        } catch(e) {
+            console.error(e);
+            grid.innerHTML = `<div style="color:#dc2626; font-size:12px;">Lỗi tải dữ liệu bổ sung: ${e.message}</div>`;
+        }
+    };
+
+    window.selectAllExtraDelete = function(state) {
+        document.querySelectorAll('.db-extra-cb').forEach(cb => cb.checked = state);
+    };
+
+    window.loadKeHoachDeleteList = async function() {
+        const grid = document.getElementById('dbKeHoachDeleteGrid');
+        if (!grid) return;
+        grid.innerHTML = '<div style="font-size:12.5px; color:#64748b; padding:6px;">⏳ Đang tải danh sách kế hoạch...</div>';
+        try {
+            const snap = await db.collection("config_kehoach").get();
+            if (snap.empty) {
+                grid.innerHTML = '<div style="font-size:12.5px; color:#64748b; font-style:italic; padding:6px;">Chưa có dữ liệu kế hoạch nào trong CSDL.</div>';
+                return;
+            }
+            grid.innerHTML = '';
+            // Group by ten_to + nam
+            const groups = new Map();
+            snap.forEach(doc => {
+                const d = doc.data();
+                const key = `${d.ten_to || 'Tổ'} - Năm ${d.nam || ''}`;
+                if (!groups.has(key)) groups.set(key, []);
+                groups.get(key).push({ id: doc.id, thang: d.thang, chiTieu: d.chi_tieu });
+            });
+
+            groups.forEach((items, key) => {
+                const row = document.createElement('label');
+                row.style.cssText = "display:flex; align-items:center; justify-content:space-between; background:#eff6ff; border:1px solid #bfdbfe; padding:8px 12px; border-radius:6px; cursor:pointer;";
+                const docIds = items.map(it => it.id).join(',');
+                row.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" class="db-kehoach-cb" value="${docIds}" style="width:17px; height:17px; cursor:pointer;">
+                        <div>
+                            <div style="font-weight:bold; font-size:13px; color:#1e3a8a;">🎯 ${key}</div>
+                            <div style="font-size:11.5px; color:#475569;">Cấu hình: <b>${items.length} tháng</b></div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(row);
+            });
+        } catch(e) {
+            console.error(e);
+            grid.innerHTML = `<div style="color:#dc2626; font-size:12px;">Lỗi tải dữ liệu kế hoạch: ${e.message}</div>`;
+        }
+    };
+
+    window.selectAllKeHoachDelete = function(state) {
+        document.querySelectorAll('.db-kehoach-cb').forEach(cb => cb.checked = state);
+    };
+
+    // ==================== CHUYỂN ĐỔI GIAO DIỆN SAO LƯU KHI ĐỔI LOẠI ====================
+    window.toggleBackupTargetChange = function() {
+        const target = document.getElementById('dbBackupTarget')?.value || 'daily_records';
+        const scopeContainer = document.getElementById('dbBackupScopeContainer');
+        const scopeSelect = document.getElementById('dbBackupScope');
+        if (!scopeContainer || !scopeSelect) return;
+
+        if (target === 'all_package') {
+            scopeContainer.style.display = 'none';
+            document.getElementById('dbBackupRangeContainer').style.display = 'none';
+            document.getElementById('dbBackupMonthContainer').style.display = 'none';
+            document.getElementById('dbBackupYearContainer').style.display = 'none';
+        } else if (target === 'config_kehoach') {
+            scopeContainer.style.display = 'block';
+            scopeSelect.innerHTML = `
+                <option value="all">Tất cả kế hoạch trong CSDL</option>
+                <option value="year">Theo Năm</option>
+            `;
+            toggleBackupInputs();
+        } else {
+            scopeContainer.style.display = 'block';
+            scopeSelect.innerHTML = `
+                <option value="all">Tất cả dữ liệu</option>
+                <option value="range">Theo khoảng ngày (Từ ngày... Đến ngày...)</option>
+                <option value="month">Theo Tháng & Năm</option>
+                <option value="year">Theo Cả Năm</option>
+            `;
+            toggleBackupInputs();
+        }
+    };
+
+    // ==================== XUẤT SAO LƯU ĐA NĂNG ====================
     window.exportDatabaseBackup = async function(format) {
-        const scope = document.getElementById('dbBackupScope').value;
+        const target = document.getElementById('dbBackupTarget')?.value || 'daily_records';
+        const scope = document.getElementById('dbBackupScope')?.value || 'all';
         let filenameTag = "TAT_CA";
         showLoading();
         try {
+            const dateStr = new Date().toISOString().slice(0,10);
+
+            // 1. SAO LƯU TOÀN BỘ HỆ THỐNG (GỘP TẤT CẢ)
+            if (target === 'all_package') {
+                if (format === 'excel') {
+                    showNotification("Toàn bộ hệ thống được đóng gói dạng JSON để đảm bảo cấu trúc đầy đủ!", "info");
+                }
+                const [snapDaily, snapExtra, snapKH] = await Promise.all([
+                    db.collection("daily_records").get(),
+                    db.collection("extra_records").get(),
+                    db.collection("config_kehoach").get()
+                ]);
+
+                const dailyList = [];
+                snapDaily.forEach(doc => {
+                    const d = doc.data();
+                    if (d && Array.isArray(d.records)) dailyList.push(...d.records);
+                    else if (d && d.ngay && d.ma_dl) dailyList.push(d);
+                });
+
+                const extraList = [];
+                snapExtra.forEach(doc => extraList.push(doc.data()));
+
+                const keHoachList = [];
+                snapKH.forEach(doc => keHoachList.push(doc.data()));
+
+                const fullPkg = {
+                    backup_type: "all_package",
+                    exported_at: new Date().toISOString(),
+                    counts: {
+                        daily_records: dailyList.length,
+                        extra_records: extraList.length,
+                        config_kehoach: keHoachList.length
+                    },
+                    daily_records: dailyList,
+                    extra_records: extraList,
+                    config_kehoach: keHoachList
+                };
+
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullPkg, null, 2));
+                const a = document.createElement('a');
+                a.setAttribute("href", dataStr);
+                a.setAttribute("download", `SaoLuu_ToanBo_HeThong_${dateStr}.json`);
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                showNotification(`✅ Đã tải file sao lưu toàn bộ hệ thống (${dailyList.length} CSDL gốc, ${extraList.length} đợt bổ sung, ${keHoachList.length} kế hoạch)!`, 'success');
+                return;
+            }
+
+            // 2. SAO LƯU DỮ LIỆU BỔ SUNG & NHẬP THÊM (extra_records)
+            if (target === 'extra_records') {
+                const snap = await db.collection("extra_records").get();
+                if (snap.empty) {
+                    return showNotification("Không có dữ liệu bổ sung trong CSDL!", "warning");
+                }
+                let extraDocs = [];
+                snap.forEach(doc => extraDocs.push(doc.data()));
+
+                // Lọc theo scope nếu chọn
+                if (scope === 'year') {
+                    const y = document.getElementById('dbBackupYearSelect')?.value;
+                    if (y) extraDocs = extraDocs.filter(d => String(d.time_key || '').startsWith(y));
+                    filenameTag = `BoSung_Nam_${y}`;
+                } else if (scope === 'month') {
+                    const m = document.getElementById('dbBackupMonthSelect')?.value;
+                    if (m) extraDocs = extraDocs.filter(d => String(d.time_key || '').startsWith(m));
+                    filenameTag = `BoSung_Thang_${m}`;
+                } else {
+                    filenameTag = `BoSung_TatCa`;
+                }
+
+                if (extraDocs.length === 0) {
+                    return showNotification("Không có dữ liệu bổ sung trong phạm vi đã chọn!", "warning");
+                }
+
+                if (format === 'json') {
+                    const pkg = {
+                        backup_type: "extra_records",
+                        exported_at: new Date().toISOString(),
+                        count: extraDocs.length,
+                        data: extraDocs
+                    };
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pkg, null, 2));
+                    const a = document.createElement('a');
+                    a.setAttribute("href", dataStr);
+                    a.setAttribute("download", `SaoLuu_DuLieuBoSung_${filenameTag}_${dateStr}.json`);
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    showNotification(`✅ Đã tải file sao lưu Bổ sung JSON (${extraDocs.length} đợt)!`, 'success');
+                } else {
+                    // Flatten thành các dòng đại lý kèm thông tin đợt
+                    const flatRows = [];
+                    extraDocs.forEach(d => {
+                        const recs = Array.isArray(d.records) ? d.records : [];
+                        recs.forEach(r => {
+                            flatRows.push({
+                                "Đợt bổ sung": d.label || d.time_key,
+                                "Mã đợt": d.id || d.doc_id,
+                                "Loại áp dụng": d.type,
+                                "Mã ĐL": r.ma_dl,
+                                "Lô tô ĐB": r.loto_db || 0,
+                                "Lô tô Cặp": r.loto_cap || 0,
+                                "Lô 2/27": r.loto_2_27 || 0,
+                                "Lô 3/23": r.loto_3_23 || 0,
+                                "XSKT": r.xskt || 0,
+                                "Thưởng": r.thuong || 0,
+                                "Ghi chú": r.ghi_chu || ''
+                            });
+                        });
+                    });
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.json_to_sheet(flatRows);
+                    XLSX.utils.book_append_sheet(wb, ws, "extra_records");
+                    XLSX.writeFile(wb, `SaoLuu_DuLieuBoSung_${filenameTag}_${dateStr}.xlsx`);
+                    showNotification(`✅ Đã tải file sao lưu Bổ sung Excel (${flatRows.length} dòng đại lý)!`, 'success');
+                }
+                return;
+            }
+
+            // 3. SAO LƯU KẾ HOẠCH DOANH SỐ (config_kehoach)
+            if (target === 'config_kehoach') {
+                const snap = await db.collection("config_kehoach").get();
+                if (snap.empty) {
+                    return showNotification("Chưa có kế hoạch doanh số nào trong CSDL!", "warning");
+                }
+                let khDocs = [];
+                snap.forEach(doc => khDocs.push(doc.data()));
+
+                if (scope === 'year') {
+                    const y = parseInt(document.getElementById('dbBackupYearSelect')?.value);
+                    if (y) khDocs = khDocs.filter(d => parseInt(d.nam) === y);
+                    filenameTag = `KeHoach_Nam_${y}`;
+                } else {
+                    filenameTag = `KeHoach_TatCa`;
+                }
+
+                if (khDocs.length === 0) {
+                    return showNotification("Không có kế hoạch trong năm đã chọn!", "warning");
+                }
+
+                if (format === 'json') {
+                    const pkg = {
+                        backup_type: "config_kehoach",
+                        exported_at: new Date().toISOString(),
+                        count: khDocs.length,
+                        data: khDocs
+                    };
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pkg, null, 2));
+                    const a = document.createElement('a');
+                    a.setAttribute("href", dataStr);
+                    a.setAttribute("download", `SaoLuu_KeHoach_${filenameTag}_${dateStr}.json`);
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    showNotification(`✅ Đã tải file sao lưu Kế hoạch JSON (${khDocs.length} bản ghi)!`, 'success');
+                } else {
+                    const flatRows = khDocs.map(d => ({
+                        "Tổ / Chi nhánh": d.ten_to,
+                        "Năm": d.nam,
+                        "Tháng": d.thang,
+                        "Chỉ tiêu kỳ 1": d.chi_tieu,
+                        "Chỉ tiêu kỳ 2": d.chi_tieu_2 || 0,
+                        "Vé bóc": d.ve_boc || 0
+                    }));
+                    const wb = XLSX.utils.book_new();
+                    const ws = XLSX.utils.json_to_sheet(flatRows);
+                    XLSX.utils.book_append_sheet(wb, ws, "config_kehoach");
+                    XLSX.writeFile(wb, `SaoLuu_KeHoach_${filenameTag}_${dateStr}.xlsx`);
+                    showNotification(`✅ Đã tải file sao lưu Kế hoạch Excel (${flatRows.length} bản ghi)!`, 'success');
+                }
+                return;
+            }
+
+            // 4. SAO LƯU CSDL GỐC (daily_records)
             let snapshot;
             if (scope === 'range') {
                 const fromD = document.getElementById('dbBackupFromDate').value;
@@ -6912,11 +7309,9 @@ H. Nam Trực: 400_449`;
             });
 
             if (records.length === 0) {
-                hideLoading();
-                return showNotification("Không có dữ liệu trong phạm vi đã chọn!", "warning");
+                return showNotification("Không có dữ liệu CSDL gốc trong phạm vi đã chọn!", "warning");
             }
 
-            const dateStr = new Date().toISOString().slice(0,10);
             if (format === 'json') {
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(records, null, 2));
                 const downloadAnchor = document.createElement('a');
@@ -6925,13 +7320,13 @@ H. Nam Trực: 400_449`;
                 document.body.appendChild(downloadAnchor);
                 downloadAnchor.click();
                 downloadAnchor.remove();
-                showNotification(`✅ Đã tải file sao lưu JSON (${records.length} bản ghi)!`, 'success');
+                showNotification(`✅ Đã tải file sao lưu JSON CSDL gốc (${records.length} bản ghi)!`, 'success');
             } else if (format === 'excel') {
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.json_to_sheet(records);
                 XLSX.utils.book_append_sheet(wb, ws, "daily_records");
                 XLSX.writeFile(wb, `Firebase_Backup_${filenameTag}_${dateStr}.xlsx`);
-                showNotification(`✅ Đã tải file sao lưu Excel (${records.length} bản ghi)!`, 'success');
+                showNotification(`✅ Đã tải file sao lưu Excel CSDL gốc (${records.length} bản ghi)!`, 'success');
             }
         } catch(e) {
             console.error(e);
@@ -6941,76 +7336,289 @@ H. Nam Trực: 400_449`;
         }
     };
 
+    // ==================== PHỤC HỒI DỮ LIỆU ĐA NĂNG ====================
     window.executeDatabaseRestore = async function() {
         const fileInput = document.getElementById('dbRestoreFileInput');
         const file = fileInput.files[0];
         if (!file) return showNotification("Vui lòng chọn file .JSON hoặc .XLSX để phục hồi!", "warning");
 
+        const targetSelect = document.getElementById('dbRestoreTarget')?.value || 'auto';
         const fileName = file.name.toLowerCase();
         showLoading();
 
         try {
-            let records = [];
+            await ensureAdminAuth();
+
+            // XỬ LÝ FILE JSON
             if (fileName.endsWith('.json')) {
                 const text = await file.text();
-                records = JSON.parse(text);
-            } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+                const parsed = JSON.parse(text);
+
+                // A. GÓI TỔNG HỢP TOÀN BỘ (all_package)
+                if (parsed.backup_type === 'all_package' || (parsed.daily_records && parsed.extra_records)) {
+                    let totalDaily = 0, totalExtra = 0, totalKH = 0;
+
+                    // Restore daily_records
+                    if (Array.isArray(parsed.daily_records) && parsed.daily_records.length > 0) {
+                        const byDay = new Map();
+                        parsed.daily_records.forEach(r => {
+                            if (!r.ngay || !r.ma_dl) return;
+                            if (!byDay.has(r.ngay)) byDay.set(r.ngay, []);
+                            byDay.get(r.ngay).push(r);
+                        });
+                        for (const [day, recs] of byDay.entries()) {
+                            await db.collection("daily_records").doc(day).set({
+                                ngay: day,
+                                count: recs.length,
+                                records: recs,
+                                updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                            }, { merge: true });
+                            totalDaily += recs.length;
+                        }
+                    }
+
+                    // Restore extra_records
+                    if (Array.isArray(parsed.extra_records) && parsed.extra_records.length > 0) {
+                        for (const edoc of parsed.extra_records) {
+                            const docId = edoc.id || edoc.doc_id || `date_${edoc.time_key}`;
+                            await db.collection("extra_records").doc(docId).set(edoc, { merge: true });
+                            totalExtra++;
+                        }
+                        await loadAllExtraSalesFromFirebase();
+                    }
+
+                    // Restore config_kehoach
+                    if (Array.isArray(parsed.config_kehoach) && parsed.config_kehoach.length > 0) {
+                        for (const kh of parsed.config_kehoach) {
+                            const docId = `${kh.ten_to}_${kh.nam}_${kh.thang}`.replace(/[\/\s|]+/g, '_');
+                            await db.collection("config_kehoach").doc(docId).set(kh, { merge: true });
+                            totalKH++;
+                        }
+                        await loadKeHoach();
+                    }
+
+                    showNotification(`✅ Phục hồi hoàn tất toàn bộ hệ thống! (${totalDaily} CSDL gốc, ${totalExtra} đợt bổ sung, ${totalKH} kế hoạch)`, 'success');
+                    fetchDatabaseStats();
+                    fileInput.value = '';
+                    return;
+                }
+
+                // B. GÓI BỔ SUNG DOANH SỐ & THƯỞNG (extra_records)
+                if (parsed.backup_type === 'extra_records' || targetSelect === 'extra_records' || (Array.isArray(parsed.data) && parsed.data[0]?.records)) {
+                    const list = Array.isArray(parsed.data) ? parsed.data : (Array.isArray(parsed) ? parsed : [parsed]);
+                    let restoredCount = 0;
+                    for (const edoc of list) {
+                        if (!edoc.time_key && !edoc.id) continue;
+                        const docId = edoc.id || edoc.doc_id || `date_${edoc.time_key}`;
+                        await db.collection("extra_records").doc(docId).set(edoc, { merge: true });
+                        restoredCount++;
+                    }
+                    await loadAllExtraSalesFromFirebase();
+                    showNotification(`✅ Đã phục hồi thành công ${restoredCount} đợt bổ sung doanh số & thưởng!`, 'success');
+                    fetchDatabaseStats();
+                    fileInput.value = '';
+                    return;
+                }
+
+                // C. GÓI KẾ HOẠCH DOANH SỐ (config_kehoach)
+                if (parsed.backup_type === 'config_kehoach' || targetSelect === 'config_kehoach' || (Array.isArray(parsed.data) && parsed.data[0]?.ten_to)) {
+                    const list = Array.isArray(parsed.data) ? parsed.data : (Array.isArray(parsed) ? parsed : [parsed]);
+                    let restoredCount = 0;
+                    for (const kh of list) {
+                        if (!kh.ten_to || !kh.nam) continue;
+                        const docId = `${kh.ten_to}_${kh.nam}_${kh.thang}`.replace(/[\/\s|]+/g, '_');
+                        await db.collection("config_kehoach").doc(docId).set(kh, { merge: true });
+                        restoredCount++;
+                    }
+                    await loadKeHoach();
+                    showNotification(`✅ Đã phục hồi thành công ${restoredCount} chỉ tiêu kế hoạch!`, 'success');
+                    fetchDatabaseStats();
+                    fileInput.value = '';
+                    return;
+                }
+
+                // D. MẶC ĐỊNH / CSDL GỐC (daily_records)
+                const records = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.data) ? parsed.data : []);
+                if (records.length === 0) {
+                    return showNotification("File sao lưu rỗng hoặc không đúng định dạng!", "error");
+                }
+                const cleanRecords = records.map(r => ({
+                    ngay: String(r.ngay || '').trim(),
+                    ma_dl: String(r.ma_dl || '').trim(),
+                    loto_db: parseFloat(r.loto_db || 0),
+                    loto_cap: parseFloat(r.loto_cap || 0),
+                    loto_2_27: parseFloat(r.loto_2_27 || 0),
+                    loto_3_23: parseFloat(r.loto_3_23 || 0),
+                    thuong: parseFloat(r.thuong || 0),
+                    xskt: parseFloat(r.xskt || 0)
+                })).filter(r => r.ngay && r.ma_dl);
+
+                if (cleanRecords.length === 0) {
+                    return showNotification("Không tìm thấy bản ghi CSDL gốc hợp lệ nào trong file!", "error");
+                }
+
+                const byDay = new Map();
+                cleanRecords.forEach(r => {
+                    if (!byDay.has(r.ngay)) byDay.set(r.ngay, []);
+                    byDay.get(r.ngay).push(r);
+                });
+
+                const dayKeys = Array.from(byDay.keys());
+                for (let i = 0; i < dayKeys.length; i += 50) {
+                    const slice = dayKeys.slice(i, i + 50);
+                    const batch = db.batch();
+                    slice.forEach(d => {
+                        const recs = byDay.get(d);
+                        const docRef = db.collection("daily_records").doc(d);
+                        batch.set(docRef, {
+                            ngay: d,
+                            count: recs.length,
+                            records: recs,
+                            updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                    });
+                    await batch.commit();
+                }
+
+                showNotification(`✅ Đã phục hồi thành công ${cleanRecords.length} bản ghi CSDL gốc (${byDay.size} ngày)!`, 'success');
+                fetchDatabaseStats();
+                fileInput.value = '';
+                return;
+            }
+
+            // XỬ LÝ FILE EXCEL (.XLSX / .XLS)
+            if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
                 const data = await file.arrayBuffer();
                 const workbook = XLSX.read(data, { type: 'array' });
+                const sheetNames = workbook.SheetNames;
+
+                // 1. Nếu có sheet extra_records hoặc người dùng chọn phục hồi Bổ sung
+                if (sheetNames.includes('extra_records') || targetSelect === 'extra_records') {
+                    const sheet = workbook.Sheets['extra_records'] || workbook.Sheets[sheetNames[0]];
+                    const rawRows = XLSX.utils.sheet_to_json(sheet);
+                    if (!Array.isArray(rawRows) || rawRows.length === 0) {
+                        return showNotification("Sheet bổ sung rỗng!", "warning");
+                    }
+                    // Group rows by "Mã đợt" or "Đợt bổ sung"
+                    const groupMap = new Map();
+                    rawRows.forEach(row => {
+                        const docId = row["Mã đợt"] || row["id"] || row["doc_id"] || 'date_custom';
+                        if (!groupMap.has(docId)) {
+                            groupMap.set(docId, {
+                                id: docId,
+                                doc_id: docId,
+                                label: row["Đợt bổ sung"] || row["Nhãn"] || docId,
+                                type: row["Loại áp dụng"] || (docId.startsWith('date_') ? 'date' : 'month'),
+                                time_key: docId.replace(/^[a-z]+_/, ''),
+                                records: []
+                            });
+                        }
+                        groupMap.get(docId).records.push({
+                            ma_dl: String(row["Mã ĐL"] || row["ma_dl"] || '').trim(),
+                            loto_db: parseFloat(row["Lô tô ĐB"] || row["loto_db"] || 0),
+                            loto_cap: parseFloat(row["Lô tô Cặp"] || row["loto_cap"] || 0),
+                            loto_2_27: parseFloat(row["Lô 2/27"] || row["loto_2_27"] || 0),
+                            loto_3_23: parseFloat(row["Lô 3/23"] || row["loto_3_23"] || 0),
+                            xskt: parseFloat(row["XSKT"] || row["xskt"] || 0),
+                            thuong: parseFloat(row["Thưởng"] || row["thuong"] || 0),
+                            ghi_chu: String(row["Ghi chú"] || row["ghi_chu"] || '')
+                        });
+                    });
+
+                    for (const [docId, docData] of groupMap.entries()) {
+                        docData.total_sales = docData.records.reduce((s, r) => s + (r.loto_db + r.loto_cap + r.loto_2_27 + r.loto_3_23 + r.xskt) * 1000, 0);
+                        docData.total_bonus = docData.records.reduce((s, r) => s + r.thuong * 1000, 0);
+                        docData.updated_at = new Date().toISOString();
+                        await db.collection("extra_records").doc(docId).set(docData, { merge: true });
+                    }
+
+                    await loadAllExtraSalesFromFirebase();
+                    showNotification(`✅ Đã phục hồi thành công ${groupMap.size} đợt bổ sung từ file Excel!`, 'success');
+                    fetchDatabaseStats();
+                    fileInput.value = '';
+                    return;
+                }
+
+                // 2. Nếu có sheet config_kehoach hoặc chọn Kế hoạch
+                if (sheetNames.includes('config_kehoach') || targetSelect === 'config_kehoach') {
+                    const sheet = workbook.Sheets['config_kehoach'] || workbook.Sheets[sheetNames[0]];
+                    const rawRows = XLSX.utils.sheet_to_json(sheet);
+                    let countKH = 0;
+                    for (const row of rawRows) {
+                        const tenTo = row["Tổ / Chi nhánh"] || row["ten_to"];
+                        const nam = parseInt(row["Năm"] || row["nam"]);
+                        const thang = parseInt(row["Tháng"] || row["thang"]);
+                        if (!tenTo || !nam || !thang) continue;
+                        const docId = `${tenTo}_${nam}_${thang}`.replace(/[\/\s|]+/g, '_');
+                        await db.collection("config_kehoach").doc(docId).set({
+                            ten_to: tenTo,
+                            nam: nam,
+                            thang: thang,
+                            chi_tieu: parseFloat(row["Chỉ tiêu kỳ 1"] || row["chi_tieu"] || 0),
+                            chi_tieu_2: parseFloat(row["Chỉ tiêu kỳ 2"] || row["chi_tieu_2"] || 0),
+                            ve_boc: parseFloat(row["Vé bóc"] || row["ve_boc"] || 0)
+                        }, { merge: true });
+                        countKH++;
+                    }
+                    await loadKeHoach();
+                    showNotification(`✅ Đã phục hồi thành công ${countKH} chỉ tiêu kế hoạch từ Excel!`, 'success');
+                    fetchDatabaseStats();
+                    fileInput.value = '';
+                    return;
+                }
+
+                // 3. Phục hồi CSDL gốc
                 const firstSheetName = workbook.SheetNames[0];
-                records = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
-            } else {
-                hideLoading();
-                return showNotification("Định dạng file không hỗ trợ! Chỉ nhận .json hoặc .xlsx", "error");
-            }
+                const records = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
+                if (!Array.isArray(records) || records.length === 0) {
+                    return showNotification("Sheet Excel rỗng!", "error");
+                }
 
-            if (!Array.isArray(records) || records.length === 0) {
-                hideLoading();
-                return showNotification("File sao lưu rỗng hoặc không đúng định dạng!", "error");
-            }
+                const cleanRecords = records.map(r => ({
+                    ngay: String(r.ngay || r["Ngày"] || '').trim(),
+                    ma_dl: String(r.ma_dl || r["Mã ĐL"] || '').trim(),
+                    loto_db: parseFloat(r.loto_db || r["Lô tô ĐB"] || 0),
+                    loto_cap: parseFloat(r.loto_cap || r["Lô tô Cặp"] || 0),
+                    loto_2_27: parseFloat(r.loto_2_27 || r["Lô 2/27"] || 0),
+                    loto_3_23: parseFloat(r.loto_3_23 || r["Lô 3/23"] || 0),
+                    thuong: parseFloat(r.thuong || r["Thưởng"] || 0),
+                    xskt: parseFloat(r.xskt || r["XSKT"] || 0)
+                })).filter(r => r.ngay && r.ma_dl);
 
-            const cleanRecords = records.map(r => ({
-                ngay: String(r.ngay || '').trim(),
-                ma_dl: String(r.ma_dl || '').trim(),
-                loto_db: parseFloat(r.loto_db || 0),
-                loto_cap: parseFloat(r.loto_cap || 0),
-                loto_2_27: parseFloat(r.loto_2_27 || 0),
-                loto_3_23: parseFloat(r.loto_3_23 || 0),
-                thuong: parseFloat(r.thuong || 0),
-                xskt: parseFloat(r.xskt || 0)
-            })).filter(r => r.ngay && r.ma_dl);
+                if (cleanRecords.length === 0) {
+                    return showNotification("Không tìm thấy bản ghi CSDL gốc hợp lệ nào trong file Excel!", "error");
+                }
 
-            if (cleanRecords.length === 0) {
-                hideLoading();
-                return showNotification("Không tìm thấy bản ghi hợp lệ nào trong file!", "error");
-            }
-
-            const byDay = new Map();
-            cleanRecords.forEach(r => {
-                if (!byDay.has(r.ngay)) byDay.set(r.ngay, []);
-                byDay.get(r.ngay).push(r);
-            });
-
-            const dayKeys = Array.from(byDay.keys());
-            for (let i = 0; i < dayKeys.length; i += 50) {
-                const slice = dayKeys.slice(i, i + 50);
-                const batch = db.batch();
-                slice.forEach(d => {
-                    const recs = byDay.get(d);
-                    const docRef = db.collection("daily_records").doc(d);
-                    batch.set(docRef, {
-                        ngay: d,
-                        count: recs.length,
-                        records: recs,
-                        updated_at: firebase.firestore.FieldValue.serverTimestamp()
-                    }, { merge: true });
+                const byDay = new Map();
+                cleanRecords.forEach(r => {
+                    if (!byDay.has(r.ngay)) byDay.set(r.ngay, []);
+                    byDay.get(r.ngay).push(r);
                 });
-                await batch.commit();
+
+                const dayKeys = Array.from(byDay.keys());
+                for (let i = 0; i < dayKeys.length; i += 50) {
+                    const slice = dayKeys.slice(i, i + 50);
+                    const batch = db.batch();
+                    slice.forEach(d => {
+                        const recs = byDay.get(d);
+                        const docRef = db.collection("daily_records").doc(d);
+                        batch.set(docRef, {
+                            ngay: d,
+                            count: recs.length,
+                            records: recs,
+                            updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true });
+                    });
+                    await batch.commit();
+                }
+
+                showNotification(`✅ Đã phục hồi thành công ${cleanRecords.length} bản ghi CSDL gốc (${byDay.size} ngày) từ Excel!`, 'success');
+                fetchDatabaseStats();
+                fileInput.value = '';
+                return;
             }
 
-            showNotification(`✅ Đã phục hồi thành công ${cleanRecords.length} bản ghi (${byDay.size} ngày) vào Firebase!`, 'success');
-            fetchDatabaseStats();
-            fileInput.value = '';
+            showNotification("Định dạng file không hỗ trợ! Chỉ nhận .json hoặc .xlsx", "error");
         } catch(e) {
             console.error(e);
             showNotification("Lỗi phục hồi dữ liệu: " + e.message, 'error');
@@ -7019,35 +7627,66 @@ H. Nam Trực: 400_449`;
         }
     };
 
+    let deleteDataSourceMode = 'daily_records';
     let datesToDelete = [];
+    let extraDocsToDelete = [];
+    let keHoachDocsToDelete = [];
     let currentDeleteDescription = "";
 
     window.promptDatabaseDelete = function() {
-        const m = document.getElementById('dbDeleteMonthSelect').value;
-        const cbFullMonth = document.getElementById('cbDeleteFullMonth').checked;
-        const checkedBoxes = Array.from(document.querySelectorAll('.db-day-cb:checked'));
-
+        deleteDataSourceMode = document.getElementById('dbDeleteDataSource')?.value || 'daily_records';
         datesToDelete = [];
+        extraDocsToDelete = [];
+        keHoachDocsToDelete = [];
         currentDeleteDescription = "";
 
-        if (!m) return showNotification("Vui lòng chọn Tháng/Năm cần xóa!", "warning");
-        const [y, mm] = m.split('-');
+        // 1. XÓA CSDL GỐC (daily_records)
+        if (deleteDataSourceMode === 'daily_records') {
+            const m = document.getElementById('dbDeleteMonthSelect').value;
+            const cbFullMonth = document.getElementById('cbDeleteFullMonth').checked;
+            const checkedBoxes = Array.from(document.querySelectorAll('.db-day-cb:checked'));
 
-        if (cbFullMonth) {
-            datesToDelete = dbDatesByMonth[m] ? [...dbDatesByMonth[m]] : [];
-            currentDeleteDescription = `TOÀN BỘ THÁNG ${mm}/${y} (${datesToDelete.length} ngày)`;
-        } else {
-            if (checkedBoxes.length === 0) {
-                return showNotification("Vui lòng tích chọn ít nhất 1 ngày hoặc chọn XÓA CẢ THÁNG!", "warning");
+            if (!m) return showNotification("Vui lòng chọn Tháng/Năm cần xóa!", "warning");
+            const [y, mm] = m.split('-');
+
+            if (cbFullMonth) {
+                datesToDelete = dbDatesByMonth[m] ? [...dbDatesByMonth[m]] : [];
+                currentDeleteDescription = `TOÀN BỘ CSDL GỐC THÁNG ${mm}/${y} (${datesToDelete.length} ngày)`;
+            } else {
+                if (checkedBoxes.length === 0) {
+                    return showNotification("Vui lòng tích chọn ít nhất 1 ngày hoặc chọn XÓA CẢ THÁNG!", "warning");
+                }
+                datesToDelete = checkedBoxes.map(cb => cb.value);
+                const formattedDays = datesToDelete.map(v => v.split('-').reverse().join('/')).join(', ');
+                currentDeleteDescription = `CSDL GỐC CỦA ${datesToDelete.length} NGÀY (${formattedDays})`;
             }
-            datesToDelete = checkedBoxes.map(cb => cb.value);
-            const formattedDays = datesToDelete.map(v => v.split('-').reverse().join('/')).join(', ');
-            currentDeleteDescription = `${datesToDelete.length} ngày (${formattedDays})`;
+        }
+        // 2. XÓA DỮ LIỆU BỔ SUNG & NHẬP THÊM (extra_records)
+        else if (deleteDataSourceMode === 'extra_records') {
+            const checkedExtra = Array.from(document.querySelectorAll('.db-extra-cb:checked'));
+            if (checkedExtra.length === 0) {
+                return showNotification("Vui lòng tích chọn ít nhất 1 đợt bổ sung cần xóa!", "warning");
+            }
+            extraDocsToDelete = checkedExtra.map(cb => cb.value);
+            currentDeleteDescription = `${extraDocsToDelete.length} ĐỢT DỮ LIỆU BỔ SUNG & NHẬP THÊM (${extraDocsToDelete.join(', ')})`;
+        }
+        // 3. XÓA KẾ HOẠCH DOANH SỐ (config_kehoach)
+        else if (deleteDataSourceMode === 'config_kehoach') {
+            const checkedKH = Array.from(document.querySelectorAll('.db-kehoach-cb:checked'));
+            if (checkedKH.length === 0) {
+                return showNotification("Vui lòng tích chọn ít nhất 1 nhóm kế hoạch cần xóa!", "warning");
+            }
+            keHoachDocsToDelete = [];
+            checkedKH.forEach(cb => {
+                const ids = cb.value.split(',').filter(x => x);
+                keHoachDocsToDelete.push(...ids);
+            });
+            currentDeleteDescription = `${keHoachDocsToDelete.length} BẢN GHI KẾ HOẠCH DOANH SỐ`;
         }
 
         document.getElementById('dbDeleteWarningText').innerHTML = `
             BẠN CÓ CHẮC CHẮN MUỐN XÓA DỮ LIỆU: <b>${currentDeleteDescription.toUpperCase()}</b> KHỎI FIREBASE?<br><br>
-            ⚠️ Hành động này sẽ <b>XÓA VĨNH VIỄN</b> toàn bộ dữ liệu ngày đã chọn trên Firebase!
+            ⚠️ Hành động này sẽ <b>XÓA VĨNH VIỄN</b> dữ liệu đã chọn trên Firebase!
         `;
         document.getElementById('txtConfirmDeleteWord').value = '';
         document.getElementById('dbDeleteConfirmModal').style.display = 'block';
@@ -7063,16 +7702,54 @@ H. Nam Trực: 400_449`;
         showLoading();
 
         try {
-            for (let i = 0; i < datesToDelete.length; i += 50) {
-                const slice = datesToDelete.slice(i, i + 50);
-                const batch = db.batch();
-                slice.forEach(d => {
-                    batch.delete(db.collection("daily_records").doc(d));
-                });
-                await batch.commit();
+            await ensureAdminAuth();
+
+            // 1. XÓA CSDL GỐC
+            if (deleteDataSourceMode === 'daily_records') {
+                for (let i = 0; i < datesToDelete.length; i += 50) {
+                    const slice = datesToDelete.slice(i, i + 50);
+                    const batch = db.batch();
+                    slice.forEach(d => {
+                        batch.delete(db.collection("daily_records").doc(d));
+                    });
+                    await batch.commit();
+                }
+                showNotification(`✅ Đã xóa thành công ${datesToDelete.length} ngày CSDL gốc khỏi Firebase!`, 'success');
+            }
+            // 2. XÓA DỮ LIỆU BỔ SUNG & NHẬP THÊM
+            else if (deleteDataSourceMode === 'extra_records') {
+                for (let i = 0; i < extraDocsToDelete.length; i += 50) {
+                    const slice = extraDocsToDelete.slice(i, i + 50);
+                    const batch = db.batch();
+                    slice.forEach(docId => {
+                        batch.delete(db.collection("extra_records").doc(docId));
+                        extraSalesMap.delete(docId);
+                    });
+                    await batch.commit();
+                }
+                renderSavedExtraList();
+                loadExtraDeleteList();
+                if (combineMode >= 2) {
+                    generateSummaryView();
+                    if (state.currentSoSo) createReport(true);
+                }
+                showNotification(`✅ Đã xóa thành công ${extraDocsToDelete.length} đợt dữ liệu bổ sung khỏi Firebase!`, 'success');
+            }
+            // 3. XÓA KẾ HOẠCH DOANH SỐ
+            else if (deleteDataSourceMode === 'config_kehoach') {
+                for (let i = 0; i < keHoachDocsToDelete.length; i += 50) {
+                    const slice = keHoachDocsToDelete.slice(i, i + 50);
+                    const batch = db.batch();
+                    slice.forEach(docId => {
+                        batch.delete(db.collection("config_kehoach").doc(docId));
+                    });
+                    await batch.commit();
+                }
+                await loadKeHoach();
+                loadKeHoachDeleteList();
+                showNotification(`✅ Đã xóa thành công ${keHoachDocsToDelete.length} bản ghi kế hoạch khỏi Firebase!`, 'success');
             }
 
-            showNotification(`✅ Đã xóa thành công ${datesToDelete.length} ngày khỏi Firebase!`, 'success');
             fetchDatabaseStats();
         } catch(e) {
             console.error(e);
