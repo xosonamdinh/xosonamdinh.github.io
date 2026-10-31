@@ -5786,7 +5786,7 @@ H. Nam Trực: 400_449`;
         const showC323    = grandC323    > 0;
         const showC227    = grandC227    > 0;
         const showXSKT    = !isExcludeXSKT && grandXSKT > 0;
-        const showThuong  = grandThuong > 0;
+        let showThuong    = grandThuong > 0;
 
         // Nhóm theo tháng để lấy chi_tieu
         const monthlyTotals = new Map();
@@ -5810,16 +5810,47 @@ H. Nam Trực: 400_449`;
         const fmtK   = v => (Math.round(v / 1000)).toLocaleString('vi-VN');
         const fmtNum = v => v.toLocaleString('vi-VN');
 
-        // Kiểm tra xem đơn vị có cấu hình Kế hoạch 2 hay không
+        // Kiểm tra xem đơn vị có cấu hình Kế hoạch 1 và Kế hoạch 2 hay không
+        let hasKH1 = false;
         let hasKH2 = false;
-        monthlyTotals.forEach(mt => { if ((mt.chiTieu2 || 0) > 0) hasKH2 = true; });
+        monthlyTotals.forEach(mt => {
+            if ((mt.chiTieu || 0) > 0) hasKH1 = true;
+            if ((mt.chiTieu2 || 0) > 0) hasKH2 = true;
+        });
+
+        const hasBothPlans = hasKH1 && hasKH2;
+        const hasOnlyOnePlan = !hasBothPlans;
+
+        // Khi đơn vị chỉ có 1 loại kế hoạch thì hiển thị thêm cả cột Thưởng
+        if (hasOnlyOnePlan) {
+            showThuong = true;
+        }
+
+        const planCols = hasBothPlans ? 4 : 2;
 
         // Đếm tổng số cột để dùng cho colspan
-        const totalCols = 1 + (showLotoDB?1:0) + (showLotoCap?1:0) + (showC323?1:0) + (showC227?1:0) + (showXSKT?1:0) + 1 + (showThuong?1:0) + 2 + (hasKH2 ? 2 : 0);
+        const totalCols = 1 + (showLotoDB?1:0) + (showLotoCap?1:0) + (showC323?1:0) + (showC227?1:0) + (showXSKT?1:0) + 1 + (showThuong?1:0) + planCols;
 
         const stickyDateTh = `position:sticky; left:0; top:0; z-index:20; min-width:56px; width:56px; max-width:56px; background-color:#107c41 !important; color:#ffffff !important; box-shadow: 2px 0 4px rgba(0,0,0,0.15);`;
         const stickyDateTd = (bg) => `position:sticky; left:0; z-index:5; min-width:56px; width:56px; max-width:56px; background-color:${bg} !important; box-shadow: 2px 0 4px rgba(0,0,0,0.10);`;
         const stickyMonthTd = `position:sticky; left:0; z-index:6; min-width:56px; width:56px; max-width:56px; background-color:#0b592e !important; color:#ffffff !important; box-shadow: 2px 0 4px rgba(0,0,0,0.15);`;
+
+        let planHeadersHtml = '';
+        if (hasBothPlans) {
+            planHeadersHtml = `
+                    <th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">(+/- KH1)</th>
+                    <th style="padding:6px 6px; text-align:center; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">Đạt KH1</th>
+                    <th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#0f766e;">(+/- KH2)</th>
+                    <th style="padding:6px 6px; text-align:center; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#0f766e;">Đạt KH2</th>`;
+        } else if (!hasKH1 && hasKH2) {
+            planHeadersHtml = `
+                    <th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#0f766e;">(+/- KH2)</th>
+                    <th style="padding:6px 6px; text-align:center; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#0f766e;">Đạt KH2</th>`;
+        } else {
+            planHeadersHtml = `
+                    <th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">${hasKH1 ? '(+/- KH1)' : '(+/-)'}</th>
+                    <th style="padding:6px 6px; text-align:center; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">${hasKH1 ? 'Đạt KH1' : 'Đạt'}</th>`;
+        }
 
         let html = `<table id="dailySummaryTable" class="daily-summary-table">
             <thead>
@@ -5832,10 +5863,7 @@ H. Nam Trực: 400_449`;
                     ${showXSKT   ? `<th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">XSKT</th>` : ''}
                     <th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#1a5c28;">Thực hiện</th>
                     ${showThuong  ? `<th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">Thưởng</th>` : ''}
-                    <th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">${hasKH2 ? '(+/- KH1)' : '(+/-)'}</th>
-                    <th style="padding:6px 6px; text-align:center; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#107c41;">${hasKH2 ? 'Đạt KH1' : 'Đạt'}</th>
-                    ${hasKH2 ? `<th style="padding:6px 6px; text-align:right; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#0f766e;">(+/- KH2)</th>
-                    <th style="padding:6px 6px; text-align:center; white-space:nowrap; border:1px solid #166534; position:sticky; top:0; z-index:10; background:#0f766e;">Đạt KH2</th>` : ''}
+                    ${planHeadersHtml}
                 </tr>
             </thead>
             <tbody>`;
@@ -5937,10 +5965,15 @@ H. Nam Trực: 400_449`;
                         ${showXSKT   ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${d.xskt    > 0 ? fmtK(d.xskt)    : ''}</td>` : ''}
                         <td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; font-weight:700; color:#15803d; white-space:nowrap;">${fmtK(d.totRev)}</td>
                         ${showThuong  ? `<td style="padding:4px 6px; text-align:right; border:1px solid #e2e8f0; color:#dc2626; white-space:nowrap;">${d.thuong > 0 ? fmtK(d.thuong) : ''}</td>` : ''}
+                        ${hasBothPlans ? `
                         <td style="padding:3px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${khCellHtml}</td>
                         <td style="padding:4px 6px; text-align:center; border:1px solid #e2e8f0; font-weight:700; color:${pctColor}; white-space:nowrap;">${pctText}${lkHtml}</td>
-                        ${hasKH2 ? `<td style="padding:3px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${khCellHtml2}</td>
-                        <td style="padding:4px 6px; text-align:center; border:1px solid #e2e8f0; font-weight:700; color:${pctColor2}; white-space:nowrap;">${pctText2}</td>` : ''}
+                        <td style="padding:3px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${khCellHtml2}</td>
+                        <td style="padding:4px 6px; text-align:center; border:1px solid #e2e8f0; font-weight:700; color:${pctColor2}; white-space:nowrap;">${pctText2}</td>` : (!hasKH1 && hasKH2 ? `
+                        <td style="padding:3px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${khCellHtml2}</td>
+                        <td style="padding:4px 6px; text-align:center; border:1px solid #e2e8f0; font-weight:700; color:${pctColor2}; white-space:nowrap;">${pctText2}</td>` : `
+                        <td style="padding:3px 6px; text-align:right; border:1px solid #e2e8f0; white-space:nowrap;">${khCellHtml}</td>
+                        <td style="padding:4px 6px; text-align:center; border:1px solid #e2e8f0; font-weight:700; color:${pctColor}; white-space:nowrap;">${pctText}${lkHtml}</td>`)}
                     </tr>`;
                 });
             }
@@ -5988,29 +6021,45 @@ H. Nam Trực: 400_449`;
                 ${showXSKT   ? `<td style="padding:6px 6px; text-align:right; border:1px solid #166534; color:#ffffff; white-space:nowrap;">${fmtK(mXSKT)}</td>` : ''}
                 <td style="padding:6px 6px; text-align:right; border:1px solid #166534; color:#86efac; font-size:13px; white-space:nowrap;">${fmtK(mTotRev)}</td>
                 ${showThuong  ? `<td style="padding:6px 6px; text-align:right; border:1px solid #166534; color:#fca5a5; white-space:nowrap;">${fmtK(mThuong)}</td>` : ''}
+                ${hasBothPlans ? `
                 <td style="padding:4px 6px; text-align:right; border:1px solid #166534; white-space:nowrap;">${mKhCellHtml}</td>
                 <td style="padding:6px 6px; text-align:center; border:1px solid #166534; font-weight:700; color:${mPctColor}; font-size:13px; white-space:nowrap;">${mPctText}</td>
-                ${hasKH2 ? `<td style="padding:4px 6px; text-align:right; border:1px solid #166534; white-space:nowrap;">${mKhCellHtml2}</td>
-                <td style="padding:6px 6px; text-align:center; border:1px solid #166534; font-weight:700; color:${mPctColor2}; font-size:13px; white-space:nowrap;">${mPctText2}</td>` : ''}
+                <td style="padding:4px 6px; text-align:right; border:1px solid #166534; white-space:nowrap;">${mKhCellHtml2}</td>
+                <td style="padding:6px 6px; text-align:center; border:1px solid #166534; font-weight:700; color:${mPctColor2}; font-size:13px; white-space:nowrap;">${mPctText2}</td>` : (!hasKH1 && hasKH2 ? `
+                <td style="padding:4px 6px; text-align:right; border:1px solid #166534; white-space:nowrap;">${mKhCellHtml2}</td>
+                <td style="padding:6px 6px; text-align:center; border:1px solid #166534; font-weight:700; color:${mPctColor2}; font-size:13px; white-space:nowrap;">${mPctText2}</td>` : `
+                <td style="padding:4px 6px; text-align:right; border:1px solid #166534; white-space:nowrap;">${mKhCellHtml}</td>
+                <td style="padding:6px 6px; text-align:center; border:1px solid #166534; font-weight:700; color:${mPctColor}; font-size:13px; white-space:nowrap;">${mPctText}</td>`)}
             </tr>`;
 
             const chiTieuDisp1 = mt.chiTieu > 0 ? fmtNum(mt.chiTieu) : '—';
             const chiTieuDisp2 = mt.chiTieu2 > 0 ? fmtNum(mt.chiTieu2) : '—';
             const tbNgayDisp1  = mt.chiTieu > 0 ? fmtNum(Math.round(mt.chiTieu / mt.daysInMonth)) + '/ngày' : '—';
-            const kh2LabelText = mt.chiTieu2 > 0 ? ` | KH2: <b>${chiTieuDisp2}</b>` : '';
+            const tbNgayDisp2  = mt.chiTieu2 > 0 ? fmtNum(Math.round(mt.chiTieu2 / mt.daysInMonth)) + '/ngày' : '—';
             
+            let planFooterSummaryHtml = '';
+            if (hasBothPlans) {
+                planFooterSummaryHtml = `📅 Tháng ${thang}/${nam} — KH1: <b>${chiTieuDisp1}</b> (TB: <b>${tbNgayDisp1}</b>) | KH2: <b>${chiTieuDisp2}</b> (TB: <b>${tbNgayDisp2}</b>) (${mt.daysInMonth} ngày)`;
+            } else if (!hasKH1 && hasKH2) {
+                planFooterSummaryHtml = `📅 Tháng ${thang}/${nam} — KH2: <b>${chiTieuDisp2}</b> (${mt.daysInMonth} ngày, TB: <b>${tbNgayDisp2}</b>)`;
+            } else if (hasKH1) {
+                planFooterSummaryHtml = `📅 Tháng ${thang}/${nam} — KH1: <b>${chiTieuDisp1}</b> (${mt.daysInMonth} ngày, TB: <b>${tbNgayDisp1}</b>)`;
+            } else {
+                planFooterSummaryHtml = `📅 Tháng ${thang}/${nam} — Chưa có kế hoạch (${mt.daysInMonth} ngày)`;
+            }
+
             let veBocTextHtml = '';
             if (veBocKeHoach > 0) {
-                veBocTextHtml = `<div style="color:#1d4ed8; font-weight:600; font-size:13px;">🎟️ Vé bóc ước tính: <b>${fmtNum(veBocKeHoach)}</b></div>`;
+                veBocTextHtml = `<div class="footer-text-main" style="color:#1d4ed8; font-weight:600;">🎟️ Vé bóc ước tính: <b>${fmtNum(veBocKeHoach)}</b></div>`;
             } else {
-                veBocTextHtml = `<div style="color:#64748b; font-weight:500; font-size:13px;">🎟️ Chưa tính vé bóc</div>`;
+                veBocTextHtml = `<div class="footer-text-main" style="color:#64748b; font-weight:500;">🎟️ Chưa tính vé bóc</div>`;
             }
 
             html += `<tr class="daily-summary-footer summary-footer-plan" style="background:#dbeafe;">
                 <td class="summary-footer-cell" colspan="${totalCols}">
                     <div style="display:flex; flex-direction:column; gap:4px; text-align:left;">
                         <div class="footer-text-main" style="color:#1d4ed8;">
-                            📅 Tháng ${thang}/${nam} — KH1: <b>${chiTieuDisp1}</b> (${mt.daysInMonth} ngày, TB: <b>${tbNgayDisp1}</b>)${kh2LabelText}
+                            ${planFooterSummaryHtml}
                         </div>
                         ${veBocTextHtml}
                     </div>
@@ -8809,7 +8858,7 @@ H. Nam Trực: 400_449`;
             currentExtraRows = [];
         }
 
-        while (currentExtraRows.length < 30) {
+        if (currentExtraRows.length === 0) {
             currentExtraRows.push({
                 ma_dl: '',
                 loto_db: 0,
@@ -9111,23 +9160,15 @@ H. Nam Trực: 400_449`;
 
     function removeExtraRow(idx) {
         currentExtraRows.splice(idx, 1);
-        while (currentExtraRows.length < 30) {
-            currentExtraRows.push({
-                ma_dl: '',
-                loto_db: 0,
-                loto_cap: 0,
-                loto_2_27: 0,
-                loto_3_23: 0,
-                xskt: 0,
-                thuong: 0,
-                ghi_chu: ''
-            });
+        if (currentExtraRows.length === 0) {
+            addNewExtraRow();
+        } else {
+            renderExtraSalesRows();
+            const targetIdx = Math.min(idx, currentExtraRows.length - 1);
+            setTimeout(() => {
+                focusExtraGridCell(targetIdx, 0);
+            }, 30);
         }
-        renderExtraSalesRows();
-        const targetIdx = Math.min(idx, currentExtraRows.length - 1);
-        setTimeout(() => {
-            focusExtraGridCell(targetIdx, 0);
-        }, 30);
     }
     window.removeExtraRow = removeExtraRow;
     window.removeExtraRow = removeExtraRow;
@@ -9194,19 +9235,14 @@ H. Nam Trực: 400_449`;
                 currentExtraRows[existingIdx].thuong = th;
                 if (note) currentExtraRows[existingIdx].ghi_chu = note;
             } else {
-                const firstEmptyIdx = currentExtraRows.findIndex(r => !r.ma_dl && !r.loto_db && !r.loto_cap && !r.loto_2_27 && !r.loto_3_23 && !r.xskt && !r.thuong);
-                if (firstEmptyIdx !== -1) {
-                    currentExtraRows[firstEmptyIdx] = { ma_dl: code, loto_db: ldb, loto_cap: lc, loto_2_27: c2, loto_3_23: c3, xskt: x, thuong: th, ghi_chu: note };
+                if (currentExtraRows.length === 1 && !currentExtraRows[0].ma_dl) {
+                    currentExtraRows[0] = { ma_dl: code, loto_db: ldb, loto_cap: lc, loto_2_27: c2, loto_3_23: c3, xskt: x, thuong: th, ghi_chu: note };
                 } else {
                     currentExtraRows.push({ ma_dl: code, loto_db: ldb, loto_cap: lc, loto_2_27: c2, loto_3_23: c3, xskt: x, thuong: th, ghi_chu: note });
                 }
             }
             addedCount++;
         });
-
-        while (currentExtraRows.length < 30) {
-            currentExtraRows.push({ ma_dl: '', loto_db: 0, loto_cap: 0, loto_2_27: 0, loto_3_23: 0, xskt: 0, thuong: 0, ghi_chu: '' });
-        }
         DOM.txtPasteExcelExtra.value = '';
         DOM.pasteExcelContainer.style.display = 'none';
         renderExtraSalesRows();
@@ -9296,12 +9332,9 @@ H. Nam Trực: 400_449`;
             await db.collection("extra_records").doc(info.docId).delete();
             extraSalesMap.delete(info.docId);
 
-            currentExtraRows = [];
-            while (currentExtraRows.length < 30) {
-                currentExtraRows.push({
-                    ma_dl: '', loto_db: 0, loto_cap: 0, loto_2_27: 0, loto_3_23: 0, xskt: 0, thuong: 0, ghi_chu: ''
-                });
-            }
+            currentExtraRows = [{
+                ma_dl: '', loto_db: 0, loto_cap: 0, loto_2_27: 0, loto_3_23: 0, xskt: 0, thuong: 0, ghi_chu: ''
+            }];
             renderExtraSalesRows();
             renderSavedExtraList();
             showNotification(`Đã xóa dữ liệu bổ sung của ${info.label}!`, 'info');
