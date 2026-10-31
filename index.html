@@ -4899,31 +4899,7 @@ H. Nam Trực: 400_449`;
         if (clonedTable) {
             clonedTable.id = 'clonedTable';
 
-            // Bỏ cột Thưởng khi copy ảnh để tiết kiệm diện tích theo yêu cầu của người dùng
-            let thuongColIdx = -1;
-            const headers = Array.from(clonedTable.querySelectorAll('thead tr th'));
-            headers.forEach((th, idx) => {
-                if (th.textContent.trim().includes('Thưởng')) {
-                    thuongColIdx = idx;
-                }
-            });
-            if (thuongColIdx !== -1) {
-                headers[thuongColIdx].remove();
-                clonedTable.querySelectorAll('tbody tr').forEach(tr => {
-                    const cells = Array.from(tr.children);
-                    if (cells[thuongColIdx]) cells[thuongColIdx].remove();
-                });
-                clonedTable.querySelectorAll('tfoot tr').forEach(tr => {
-                    const cells = Array.from(tr.children);
-                    if (cells[thuongColIdx]) cells[thuongColIdx].remove();
-                });
-                clonedTable.querySelectorAll('.summary-footer-cell').forEach(td => {
-                    let curColspan = parseInt(td.getAttribute('colspan') || '1', 10);
-                    if (curColspan > 1) {
-                        td.setAttribute('colspan', String(curColspan - 1));
-                    }
-                });
-            }
+            // Giữ nguyên cột Thưởng nếu bảng đang hiển thị để khớp với ảnh chụp
             clonedTable.style.setProperty('width', '100%', 'important');
             clonedTable.style.setProperty('min-width', '100%', 'important');
             clonedTable.style.setProperty('max-width', '100%', 'important');
@@ -4992,6 +4968,7 @@ H. Nam Trực: 400_449`;
                 });
             }
         }
+
 
         cloned.querySelectorAll('input').forEach(input => {
             const val = input.value || '0';
