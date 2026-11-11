@@ -460,6 +460,20 @@
       color: #d63031;
     }
 
+    .level-pill {
+      font-family: 'Bungee', cursive;
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f39c12, #f1c40f);
+      color: #fff;
+      text-shadow: 1px 1px 0px rgba(0,0,0,0.25);
+      box-shadow: 0 3px 8px rgba(241, 196, 15, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
     .hp-bar-outer {
       width: 260px;
       height: 18px;
@@ -487,6 +501,26 @@
       font-weight: 900;
       color: white;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+
+    .hp-sub-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0 4px;
+    }
+
+    .hp-regen-tag {
+      font-size: 11px;
+      font-weight: 800;
+      color: #20bf6b;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #e8f8f0;
+      padding: 1px 7px;
+      border-radius: 10px;
     }
 
     .victim-status {
@@ -871,12 +905,16 @@
 
     <div class="stats-card">
       <div class="stat-item">
-        <span class="stat-label">Tổng Đòn Đánh</span>
+        <span class="stat-label">Tổng Đòn</span>
         <span id="stat-hits" class="stat-val hits">0</span>
       </div>
       <div class="stat-item">
-        <span class="stat-label">Điểm Xả Giận</span>
+        <span class="stat-label">Điểm Xả</span>
         <span id="stat-gold" class="stat-val gold">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Cấp Độ Nộm</span>
+        <span id="stat-level" class="stat-val level" style="color: #e67e22;">Lv.1</span>
       </div>
       <div class="stat-item">
         <span class="stat-label">Combo Max</span>
@@ -976,6 +1014,7 @@
   <!-- VICTIM STATUS & HEALTH HUD -->
   <div class="character-hud">
     <div class="target-header">
+      <span id="target-level-pill" class="level-pill">👑 Cấp 1</span>
       <div id="target-name-display" class="target-name-tag" title="Bấm để đổi tên">
         <span id="target-gender-icon">👨‍💼</span> <span id="target-name-text">Sếp Khó Tính</span>
       </div>
@@ -985,7 +1024,10 @@
       <div id="hp-bar-fill" class="hp-bar-inner"></div>
       <div id="hp-bar-val" class="hp-bar-text">100 / 100 HP</div>
     </div>
-    <div class="victim-status" id="victim-status-text">Đang cười khẩy thách thức! 😏</div>
+    <div class="hp-sub-bar">
+      <span class="hp-regen-tag" id="hp-regen-display">💚 +1.0 HP/giây</span>
+      <div class="victim-status" id="victim-status-text">Đang cười khẩy thách thức! 😏</div>
+    </div>
   </div>
 
   <div id="combo-banner" class="combo-banner">🔥 5x COMBO! ĐẬP NỮA ĐI! 🔥</div>
@@ -1027,6 +1069,17 @@
             <button type="button" class="gender-btn" data-gender="female">
               <span>👩 Nữ (♀)</span>
             </button>
+          </div>
+        </div>
+
+        <div class="form-group" style="background: white; padding: 10px 14px; border-radius: 14px; border: 1px solid #dfe4ea;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <label class="form-label" style="margin: 0;">👑 Cấp Độ Người Nộm:</label>
+            <span id="modal-level-display" style="font-weight: 900; color: #e67e22; font-family: 'Bungee', cursive;">Cấp 1</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #57606f;">
+            <span id="modal-level-details">Máu: 100 HP | Hồi máu: +1.0 HP/s</span>
+            <button type="button" id="btn-reset-level" class="btn btn-heal" style="padding: 3px 10px; font-size: 11px;">↺ Đặt lại Cấp 1</button>
           </div>
         </div>
       </div>
@@ -1298,6 +1351,28 @@
       });
     }
 
+    playLevelUp() {
+      if (!this.enabled) return;
+      this.init();
+      const now = this.ctx.currentTime;
+      // Majestic triumphant arpeggio fanfare
+      const notes = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+
+        gain.gain.setValueAtTime(0.28, now + idx * 0.07);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.07 + 0.35);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now + idx * 0.07);
+        osc.stop(now + idx * 0.07 + 0.35);
+      });
+    }
+
     playGiggle() {
       if (!this.enabled) return;
       this.init();
@@ -1439,14 +1514,23 @@
     taser: { name: 'Dùi Cui Điện', emoji: '⚡', sound: 'electric', power: 22, isRanged: false, comic: ['BZZZZT!', 'TÊ TÁI!', 'GIẬT!'] }
   };
 
-  // Stats
+  // Stats & Leveling
   let totalHits = 0;
   let totalGold = 0;
   let currentCombo = 0;
   let maxCombo = 0;
   let comboTimeout = null;
+
+  // Infinite Level Progression (+50 HP per level & proportional regen)
+  let dummyLevel = 1;
+  function getMaxHp() {
+    return 100 + (dummyLevel - 1) * 50;
+  }
+  function getRegenPerSec() {
+    // Proportional regen rate: 1.0 HP/s at Lv1, 1.5 HP/s at Lv2, 2.0 HP/s at Lv3... (1% of Max HP)
+    return Math.round((getMaxHp() * 0.01) * 10) / 10;
+  }
   let currentHp = 100;
-  const maxHp = 100;
 
   // Face image settings
   const userFace = {
@@ -2144,6 +2228,12 @@
     totalGold += w.power * 10;
     currentHp = Math.max(0, currentHp - Math.floor(w.power * 0.8));
 
+    // Check if knocked out & Level Up!
+    if (currentHp <= 0) {
+      triggerLevelUp();
+      return;
+    }
+
     currentCombo++;
     if (currentCombo > maxCombo) maxCombo = currentCombo;
     clearTimeout(comboTimeout);
@@ -2156,15 +2246,58 @@
     updateUI();
   }
 
+  function triggerLevelUp() {
+    dummyLevel++;
+    const newMax = getMaxHp();
+    const newRegen = getRegenPerSec();
+    currentHp = newMax;
+
+    // Bonus reward gold
+    const bonusGold = dummyLevel * 500;
+    totalGold += bonusGold;
+
+    sounds.playLevelUp();
+
+    // Confetti celebration particles
+    for (let i = 0; i < 45; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const spd = 4 + Math.random() * 9;
+      const confetti = ['🎉', '⭐', '✨', '👑', '🥇', '💥', '💰', '🔥', '💖'];
+      particles.push(new Particle(dummy.x, dummy.y - 40, confetti[Math.floor(Math.random() * confetti.length)], Math.cos(ang) * spd, Math.sin(ang) * spd - 4, 55));
+    }
+
+    // Screen Shake
+    document.body.classList.remove('shake-screen');
+    void document.body.offsetWidth;
+    document.body.classList.add('shake-screen');
+
+    // Comic celebration banner
+    spawnComicPop(dummy.x, dummy.y - 120, [
+      `K.O.! THĂNG CẤP ${dummyLevel}!`,
+      `MÁU TĂNG: ${newMax} HP!`,
+      `HỒI MÁU: +${newRegen.toFixed(1)} HP/s!`
+    ]);
+
+    // Recoil backflip
+    dummy.applyImpulse((Math.random() - 0.5) * 16, -18, 0.45, 0.35, -0.35);
+
+    stickies.length = 0; // clear stickers on level up
+    updateDamageLevel();
+    updateUI();
+  }
+
   function updateDamageLevel() {
     const name = dummyProfile.name || 'Người nộm';
-    if (currentHp <= 25) {
+    const maxHp = getMaxHp();
+    const hpRatio = currentHp / maxHp;
+
+    if (hpRatio <= 0.25) {
       dummy.damageLevel = 3;
       document.getElementById('victim-status-text').textContent = `${name}: Choáng váng nặng, thấy ngàn vì sao! 😵`;
-    } else if (currentHp <= 50) {
+    } else if (hpRatio <= 0.50) {
       dummy.damageLevel = 2;
       document.getElementById('victim-status-text').textContent = `${name}: Mắt bầm tím, u một cục tướng! 🤕`;
-    } else if (currentHp <= 75) {
+    } else if (hpRatio <= 0.75) {
       dummy.damageLevel = 1;
       document.getElementById('victim-status-text').textContent = `${name}: Dán băng cá nhân, bắt đầu rén! 😰`;
     } else {
@@ -2184,17 +2317,29 @@
   }
 
   function updateUI() {
+    const maxHp = getMaxHp();
+    const regenRate = getRegenPerSec();
+
     document.getElementById('stat-hits').textContent = totalHits.toLocaleString();
     document.getElementById('stat-gold').textContent = totalGold.toLocaleString();
     document.getElementById('stat-combo').textContent = `${maxCombo}x`;
+    document.getElementById('stat-level').textContent = `Lv.${dummyLevel}`;
 
     const hpBar = document.getElementById('hp-bar-fill');
     const hpVal = document.getElementById('hp-bar-val');
     const pct = Math.max(0, Math.min(100, (currentHp / maxHp) * 100));
     hpBar.style.width = `${pct}%`;
-    hpVal.textContent = `${currentHp} / ${maxHp} HP`;
+    hpVal.textContent = `${Math.ceil(currentHp)} / ${maxHp} HP`;
 
-    // Target Info
+    const regenTag = document.getElementById('hp-regen-display');
+    if (regenTag) {
+      regenTag.textContent = `💚 +${regenRate.toFixed(1)} HP/giây`;
+    }
+
+    // Target Info & Level Badge
+    const lvlPill = document.getElementById('target-level-pill');
+    if (lvlPill) lvlPill.textContent = `👑 Cấp ${dummyLevel}`;
+
     document.getElementById('target-name-text').textContent = dummyProfile.name;
     const isMale = (dummyProfile.gender === 'male');
     const genderPill = document.getElementById('target-gender-pill');
@@ -2202,15 +2347,42 @@
     genderPill.textContent = isMale ? 'Nam ♂' : 'Nữ ♀';
     document.getElementById('target-gender-icon').textContent = isMale ? '👨‍💼' : '👩‍🦰';
 
+    // Modal Level Info
+    const modalLvlDisplay = document.getElementById('modal-level-display');
+    if (modalLvlDisplay) modalLvlDisplay.textContent = `Cấp ${dummyLevel}`;
+    const modalLvlDetails = document.getElementById('modal-level-details');
+    if (modalLvlDetails) modalLvlDetails.textContent = `Máu: ${maxHp} HP | Hồi máu: +${regenRate.toFixed(1)} HP/s`;
+
     sounds.setGender(dummyProfile.gender);
 
     updateComboBanner();
   }
 
+  // Auto-Regeneration Over Time (1% Max HP per second, proportional to level)
+  setInterval(() => {
+    const maxHp = getMaxHp();
+    const regenRate = getRegenPerSec();
+    if (currentHp < maxHp) {
+      currentHp = Math.min(maxHp, currentHp + regenRate);
+      updateDamageLevel();
+      updateUI();
+
+      // Soft green healing pulse particle every few seconds if damaged
+      if (Math.random() < 0.35) {
+        particles.push(new Particle(dummy.x + (Math.random() - 0.5) * 50, dummy.y - 70, '💚', 0, -1.2, 25));
+      }
+
+      // If fully healed back to maxHp, slowly clear attached projectiles
+      if (currentHp >= maxHp && stickies.length > 0) {
+        stickies.shift();
+      }
+    }
+  }, 1000);
+
   // Heal / Reset
   document.getElementById('btn-heal').addEventListener('click', () => {
     sounds.playHeal();
-    currentHp = maxHp;
+    currentHp = getMaxHp();
     stickies.length = 0;
     dummy.damageLevel = 0;
     dummy.restX = width / 2;
@@ -2396,6 +2568,19 @@
     closeModal();
     spawnComicPop(dummy.x, dummy.y - 120, [`ĐÃ ĐỔI: ${dummyProfile.name.toUpperCase()}!`]);
   });
+
+  // Reset Level Button
+  const btnResetLevel = document.getElementById('btn-reset-level');
+  if (btnResetLevel) {
+    btnResetLevel.addEventListener('click', () => {
+      dummyLevel = 1;
+      currentHp = getMaxHp();
+      updateDamageLevel();
+      updateUI();
+      sounds.playHeal();
+      spawnComicPop(dummy.x, dummy.y - 120, ['ĐÃ VỀ CẤP 1!']);
+    });
+  }
 
   // Sliders
   scaleInput.addEventListener('input', (e) => {
