@@ -1,0 +1,2185 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Xả Stress Cực Mạnh - Game Đập Nộm Hài Hước</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #ff4757;
+      --primary-dark: #ee5253;
+      --secondary: #ffa502;
+      --accent: #2ed573;
+      --blue: #1e90ff;
+      --dark: #2f3542;
+      --panel-bg: rgba(255, 255, 255, 0.94);
+      --shadow: 0 10px 25px rgba(0,0,0,0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      font-family: 'Nunito', sans-serif;
+      background: radial-gradient(circle at center, #ffeaa7 0%, #fab1a0 60%, #ff7675 100%);
+      color: #333;
+      position: relative;
+      transition: background 0.5s ease;
+    }
+
+    /* THEME BACKGROUNDS */
+    body.bg-office {
+      background: radial-gradient(circle at center, #dfe4ea 0%, #ced6e0 60%, #747d8c 100%);
+    }
+    body.bg-gym {
+      background: radial-gradient(circle at center, #a8ff78 0%, #78ffd6 60%, #11998e 100%);
+    }
+    body.bg-dungeon {
+      background: radial-gradient(circle at center, #4b4b4b 0%, #2c2c54 60%, #130f40 100%);
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 100;
+      background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.3) 80%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .top-bar > * {
+      pointer-events: auto;
+    }
+
+    .game-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Bungee', cursive;
+      font-size: 22px;
+      color: #d63031;
+      text-shadow: 2px 2px 0px #fff, 4px 4px 0px rgba(0,0,0,0.12);
+      letter-spacing: 0.5px;
+    }
+
+    .game-logo span {
+      background: linear-gradient(45deg, #ff4757, #ff6b81);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      box-shadow: 0 3px 8px rgba(255,71,87,0.4);
+    }
+
+    .stats-card {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(10px);
+      padding: 8px 18px;
+      border-radius: 40px;
+      box-shadow: var(--shadow);
+      border: 2px solid white;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.1;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-val {
+      font-family: 'Bungee', cursive;
+      font-size: 18px;
+      color: #2f3542;
+    }
+
+    .stat-val.gold { color: #e67e22; }
+    .stat-val.hits { color: #d63031; }
+    .stat-val.combo { color: #9b59b6; }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn {
+      cursor: pointer;
+      border: none;
+      outline: none;
+      padding: 9px 16px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      border-radius: 30px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px) scale(1.04);
+    }
+
+    .btn:active {
+      transform: translateY(1px) scale(0.96);
+    }
+
+    .btn-upload {
+      background: linear-gradient(135deg, #0984e3, #74b9ff);
+      color: white;
+    }
+
+    .btn-heal {
+      background: linear-gradient(135deg, #2ed573, #7bed9f);
+      color: #0c4b22;
+    }
+
+    .btn-screenshot {
+      background: linear-gradient(135deg, #e056fd, #be2edd);
+      color: white;
+    }
+
+    .btn-bg {
+      background: white;
+      color: #2f3542;
+    }
+
+    .btn-sound {
+      background: white;
+      color: #2f3542;
+      padding: 9px 12px;
+    }
+
+    /* WEAPON PANELS (LEFT & RIGHT) */
+    .weapons-panel {
+      position: absolute;
+      top: 80px;
+      bottom: 24px;
+      width: 145px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 90;
+      padding: 8px 4px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+    }
+
+    .weapons-panel::-webkit-scrollbar {
+      width: 4px;
+    }
+    .weapons-panel::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+    }
+
+    .weapons-left {
+      left: 14px;
+    }
+
+    .weapons-right {
+      right: 14px;
+    }
+
+    .panel-header {
+      text-align: center;
+      font-family: 'Bungee', cursive;
+      font-size: 11px;
+      color: rgba(0,0,0,0.55);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+      background: rgba(255,255,255,0.65);
+      padding: 4px 8px;
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+    }
+
+    .weapon-card {
+      background: var(--panel-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 18px;
+      padding: 10px 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      text-align: center;
+      box-shadow: 0 5px 14px rgba(0,0,0,0.08);
+      border: 3px solid transparent;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
+
+    .weapon-card:hover {
+      transform: translateY(-3px) scale(1.04);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      border-color: #ffd32a;
+    }
+
+    .weapon-card.active {
+      background: #fff;
+      border-color: var(--primary);
+      transform: scale(1.06);
+      box-shadow: 0 0 18px rgba(255, 71, 87, 0.45);
+    }
+
+    .weapon-card.active::after {
+      content: '✓ ĐANG CHỌN';
+      position: absolute;
+      bottom: -7px;
+      background: var(--primary);
+      color: white;
+      font-size: 8px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .weapon-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      background: #f1f2f6;
+      font-size: 28px;
+      transition: transform 0.2s;
+    }
+
+    .weapon-card:hover .weapon-icon {
+      transform: rotate(8deg) scale(1.1);
+    }
+
+    .weapon-name {
+      font-size: 12px;
+      font-weight: 800;
+      color: #2f3542;
+      line-height: 1.2;
+    }
+
+    .weapon-type-badge {
+      font-size: 9px;
+      font-weight: 700;
+      color: #fff;
+      background: #747d8c;
+      padding: 1px 6px;
+      border-radius: 8px;
+    }
+
+    /* GAME ARENA & CANVAS */
+    #game-stage {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      cursor: crosshair;
+    }
+
+    /* FLOATING COMIC TEXT & PARTICLES */
+    .comic-pop {
+      position: absolute;
+      font-family: 'Bungee', cursive;
+      font-size: 32px;
+      font-weight: 900;
+      pointer-events: none;
+      z-index: 150;
+      transform: translate(-50%, -50%);
+      animation: comicFloat 0.85s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+      text-shadow: 3px 3px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 0 6px 12px rgba(0,0,0,0.3);
+    }
+
+    @keyframes comicFloat {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -30%) scale(0.3) rotate(-15deg);
+      }
+      30% {
+        opacity: 1;
+        transform: translate(-50%, -70%) scale(1.3) rotate(8deg);
+      }
+      70% {
+        opacity: 1;
+        transform: translate(-50%, -100%) scale(1.05) rotate(-3deg);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -140%) scale(0.8) rotate(10deg);
+      }
+    }
+
+    /* FLOATING DAMAGE NUMBER */
+    .dmg-number {
+      position: absolute;
+      font-family: 'Bungee', cursive;
+      font-size: 24px;
+      color: #ff3838;
+      pointer-events: none;
+      z-index: 145;
+      text-shadow: 2px 2px 0 #fff, 3px 3px 0 #000;
+      animation: dmgRise 0.75s ease-out forwards;
+    }
+
+    @keyframes dmgRise {
+      0% { opacity: 1; transform: translate(-50%, 0) scale(0.6); }
+      40% { opacity: 1; transform: translate(-50%, -35px) scale(1.3); }
+      100% { opacity: 0; transform: translate(-50%, -70px) scale(1); }
+    }
+
+    /* HEALTH & RAGE BAR IN ARENA */
+    .character-hud {
+      position: absolute;
+      top: 82px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 80;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.92);
+      padding: 8px 18px;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      border: 2px solid white;
+    }
+
+    .hp-bar-outer {
+      width: 250px;
+      height: 18px;
+      background: #dfe4ea;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    .hp-bar-inner {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #2ed573, #ffa502, #ff4757);
+      transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 10px;
+    }
+
+    .hp-bar-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 11px;
+      font-weight: 900;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+    }
+
+    .victim-status {
+      font-size: 12px;
+      font-weight: 800;
+      color: #57606f;
+    }
+
+    /* MODAL FOR FACE UPLOAD / CAMERA / CUSTOMIZE */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: white;
+      width: 90%;
+      max-width: 580px;
+      max-height: 90vh;
+      border-radius: 28px;
+      padding: 26px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+      transform: translateY(20px) scale(0.95);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-family: 'Bungee', cursive;
+      font-size: 20px;
+      color: #2f3542;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-close {
+      cursor: pointer;
+      background: #f1f2f6;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      font-size: 18px;
+      font-weight: bold;
+      color: #747d8c;
+      transition: background 0.15s;
+    }
+
+    .modal-close:hover {
+      background: #ff4757;
+      color: white;
+    }
+
+    .face-preview-container {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      background: #f8f9fa;
+      padding: 16px;
+      border-radius: 20px;
+      border: 2px dashed #ced6e0;
+    }
+
+    .face-circle-preview {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 4px solid var(--primary);
+      overflow: hidden;
+      position: relative;
+      background: #ffeaa7;
+      flex-shrink: 0;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+    }
+
+    .face-circle-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      transform-origin: center center;
+    }
+
+    .face-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .control-row input[type="range"] {
+      width: 130px;
+      accent-color: var(--primary);
+    }
+
+    .presets-title {
+      font-weight: 800;
+      font-size: 14px;
+      color: #747d8c;
+      margin-top: 4px;
+    }
+
+    .preset-faces {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .preset-face-btn {
+      cursor: pointer;
+      border: 2px solid #e4e7eb;
+      background: white;
+      border-radius: 16px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      transition: all 0.15s;
+    }
+
+    .preset-face-btn:hover {
+      border-color: var(--blue);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .upload-btns-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .upload-btns-row .btn {
+      flex: 1;
+      justify-content: center;
+    }
+
+    /* WEBCAM VIDEO PREVIEW */
+    #webcam-stream {
+      display: none;
+      width: 100%;
+      border-radius: 16px;
+      transform: scaleX(-1);
+    }
+
+    /* INSTRUCTION BANNER */
+    .instruction-tooltip {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(47, 53, 66, 0.9);
+      color: white;
+      backdrop-filter: blur(8px);
+      padding: 10px 24px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      z-index: 80;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      border: 1px solid rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: pulseAttention 2.5s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes pulseAttention {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.03); }
+    }
+
+    /* COMIC COMBO DISPLAY */
+    .combo-banner {
+      position: absolute;
+      top: 150px;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+      z-index: 85;
+      font-family: 'Bungee', cursive;
+      font-size: 26px;
+      color: #ff3838;
+      text-shadow: 2px 2px 0 #fff, 4px 4px 0 #000;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .combo-banner.visible {
+      transform: translateX(-50%) scale(1);
+    }
+
+    /* WEAPON CURSOR OVERLAY */
+    #weapon-cursor {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      display: none;
+      transition: transform 0.08s ease-out;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25));
+    }
+
+    #weapon-cursor.swinging {
+      animation: weaponSwing 0.22s ease-in-out;
+    }
+
+    @keyframes weaponSwing {
+      0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+      40% { transform: translate(-50%, -50%) rotate(-45deg) scale(1.2); }
+      70% { transform: translate(-50%, -50%) rotate(35deg) scale(1.15); }
+      100% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+    }
+
+    /* SCREEN SHAKE */
+    .shake-screen {
+      animation: screenRumble 0.15s ease-in-out;
+    }
+
+    @keyframes screenRumble {
+      0% { transform: translate(0, 0); }
+      25% { transform: translate(-4px, 3px); }
+      50% { transform: translate(4px, -3px); }
+      75% { transform: translate(-3px, -2px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .weapons-panel {
+        width: 105px;
+      }
+      .weapon-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 22px;
+      }
+      .weapon-name {
+        font-size: 10px;
+      }
+      .top-bar {
+        padding: 0 10px;
+      }
+      .game-logo {
+        font-size: 15px;
+      }
+      .game-logo span {
+        display: none;
+      }
+      .instruction-tooltip {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <header class="top-bar">
+    <div class="game-logo">
+      🥊 XẢ STRESS CỰC MẠNH
+      <span>Anti-Stress Dummy</span>
+    </div>
+
+    <div class="stats-card">
+      <div class="stat-item">
+        <span class="stat-label">Tổng Đòn Đánh</span>
+        <span id="stat-hits" class="stat-val hits">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Điểm Xả Giận</span>
+        <span id="stat-gold" class="stat-val gold">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Combo Max</span>
+        <span id="stat-combo" class="stat-val combo">0x</span>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button id="btn-open-face-modal" class="btn btn-upload" title="Thay đổi khuôn mặt nhân vật">
+        📷 Thay Mặt
+      </button>
+      <button id="btn-heal" class="btn btn-heal" title="Hồi phục và lau sạch thương tích">
+        🩹 Hồi Máu
+      </button>
+      <button id="btn-change-bg" class="btn btn-bg" title="Đổi không gian / phông nền">
+        🖼️ Đổi Nền
+      </button>
+      <button id="btn-screenshot" class="btn btn-screenshot" title="Chụp ảnh troll lưu kỉ niệm">
+        📸 Chụp Ảnh
+      </button>
+      <button id="btn-sound-toggle" class="btn btn-sound" title="Bật/Tắt Âm thanh">
+        🔊 Âm thanh
+      </button>
+    </div>
+  </header>
+
+  <!-- LEFT WEAPONS (MELEE & CLASSIC) -->
+  <nav class="weapons-panel weapons-left" aria-label="Vũ khí cận chiến">
+    <div class="panel-header">🔨 Cận Chiến</div>
+
+    <div class="weapon-card active" data-weapon="hammer">
+      <div class="weapon-icon">🔨</div>
+      <span class="weapon-name">Búa Cao Su</span>
+      <span class="weapon-type-badge">Chíp chíp</span>
+    </div>
+
+    <div class="weapon-card" data-weapon="slipper">
+      <div class="weapon-icon">🩴</div>
+      <span class="weapon-name">Dép Tổ Ong</span>
+      <span class="weapon-type-badge">Huyền thoại</span>
+    </div>
+
+    <div class="weapon-card" data-weapon="glove">
+      <div class="weapon-icon">🥊</div>
+      <span class="weapon-name">Găng Boxing</span>
+      <span class="weapon-type-badge">Đấm móc</span>
+    </div>
+
+    <div class="weapon-card" data-weapon="sword">
+      <div class="weapon-icon">🗡️</div>
+      <span class="weapon-name">Kiếm Xốp</span>
+      <span class="weapon-type-badge">Vù vù</span>
+    </div>
+
+    <div class="weapon-card" data-weapon="feather">
+      <div class="weapon-icon">🪶</div>
+      <span class="weapon-name">Lông Cù Lét</span>
+      <span class="weapon-type-badge">Cười rũ</span>
+    </div>
+  </nav>
+
+  <!-- RIGHT WEAPONS (RANGED & FUNKY) -->
+  <nav class="weapons-panel weapons-right" aria-label="Vũ khí tầm xa và độc lạ">
+    <div class="panel-header">🎯 Tầm Xa & Lạ</div>
+
+    <div class="weapon-card" data-weapon="bow">
+      <div class="weapon-icon">🏹</div>
+      <span class="weapon-name">Cung Giác Hút</span>
+      <span class="weapon-type-badge">Dính trán</span>
+    </div>
+
+    <div class="weapon-card" data-weapon="tomato">
+      <div class="weapon-icon">🍅</div>
+      <span class="weapon-name">Cà Chua Thối</span>
+      <span class="weapon-type-badge">Bẹp nhầy</span>
+    </div>
+
+    <div class="weapon-card" data-weapon="egg">
+      <div class="weapon-icon">🥚</div>
+      <span class="weapon-name">Trứng Ung</span>
+      <span class="weapon-type-badge">Nhem nhuốc</span>
+    </div>
+
+    <div class="weapon-card" data-weapon="nerf">
+      <div class="weapon-icon">🔫</div>
+      <span class="weapon-name">Súng Đạn Xốp</span>
+      <span class="weapon-type-badge">Chíu chíu</span>
+    </div>
+
+    <div class="weapon-card" data-weapon="taser">
+      <div class="weapon-icon">⚡</div>
+      <span class="weapon-name">Dùi Cui Điện</span>
+      <span class="weapon-type-badge">Giật tê tái</span>
+    </div>
+  </nav>
+
+  <!-- VICTIM STATUS & HEALTH HUD -->
+  <div class="character-hud">
+    <div class="victim-status" id="victim-status-text">Tình trạng: Còn nguyên vẹn, đang cười khẩy! 😏</div>
+    <div class="hp-bar-outer">
+      <div id="hp-bar-fill" class="hp-bar-inner"></div>
+      <div id="hp-bar-val" class="hp-bar-text">100 / 100 HP</div>
+    </div>
+  </div>
+
+  <div id="combo-banner" class="combo-banner">🔥 5x COMBO! ĐẬP NỮA ĐI! 🔥</div>
+
+  <!-- INSTRUCTION TOOLTIP -->
+  <div class="instruction-tooltip">
+    <span>💡 <b>Cách chơi:</b> Bấm chuột để đánh, hoặc giữ Shift + Kéo chuột để túm nộm quăng quật! Bấm nút "📷 Thay Mặt" để gắn mặt bạn bè / sếp!</span>
+  </div>
+
+  <!-- CANVAS ARENA -->
+  <canvas id="game-stage"></canvas>
+
+  <!-- WEAPON MOUSE CURSOR -->
+  <div id="weapon-cursor">
+    <span id="weapon-cursor-emoji" style="font-size: 54px;">🔨</span>
+  </div>
+
+  <!-- MODAL: FACE UPLOAD & CUSTOMIZATION -->
+  <div id="face-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">🎭 Gắn Khuôn Mặt Cho Nhân Vật</h3>
+        <button id="modal-close-btn" class="modal-close">✕</button>
+      </div>
+
+      <div class="face-preview-container">
+        <div class="face-circle-preview">
+          <img id="face-preview-img" src="" alt="Face Preview">
+        </div>
+        <div class="face-controls">
+          <div class="control-row">
+            <span>🔍 Phóng to / Thu nhỏ:</span>
+            <input type="range" id="face-scale" min="0.4" max="2.2" step="0.05" value="1.0">
+          </div>
+          <div class="control-row">
+            <span>↔️ Dịch sang trái / phải:</span>
+            <input type="range" id="face-offset-x" min="-60" max="60" step="1" value="0">
+          </div>
+          <div class="control-row">
+            <span>↕️ Dịch lên / xuống:</span>
+            <input type="range" id="face-offset-y" min="-60" max="60" step="1" value="0">
+          </div>
+          <div class="control-row">
+            <span>🔄 Xoay góc mặt:</span>
+            <input type="range" id="face-rotate" min="-45" max="45" step="1" value="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="upload-btns-row">
+        <input type="file" id="face-file-input" accept="image/*" style="display: none;">
+        <button id="btn-trigger-upload" class="btn btn-upload">
+          📁 Tải Ảnh Từ Máy Tính Lên
+        </button>
+        <button id="btn-webcam" class="btn btn-screenshot">
+          📸 Chụp Bằng Camera
+        </button>
+      </div>
+
+      <video id="webcam-stream" autoplay playsinline></video>
+      <button id="btn-capture-camera" class="btn btn-heal" style="display: none; justify-content: center; margin-top: 8px;">
+        📷 Bấm Để Chụp Ngay
+      </button>
+
+      <div class="presets-title">Hoặc chọn nhanh khuôn mặt mẫu:</div>
+      <div class="preset-faces">
+        <button class="preset-face-btn" data-preset="boss">
+          <span style="font-size: 22px;">👨‍💼</span> Sếp khó tính
+        </button>
+        <button class="preset-face-btn" data-preset="troll">
+          <span style="font-size: 22px;">🤪</span> Thánh Troll
+        </button>
+        <button class="preset-face-btn" data-preset="ex">
+          <span style="font-size: 22px;">💔</span> Người yêu cũ
+        </button>
+        <button class="preset-face-btn" data-preset="dummy">
+          <span style="font-size: 22px;">🤖</span> Nộm rơm gốc
+        </button>
+      </div>
+
+      <button id="btn-apply-face" class="btn btn-heal" style="justify-content: center; font-size: 16px; padding: 12px; margin-top: 6px;">
+        ✅ Hoàn Tất & Áp Dụng Mặt Này!
+      </button>
+    </div>
+  </div>
+
+  <script>
+  /* =========================================================================
+     AUDIO SYNTHESIS ENGINE (Web Audio API - Crisp & Hilarious)
+     ========================================================================= */
+  class SoundFX {
+    constructor() {
+      this.ctx = null;
+      this.enabled = true;
+    }
+
+    init() {
+      if (!this.ctx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioContext();
+      }
+      if (this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+    }
+
+    playSqueak() {
+      if (!this.enabled) return;
+      this.init();
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(450, now);
+      osc.frequency.exponentialRampToValueAtTime(1150, now + 0.09);
+      osc.frequency.exponentialRampToValueAtTime(700, now + 0.2);
+
+      gain.gain.setValueAtTime(0.35, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.22);
+    }
+
+    playSlap() {
+      if (!this.enabled) return;
+      this.init();
+      const now = this.ctx.currentTime;
+      // White noise burst for sharp slap
+      const bufferSize = Math.floor(this.ctx.sampleRate * 0.1);
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const output = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.2));
+      }
+      const whiteNoise = this.ctx.createBufferSource();
+      whiteNoise.buffer = buffer;
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(1900, now);
+      filter.Q.setValueAtTime(1.6, now);
+
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(0.75, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+
+      whiteNoise.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+      whiteNoise.start(now);
+    }
+
+    playPunch() {
+      if (!this.enabled) return;
+      this.init();
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 0.16);
+
+      gain.gain.setValueAtTime(0.85, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.18);
+    }
+
+    playWhoosh() {
+      if (!this.enabled) return;
+      this.init();
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(550, now);
+      osc.frequency.linearRampToValueAtTime(180, now + 0.13);
+
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.14);
+    }
+
+    playSplat() {
+      if (!this.enabled) return;
+      this.init();
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(450, now);
+      osc.frequency.exponentialRampToValueAtTime(80, now + 0.18);
+
+      gain.gain.setValueAtTime(0.5, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    }
+
+    playPlop() {
+      if (!this.enabled) return;
+      this.init();
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(260, now);
+      osc.frequency.exponentialRampToValueAtTime(750, now + 0.11);
+
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.13);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.13);
+    }
+
+    playElectric() {
+      if (!this.enabled) return;
+      this.init();
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(90, now);
+      osc.frequency.linearRampToValueAtTime(180, now + 0.08);
+      osc.frequency.linearRampToValueAtTime(50, now + 0.22);
+
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.24);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.24);
+    }
+
+    playHeal() {
+      if (!this.enabled) return;
+      this.init();
+      const now = this.ctx.currentTime;
+      const notes = [330, 440, 550, 660, 880];
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+
+        gain.gain.setValueAtTime(0.2, now + idx * 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.05 + 0.2);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now + idx * 0.05);
+        osc.stop(now + idx * 0.05 + 0.2);
+      });
+    }
+
+    playGiggle() {
+      if (!this.enabled) return;
+      this.init();
+      const now = this.ctx.currentTime;
+      const tones = [500, 630, 510, 660, 520, 720];
+      tones.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.05);
+
+        gain.gain.setValueAtTime(0.2, now + idx * 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.05 + 0.07);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now + idx * 0.05);
+        osc.stop(now + idx * 0.05 + 0.07);
+      });
+    }
+  }
+
+  const sounds = new SoundFX();
+
+  /* =========================================================================
+     PRESET FACES GENERATOR (Procedural SVG Data URIs)
+     ========================================================================= */
+  function createSvgAvatar(type) {
+    let svg = '';
+    if (type === 'boss') {
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="95" fill="#fbc531"/>
+        <path d="M 40 68 L 85 85" stroke="#2f3542" stroke-width="12" stroke-linecap="round"/>
+        <path d="M 160 68 L 115 85" stroke="#2f3542" stroke-width="12" stroke-linecap="round"/>
+        <ellipse cx="65" cy="98" rx="14" ry="16" fill="#fff"/>
+        <circle cx="68" cy="98" r="8" fill="#d63031"/>
+        <ellipse cx="135" cy="98" rx="14" ry="16" fill="#fff"/>
+        <circle cx="132" cy="98" r="8" fill="#d63031"/>
+        <path d="M 60 135 Q 100 120 100 145 Q 100 120 140 135 Q 155 160 100 152 Q 45 160 60 135 Z" fill="#2f3542"/>
+        <path d="M 75 160 Q 100 190 125 160 Z" fill="#c0392b"/>
+      </svg>`;
+    } else if (type === 'troll') {
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="95" fill="#7bed9f"/>
+        <ellipse cx="60" cy="80" rx="20" ry="24" fill="#fff"/>
+        <circle cx="52" cy="84" r="10" fill="#2f3542"/>
+        <ellipse cx="140" cy="76" rx="24" ry="20" fill="#fff"/>
+        <circle cx="148" cy="72" r="10" fill="#2f3542"/>
+        <path d="M 35 125 Q 100 195 165 125 Q 100 150 35 125 Z" fill="#2f3542"/>
+        <path d="M 80 150 Q 100 185 120 150 Z" fill="#ff4757"/>
+        <ellipse cx="40" cy="120" rx="15" ry="8" fill="#ff6b81" opacity="0.6"/>
+        <ellipse cx="160" cy="120" rx="15" ry="8" fill="#ff6b81" opacity="0.6"/>
+      </svg>`;
+    } else if (type === 'ex') {
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="95" fill="#fab1a0"/>
+        <path d="M 45 85 Q 70 70 90 90" stroke="#2f3542" stroke-width="8" stroke-linecap="round" fill="none"/>
+        <path d="M 110 90 Q 130 70 155 85" stroke="#2f3542" stroke-width="8" stroke-linecap="round" fill="none"/>
+        <path d="M 70 145 Q 110 135 145 120" stroke="#2f3542" stroke-width="8" stroke-linecap="round" fill="none"/>
+        <text x="80" y="55" font-size="32">💔</text>
+      </svg>`;
+    } else {
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="95" fill="#f8c291"/>
+        <circle cx="65" cy="85" r="16" fill="#e55039"/>
+        <line x1="57" y1="77" x2="73" y2="93" stroke="#fff" stroke-width="4"/>
+        <line x1="73" y1="77" x2="57" y2="93" stroke="#fff" stroke-width="4"/>
+        <circle cx="135" cy="85" r="16" fill="#e55039"/>
+        <line x1="127" y1="77" x2="143" y2="93" stroke="#fff" stroke-width="4"/>
+        <line x1="143" y1="77" x2="127" y2="93" stroke="#fff" stroke-width="4"/>
+        <path d="M 55 140 Q 100 170 145 140" stroke="#38ada9" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <line x1="75" y1="135" x2="75" y2="155" stroke="#38ada9" stroke-width="5"/>
+        <line x1="100" y1="140" x2="100" y2="163" stroke="#38ada9" stroke-width="5"/>
+        <line x1="125" y1="135" x2="125" y2="155" stroke="#38ada9" stroke-width="5"/>
+      </svg>`;
+    }
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  }
+
+  /* =========================================================================
+     GAME STATE & LOGIC
+     ========================================================================= */
+  const canvas = document.getElementById('game-stage');
+  const ctx = canvas.getContext('2d');
+
+  let width = (canvas.width = window.innerWidth);
+  let height = (canvas.height = window.innerHeight);
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+    dummy.restX = width / 2;
+    dummy.restY = height * 0.52;
+  });
+
+  // Current Weapon & Specs
+  let currentWeapon = 'hammer';
+  const weapons = {
+    hammer: { name: 'Búa Cao Su', emoji: '🔨', sound: 'squeak', power: 12, isRanged: false, comic: ['BONK!', 'BỐP!', 'CHÍP!'] },
+    slipper: { name: 'Dép Tổ Ong', emoji: '🩴', sound: 'slap', power: 15, isRanged: false, comic: ['BẸP!', 'CHÁT!', 'VẢ!'] },
+    glove: { name: 'Găng Boxing', emoji: '🥊', sound: 'punch', power: 16, isRanged: false, comic: ['POW!', 'HUỴCH!', 'K.O!'] },
+    sword: { name: 'Kiếm Xốp', emoji: '🗡️', sound: 'whoosh', power: 14, isRanged: false, comic: ['XOẸT!', 'CHÉM!', 'VÙ!'] },
+    feather: { name: 'Lông Cù Lét', emoji: '🪶', sound: 'giggle', power: 6, isRanged: false, comic: ['HIHI!', 'HAHA!', 'NHỘT!'] },
+    bow: { name: 'Cung Giác Hút', emoji: '🏹', sound: 'plop', power: 10, isRanged: true, comic: ['PLOP!', 'DÍNH!', 'TRÚNG!'] },
+    tomato: { name: 'Cà Chua Thối', emoji: '🍅', sound: 'splat', power: 8, isRanged: true, comic: ['SPLAT!', 'BẸT!', 'CHUA LÈ!'] },
+    egg: { name: 'Trứng Ung', emoji: '🥚', sound: 'splat', power: 8, isRanged: true, comic: ['TÁCH!', 'UNNGG!', 'BẨN!'] },
+    nerf: { name: 'Súng Đạn Xốp', emoji: '🔫', sound: 'plop', power: 11, isRanged: true, comic: ['PẰNG!', 'CHÍU!', 'TRÚNG!'] },
+    taser: { name: 'Dùi Cui Điện', emoji: '⚡', sound: 'electric', power: 22, isRanged: false, comic: ['BZZZZT!', 'TÊ TÁI!', 'GIẬT!'] }
+  };
+
+  // Stats
+  let totalHits = 0;
+  let totalGold = 0;
+  let currentCombo = 0;
+  let maxCombo = 0;
+  let comboTimeout = null;
+  let currentHp = 100;
+  const maxHp = 100;
+
+  // Face image settings
+  const userFace = {
+    img: new Image(),
+    isLoaded: false,
+    scale: 1.0,
+    offsetX: 0,
+    offsetY: 0,
+    rotate: 0
+  };
+
+  // Particles & Projectiles & Stickers
+  const particles = [];
+  const stickies = [];
+  const flyingProjectiles = [];
+
+  /* =========================================================================
+     RAGDOLL DUMMY OBJECT
+     ========================================================================= */
+  class DummyCharacter {
+    constructor(x, y) {
+      this.restX = x;
+      this.restY = y;
+      this.x = x;
+      this.y = y;
+      this.vx = 0;
+      this.vy = 0;
+      this.angle = 0;
+      this.vAngle = 0;
+
+      // Spring physics params
+      this.k = 0.038;
+      this.damp = 0.88;
+
+      // Squash and stretch deformation
+      this.scaleX = 1;
+      this.scaleY = 1;
+      this.vScaleX = 0;
+      this.vScaleY = 0;
+
+      // Head relative offset
+      this.headOffset = { x: 0, y: -130 };
+      this.headAngle = 0;
+      this.vHeadAngle = 0;
+
+      // Dragging state
+      this.isDragging = false;
+      this.dragOffset = { x: 0, y: 0 };
+
+      // Damage state
+      this.damageLevel = 0;
+      this.isElectrified = 0;
+      this.tickleTimer = 0;
+
+      // Body parts dimensions
+      this.headRadius = 55;
+      this.bodyWidth = 84;
+      this.bodyHeight = 110;
+    }
+
+    update() {
+      // Spring force returning to resting position
+      if (!this.isDragging) {
+        const fx = (this.restX - this.x) * this.k;
+        const fy = (this.restY - this.y) * this.k;
+
+        this.vx += fx;
+        this.vy += fy;
+
+        this.vx *= this.damp;
+        this.vy *= this.damp;
+
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Angle spring
+        const fAngle = -this.angle * 0.05;
+        this.vAngle += fAngle;
+        this.vAngle *= 0.86;
+        this.angle += this.vAngle;
+
+        // Head independent spring
+        const fHead = -this.headAngle * 0.08;
+        this.vHeadAngle += fHead;
+        this.vHeadAngle *= 0.84;
+        this.headAngle += this.vHeadAngle;
+      }
+
+      // Squash/stretch spring back to 1
+      const fScaleX = (1 - this.scaleX) * 0.12;
+      const fScaleY = (1 - this.scaleY) * 0.12;
+      this.vScaleX += fScaleX;
+      this.vScaleY += fScaleY;
+      this.vScaleX *= 0.82;
+      this.vScaleY *= 0.82;
+      this.scaleX += this.vScaleX;
+      this.scaleY += this.vScaleY;
+
+      // Screen boundaries
+      if (this.x < 140) { this.x = 140; this.vx = Math.abs(this.vx) * 0.8; }
+      if (this.x > width - 140) { this.x = width - 140; this.vx = -Math.abs(this.vx) * 0.8; }
+
+      if (this.isElectrified > 0) {
+        this.isElectrified--;
+        this.x += (Math.random() - 0.5) * 16;
+        this.headAngle += (Math.random() - 0.5) * 0.3;
+      }
+
+      if (this.tickleTimer > 0) {
+        this.tickleTimer--;
+        this.headAngle = Math.sin(Date.now() * 0.035) * 0.25;
+        this.scaleY = 0.92 + Math.sin(Date.now() * 0.045) * 0.1;
+      }
+    }
+
+    applyImpulse(fx, fy, torque = 0, squashX = 0, squashY = 0) {
+      this.vx += fx;
+      this.vy += fy;
+      this.vAngle += torque;
+      this.vHeadAngle += torque * 1.5;
+      this.scaleX += squashX;
+      this.scaleY += squashY;
+    }
+
+    containsPoint(px, py) {
+      const hx = this.x + Math.sin(this.angle) * this.headOffset.y;
+      const hy = this.y + Math.cos(this.angle) * this.headOffset.y;
+      const distHead = Math.hypot(px - hx, py - hy);
+      if (distHead <= this.headRadius + 22) return { part: 'head', x: hx, y: hy };
+
+      const distBody = Math.hypot(px - this.x, py - this.y);
+      if (distBody <= 85) return { part: 'body', x: this.x, y: this.y };
+
+      return null;
+    }
+
+    draw(ctx) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle);
+      ctx.scale(this.scaleX, this.scaleY);
+
+      // Floor Shadow
+      ctx.save();
+      const shadowDist = (this.restY - this.y) * 0.3;
+      ctx.fillStyle = 'rgba(0,0,0,0.13)';
+      ctx.beginPath();
+      ctx.ellipse(0, 160 + shadowDist, 75, 18, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // Electrified Aura Effect
+      if (this.isElectrified > 0) {
+        ctx.strokeStyle = '#f1c40f';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        for (let i = 0; i < 8; i++) {
+          const ang = (i / 8) * Math.PI * 2;
+          const r = 90 + Math.random() * 30;
+          ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r - 40);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
+
+      // 1. LEGS
+      ctx.fillStyle = '#2c3e50';
+      ctx.beginPath();
+      ctx.roundRect(-42, 60, 26, 75, 12);
+      ctx.fill();
+      ctx.fillStyle = '#e74c3c';
+      ctx.beginPath();
+      ctx.ellipse(-30, 138, 20, 10, -0.1, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#2c3e50';
+      ctx.beginPath();
+      ctx.roundRect(16, 60, 26, 75, 12);
+      ctx.fill();
+      ctx.fillStyle = '#e74c3c';
+      ctx.beginPath();
+      ctx.ellipse(28, 138, 20, 10, 0.1, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. TORSO / BODY
+      ctx.fillStyle = '#3498db';
+      ctx.beginPath();
+      ctx.roundRect(-this.bodyWidth / 2, -50, this.bodyWidth, this.bodyHeight, 22);
+      ctx.fill();
+      ctx.strokeStyle = '#2980b9';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Target icon on chest
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.arc(0, 0, 20, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#e74c3c';
+      ctx.beginPath();
+      ctx.arc(0, 0, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.arc(0, 0, 7, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 3. ARMS
+      ctx.strokeStyle = '#2980b9';
+      ctx.lineWidth = 16;
+      ctx.lineCap = 'round';
+
+      const leftArmWave = Math.sin(Date.now() * 0.008) * 15;
+      ctx.beginPath();
+      ctx.moveTo(-this.bodyWidth / 2 + 5, -30);
+      ctx.quadraticCurveTo(-75 + leftArmWave, 0, -65, 45);
+      ctx.stroke();
+
+      ctx.fillStyle = '#f1c40f';
+      ctx.beginPath();
+      ctx.arc(-65, 48, 14, 0, Math.PI * 2);
+      ctx.fill();
+
+      const rightArmWave = -Math.sin(Date.now() * 0.008) * 15;
+      ctx.beginPath();
+      ctx.moveTo(this.bodyWidth / 2 - 5, -30);
+      ctx.quadraticCurveTo(75 + rightArmWave, 0, 65, 45);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(65, 48, 14, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 4. NECK
+      ctx.fillStyle = '#f8c291';
+      ctx.fillRect(-12, -75, 24, 30);
+
+      // 5. HEAD
+      ctx.save();
+      ctx.translate(this.headOffset.x, this.headOffset.y);
+      ctx.rotate(this.headAngle);
+
+      ctx.beginPath();
+      ctx.arc(0, 0, this.headRadius, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.save();
+      ctx.clip();
+
+      if (userFace.isLoaded) {
+        ctx.save();
+        ctx.translate(userFace.offsetX, userFace.offsetY);
+        ctx.rotate((userFace.rotate * Math.PI) / 180);
+        ctx.scale(userFace.scale, userFace.scale);
+
+        const img = userFace.img;
+        const aspect = img.width / img.height;
+        let dw = this.headRadius * 2.4;
+        let dh = dw / aspect;
+        if (dh < this.headRadius * 2.4) {
+          dh = this.headRadius * 2.4;
+          dw = dh * aspect;
+        }
+        ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
+        ctx.restore();
+      } else {
+        ctx.fillStyle = '#ffeaa7';
+        ctx.fill();
+      }
+
+      ctx.restore(); // end clip
+
+      // Head Border
+      ctx.strokeStyle = '#d63031';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(0, 0, this.headRadius, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // DAMAGE OVERLAYS ON HEAD
+      if (this.damageLevel >= 1) {
+        // Bandage
+        ctx.save();
+        ctx.translate(25, -28);
+        ctx.rotate(0.3);
+        ctx.fillStyle = '#f5cd79';
+        ctx.strokeStyle = '#e77f67';
+        ctx.lineWidth = 2;
+        ctx.fillRect(-18, -8, 36, 16);
+        ctx.strokeRect(-18, -8, 36, 16);
+        ctx.fillStyle = '#e74c3c';
+        ctx.beginPath();
+        ctx.arc(0, 0, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      if (this.damageLevel >= 2) {
+        // Bruise
+        ctx.fillStyle = 'rgba(142, 68, 173, 0.45)';
+        ctx.beginPath();
+        ctx.ellipse(-26, 10, 16, 12, 0.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Big bump
+        ctx.fillStyle = '#ff7675';
+        ctx.beginPath();
+        ctx.arc(-20, -52, 14, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#d63031';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      if (this.damageLevel >= 3) {
+        // Orbiting dizzy stars
+        const starTime = Date.now() * 0.006;
+        for (let s = 0; s < 3; s++) {
+          const starAngle = starTime + (s * Math.PI * 2) / 3;
+          const sx = Math.cos(starAngle) * (this.headRadius + 22);
+          const sy = Math.sin(starAngle) * 20 - 45;
+          ctx.fillStyle = '#f1c40f';
+          ctx.font = '20px sans-serif';
+          ctx.fillText('⭐', sx - 10, sy + 6);
+        }
+      }
+
+      ctx.restore(); // end Head
+
+      // 6. STUCK ITEMS (Arrows, Darts, Tomatoes)
+      for (const stick of stickies) {
+        ctx.save();
+        ctx.translate(stick.relX, stick.relY);
+        ctx.rotate(stick.angle);
+        if (stick.type === 'arrow') {
+          ctx.fillStyle = '#ff4757';
+          ctx.beginPath();
+          ctx.arc(0, 0, 14, Math.PI * 0.75, Math.PI * 1.75);
+          ctx.fill();
+          ctx.strokeStyle = '#d35400';
+          ctx.lineWidth = 5;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(40, -15);
+          ctx.stroke();
+          ctx.fillStyle = '#2ed573';
+          ctx.fillRect(36, -20, 10, 10);
+        } else if (stick.type === 'dart') {
+          ctx.fillStyle = '#3498db';
+          ctx.fillRect(0, -6, 28, 12);
+          ctx.fillStyle = '#e67e22';
+          ctx.beginPath();
+          ctx.arc(0, 0, 7, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (stick.type === 'tomato') {
+          ctx.fillStyle = '#eb4d4b';
+          ctx.beginPath();
+          ctx.arc(0, 0, 22, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillRect(-6, 12, 6, 18);
+          ctx.fillRect(6, 10, 5, 24);
+          ctx.fillStyle = '#f9ca24';
+          ctx.beginPath();
+          ctx.arc(-4, -4, 3, 0, Math.PI * 2);
+          ctx.arc(6, 4, 3, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (stick.type === 'egg') {
+          ctx.fillStyle = 'rgba(255,255,255,0.85)';
+          ctx.beginPath();
+          ctx.arc(0, 0, 24, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#f39c12';
+          ctx.beginPath();
+          ctx.arc(0, 0, 12, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      ctx.restore(); // end dummy
+    }
+  }
+
+  const dummy = new DummyCharacter(width / 2, height * 0.52);
+
+  // Initialize with Boss face
+  userFace.img.onload = () => {
+    userFace.isLoaded = true;
+    updateModalPreview();
+  };
+  userFace.img.src = createSvgAvatar('boss');
+
+  /* =========================================================================
+     PARTICLES, PROJECTILES & COMIC POPUPS
+     ========================================================================= */
+  class Particle {
+    constructor(x, y, emoji, vx, vy, life = 40) {
+      this.x = x;
+      this.y = y;
+      this.emoji = emoji;
+      this.vx = vx;
+      this.vy = vy;
+      this.life = life;
+      this.maxLife = life;
+      this.scale = 1;
+      this.rotation = Math.random() * Math.PI * 2;
+      this.vRot = (Math.random() - 0.5) * 0.3;
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      this.vy += 0.35;
+      this.rotation += this.vRot;
+      this.life--;
+      this.scale = Math.max(0, this.life / this.maxLife);
+    }
+
+    draw(ctx) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rotation);
+      ctx.scale(this.scale, this.scale);
+      ctx.font = '24px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(this.emoji, 0, 0);
+      ctx.restore();
+    }
+  }
+
+  // Flying projectile that shoots from screen edge/bottom to target
+  class Projectile {
+    constructor(startX, startY, targetX, targetY, weaponKey) {
+      this.x = startX;
+      this.y = startY;
+      this.targetX = targetX;
+      this.targetY = targetY;
+      this.weaponKey = weaponKey;
+      this.speed = 28;
+
+      const angle = Math.atan2(targetY - startY, targetX - startX);
+      this.vx = Math.cos(angle) * this.speed;
+      this.vy = Math.sin(angle) * this.speed;
+      this.rotation = angle;
+    }
+
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      const dist = Math.hypot(this.targetX - this.x, this.targetY - this.y);
+      if (dist < 32) {
+        // Reached target
+        applyHitEffect(this.targetX, this.targetY, this.weaponKey);
+        return false; // remove
+      }
+      return true;
+    }
+
+    draw(ctx) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rotation);
+      ctx.font = '32px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const em = weapons[this.weaponKey].emoji;
+      ctx.fillText(em, 0, 0);
+      ctx.restore();
+    }
+  }
+
+  function spawnHitFx(x, y, type) {
+    const emojis = {
+      hammer: ['💥', '⭐', '💫', '✨'],
+      slipper: ['💥', '⚡', '💨', '💢'],
+      glove: ['🥊', '💥', '⭐', '🔥'],
+      sword: ['✨', '⚡', '🗡️', '💨'],
+      feather: ['🪶', '😂', '✨', '💨'],
+      bow: ['🎯', '✨', '💨'],
+      tomato: ['🍅', '💦', '🔴', '💥'],
+      egg: ['🍳', '🥚', '💦', '✨'],
+      nerf: ['🎯', '💨', '🔵', '💥'],
+      taser: ['⚡', '⚡', '💥', '💫', '✨']
+    }[type] || ['💥', '⭐'];
+
+    for (let i = 0; i < 7; i++) {
+      const em = emojis[Math.floor(Math.random() * emojis.length)];
+      const ang = Math.random() * Math.PI * 2;
+      const spd = 3 + Math.random() * 7;
+      particles.push(new Particle(x, y, em, Math.cos(ang) * spd, Math.sin(ang) * spd - 3, 30 + Math.random() * 15));
+    }
+  }
+
+  function spawnComicPop(x, y, textList) {
+    const text = textList[Math.floor(Math.random() * textList.length)];
+    const pop = document.createElement('div');
+    pop.className = 'comic-pop';
+    pop.textContent = text;
+    pop.style.left = `${x}px`;
+    pop.style.top = `${y}px`;
+
+    const colors = ['#ff4757', '#ffa502', '#2ed573', '#1e90ff', '#e056fd', '#ff6b81'];
+    pop.style.color = colors[Math.floor(Math.random() * colors.length)];
+
+    document.body.appendChild(pop);
+    setTimeout(() => pop.remove(), 900);
+  }
+
+  function spawnDamageNumber(x, y, dmg) {
+    const num = document.createElement('div');
+    num.className = 'dmg-number';
+    num.textContent = `-${dmg}`;
+    num.style.left = `${x + (Math.random() - 0.5) * 40}px`;
+    num.style.top = `${y}px`;
+    document.body.appendChild(num);
+    setTimeout(() => num.remove(), 800);
+  }
+
+  /* =========================================================================
+     ATTACK / HIT EXECUTION
+     ========================================================================= */
+  function handlePlayerAttack(clientX, clientY) {
+    const w = weapons[currentWeapon];
+
+    if (w.isRanged) {
+      // Shoot projectile towards target from bottom/sides
+      const startX = clientX < width / 2 ? 80 : width - 80;
+      const startY = height - 100;
+      flyingProjectiles.push(new Projectile(startX, startY, clientX, clientY, currentWeapon));
+      sounds.playWhoosh();
+    } else {
+      // Melee attack immediately
+      applyHitEffect(clientX, clientY, currentWeapon);
+    }
+  }
+
+  function applyHitEffect(clientX, clientY, weaponKey) {
+    const w = weapons[weaponKey];
+    const hitTarget = dummy.containsPoint(clientX, clientY);
+
+    // Screen Shake on strong hits
+    if (w.power >= 14) {
+      document.body.classList.remove('shake-screen');
+      void document.body.offsetWidth;
+      document.body.classList.add('shake-screen');
+    }
+
+    // Play specific sound
+    if (w.sound === 'squeak') sounds.playSqueak();
+    else if (w.sound === 'slap') sounds.playSlap();
+    else if (w.sound === 'punch') sounds.playPunch();
+    else if (w.sound === 'whoosh') sounds.playWhoosh();
+    else if (w.sound === 'splat') sounds.playSplat();
+    else if (w.sound === 'plop') sounds.playPlop();
+    else if (w.sound === 'electric') sounds.playElectric();
+    else if (w.sound === 'giggle') sounds.playGiggle();
+
+    // Trigger cursor swing animation
+    const cursor = document.getElementById('weapon-cursor');
+    cursor.classList.remove('swinging');
+    void cursor.offsetWidth;
+    cursor.classList.add('swinging');
+
+    // Direction from dummy center to click
+    const dx = clientX - dummy.x;
+    const dy = clientY - dummy.y;
+    const impulseStrength = w.power * 1.5;
+
+    const pushX = (dx < 0 ? 1 : -1) * impulseStrength * 0.7;
+    const pushY = -impulseStrength * 0.4;
+    const torque = (dx < 0 ? -0.15 : 0.15) * (w.power / 10);
+
+    dummy.applyImpulse(pushX, pushY, torque, -0.15, 0.2);
+
+    if (weaponKey === 'taser') {
+      dummy.isElectrified = 22;
+    } else if (weaponKey === 'feather') {
+      dummy.tickleTimer = 35;
+    }
+
+    // Attach stickies if hit dummy
+    if (hitTarget) {
+      const rx = (clientX - dummy.x) * 0.8;
+      const ry = (clientY - dummy.y) * 0.8;
+      if (weaponKey === 'bow') {
+        stickies.push({ type: 'arrow', relX: rx, relY: ry, angle: (Math.random() - 0.5) * 0.6 });
+      } else if (weaponKey === 'nerf') {
+        stickies.push({ type: 'dart', relX: rx, relY: ry, angle: (Math.random() - 0.5) * 0.8 });
+      } else if (weaponKey === 'tomato') {
+        stickies.push({ type: 'tomato', relX: rx, relY: ry, angle: 0 });
+      } else if (weaponKey === 'egg') {
+        stickies.push({ type: 'egg', relX: rx, relY: ry, angle: 0 });
+      }
+      if (stickies.length > 20) stickies.shift();
+    }
+
+    // Spawn FX & Floating damage
+    spawnHitFx(clientX, clientY, weaponKey);
+    spawnComicPop(clientX, clientY - 30, w.comic);
+    spawnDamageNumber(clientX, clientY - 20, Math.floor(w.power * 5));
+
+    // Update Stats & Health
+    totalHits++;
+    totalGold += w.power * 10;
+    currentHp = Math.max(0, currentHp - Math.floor(w.power * 0.8));
+
+    // Combo system
+    currentCombo++;
+    if (currentCombo > maxCombo) maxCombo = currentCombo;
+    clearTimeout(comboTimeout);
+    comboTimeout = setTimeout(() => {
+      currentCombo = 0;
+      updateComboBanner();
+    }, 1800);
+
+    updateDamageLevel();
+    updateUI();
+  }
+
+  function updateDamageLevel() {
+    if (currentHp <= 25) {
+      dummy.damageLevel = 3;
+      document.getElementById('victim-status-text').textContent = 'Tình trạng: Choáng váng nặng, thấy ngàn vì sao! 😵';
+    } else if (currentHp <= 50) {
+      dummy.damageLevel = 2;
+      document.getElementById('victim-status-text').textContent = 'Tình trạng: Mắt bầm tím, u một cục tướng! 🤕';
+    } else if (currentHp <= 75) {
+      dummy.damageLevel = 1;
+      document.getElementById('victim-status-text').textContent = 'Tình trạng: Dán băng cá nhân, bắt đầu rén! 😰';
+    } else {
+      dummy.damageLevel = 0;
+      document.getElementById('victim-status-text').textContent = 'Tình trạng: Còn nguyên vẹn, đang cười khẩy! 😏';
+    }
+  }
+
+  function updateComboBanner() {
+    const banner = document.getElementById('combo-banner');
+    if (currentCombo >= 3) {
+      banner.textContent = `🔥 ${currentCombo}x COMBO! ${currentCombo >= 10 ? 'SIÊU XẢ GIẬN!' : 'ĐẬP NỮA ĐI!'} 🔥`;
+      banner.classList.add('visible');
+    } else {
+      banner.classList.remove('visible');
+    }
+  }
+
+  function updateUI() {
+    document.getElementById('stat-hits').textContent = totalHits.toLocaleString();
+    document.getElementById('stat-gold').textContent = totalGold.toLocaleString();
+    document.getElementById('stat-combo').textContent = `${maxCombo}x`;
+
+    const hpBar = document.getElementById('hp-bar-fill');
+    const hpVal = document.getElementById('hp-bar-val');
+    const pct = Math.max(0, Math.min(100, (currentHp / maxHp) * 100));
+    hpBar.style.width = `${pct}%`;
+    hpVal.textContent = `${currentHp} / ${maxHp} HP`;
+
+    updateComboBanner();
+  }
+
+  // Heal / Reset
+  document.getElementById('btn-heal').addEventListener('click', () => {
+    sounds.playHeal();
+    currentHp = maxHp;
+    stickies.length = 0;
+    dummy.damageLevel = 0;
+    dummy.restX = width / 2;
+    dummy.restY = height * 0.52;
+    dummy.vx = 0;
+    dummy.vy = 0;
+    dummy.angle = 0;
+    updateDamageLevel();
+    updateUI();
+
+    for (let i = 0; i < 18; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const spd = 2 + Math.random() * 5;
+      particles.push(new Particle(dummy.x, dummy.y, '💚', Math.cos(ang) * spd, Math.sin(ang) * spd - 2, 40));
+    }
+    spawnComicPop(dummy.x, dummy.y - 120, ['HỒI MÁU!', 'LÀNH LẶN!', 'SẴN SÀNG!']);
+  });
+
+  // Background Theme Switcher
+  const backgrounds = ['', 'bg-office', 'bg-gym', 'bg-dungeon'];
+  let currentBgIdx = 0;
+  document.getElementById('btn-change-bg').addEventListener('click', () => {
+    currentBgIdx = (currentBgIdx + 1) % backgrounds.length;
+    document.body.className = backgrounds[currentBgIdx];
+    sounds.playWhoosh();
+  });
+
+  // Screenshot / Save Troll Image
+  document.getElementById('btn-screenshot').addEventListener('click', () => {
+    // Render current frame to temp canvas with text watermarks
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    const tCtx = tempCanvas.getContext('2d');
+
+    // Draw background
+    tCtx.fillStyle = '#ff7675';
+    tCtx.fillRect(0, 0, width, height);
+
+    // Draw dummy onto temp canvas
+    dummy.draw(tCtx);
+
+    // Add watermark
+    tCtx.font = 'bold 24px Nunito, sans-serif';
+    tCtx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    tCtx.textAlign = 'center';
+    tCtx.fillText('🥊 Xả Stress Cực Mạnh - Đã Bị Ăn Đòn Tơi Tả! 🥊', width / 2, 60);
+
+    const link = document.createElement('a');
+    link.download = `xa-stress-troll-${Date.now()}.png`;
+    link.href = tempCanvas.toDataURL('image/png');
+    link.click();
+  });
+
+  /* =========================================================================
+     WEAPON SELECTOR & CURSOR TRACKING
+     ========================================================================= */
+  const weaponCards = document.querySelectorAll('.weapon-card');
+  const weaponCursor = document.getElementById('weapon-cursor');
+  const weaponCursorEmoji = document.getElementById('weapon-cursor-emoji');
+
+  weaponCards.forEach(card => {
+    card.addEventListener('click', () => {
+      weaponCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      currentWeapon = card.dataset.weapon;
+      weaponCursorEmoji.textContent = weapons[currentWeapon].emoji;
+      sounds.playWhoosh();
+    });
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    weaponCursor.style.display = 'block';
+    weaponCursor.style.left = `${e.clientX}px`;
+    weaponCursor.style.top = `${e.clientY}px`;
+
+    // Handle Dragging Ragdoll
+    if (dummy.isDragging) {
+      dummy.x = e.clientX - dummy.dragOffset.x;
+      dummy.y = e.clientY - dummy.dragOffset.y;
+    }
+  });
+
+  window.addEventListener('mouseleave', () => {
+    weaponCursor.style.display = 'none';
+  });
+
+  /* =========================================================================
+     CANVAS INTERACTION (Click & Drag Physics)
+     ========================================================================= */
+  canvas.addEventListener('mousedown', (e) => {
+    if (e.shiftKey || e.button === 2) {
+      dummy.isDragging = true;
+      dummy.dragOffset.x = e.clientX - dummy.x;
+      dummy.dragOffset.y = e.clientY - dummy.y;
+      return;
+    }
+
+    handlePlayerAttack(e.clientX, e.clientY);
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (dummy.isDragging) {
+      dummy.isDragging = false;
+      dummy.vx = (Math.random() - 0.5) * 20;
+      dummy.vy = -10;
+    }
+  });
+
+  // Touch Support
+  canvas.addEventListener('touchstart', (e) => {
+    const touch = e.touches[0];
+    handlePlayerAttack(touch.clientX, touch.clientY);
+    e.preventDefault();
+  }, { passive: false });
+
+  /* =========================================================================
+     MODAL: FACE CUSTOMIZER & CAMERA
+     ========================================================================= */
+  const faceModal = document.getElementById('face-modal');
+  const btnOpenModal = document.getElementById('btn-open-face-modal');
+  const btnCloseModal = document.getElementById('modal-close-btn');
+  const facePreviewImg = document.getElementById('face-preview-img');
+
+  const scaleInput = document.getElementById('face-scale');
+  const offsetXInput = document.getElementById('face-offset-x');
+  const offsetYInput = document.getElementById('face-offset-y');
+  const rotateInput = document.getElementById('face-rotate');
+
+  const fileInput = document.getElementById('face-file-input');
+  const btnTriggerUpload = document.getElementById('btn-trigger-upload');
+  const btnWebcam = document.getElementById('btn-webcam');
+  const webcamStream = document.getElementById('webcam-stream');
+  const btnCaptureCamera = document.getElementById('btn-capture-camera');
+  const btnApplyFace = document.getElementById('btn-apply-face');
+
+  let mediaStream = null;
+
+  function updateModalPreview() {
+    facePreviewImg.src = userFace.img.src;
+    facePreviewImg.style.transform = `scale(${userFace.scale}) translate(${userFace.offsetX}px, ${userFace.offsetY}px) rotate(${userFace.rotate}deg)`;
+  }
+
+  btnOpenModal.addEventListener('click', () => {
+    faceModal.classList.add('active');
+    updateModalPreview();
+  });
+
+  function closeModal() {
+    faceModal.classList.remove('active');
+    stopWebcam();
+  }
+
+  btnCloseModal.addEventListener('click', closeModal);
+  btnApplyFace.addEventListener('click', closeModal);
+
+  // Sliders
+  scaleInput.addEventListener('input', (e) => {
+    userFace.scale = parseFloat(e.target.value);
+    updateModalPreview();
+  });
+  offsetXInput.addEventListener('input', (e) => {
+    userFace.offsetX = parseInt(e.target.value);
+    updateModalPreview();
+  });
+  offsetYInput.addEventListener('input', (e) => {
+    userFace.offsetY = parseInt(e.target.value);
+    updateModalPreview();
+  });
+  rotateInput.addEventListener('input', (e) => {
+    userFace.rotate = parseInt(e.target.value);
+    updateModalPreview();
+  });
+
+  // Presets
+  document.querySelectorAll('.preset-face-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const presetType = btn.dataset.preset;
+      userFace.img.onload = () => {
+        userFace.isLoaded = true;
+        updateModalPreview();
+      };
+      userFace.img.src = createSvgAvatar(presetType);
+
+      userFace.scale = 1.0;
+      userFace.offsetX = 0;
+      userFace.offsetY = 0;
+      userFace.rotate = 0;
+      scaleInput.value = 1.0;
+      offsetXInput.value = 0;
+      offsetYInput.value = 0;
+      rotateInput.value = 0;
+    });
+  });
+
+  // Local File Upload
+  btnTriggerUpload.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        userFace.img.onload = () => {
+          userFace.isLoaded = true;
+          updateModalPreview();
+        };
+        userFace.img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Webcam Capture
+  btnWebcam.addEventListener('click', async () => {
+    try {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        mediaStream = await navigator.mediaDevices.getUserMedia({ video: { width: 400, height: 400 } });
+        webcamStream.srcObject = mediaStream;
+        webcamStream.style.display = 'block';
+        btnCaptureCamera.style.display = 'flex';
+      } else {
+        alert('Trình duyệt không hỗ trợ mở camera hoặc bạn chưa cấp quyền.');
+      }
+    } catch (err) {
+      alert('Không thể mở camera: ' + err.message);
+    }
+  });
+
+  btnCaptureCamera.addEventListener('click', () => {
+    if (!webcamStream.videoWidth) return;
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = webcamStream.videoWidth;
+    tempCanvas.height = webcamStream.videoHeight;
+    const tCtx = tempCanvas.getContext('2d');
+    tCtx.translate(tempCanvas.width, 0);
+    tCtx.scale(-1, 1);
+    tCtx.drawImage(webcamStream, 0, 0);
+
+    userFace.img.onload = () => {
+      userFace.isLoaded = true;
+      updateModalPreview();
+    };
+    userFace.img.src = tempCanvas.toDataURL('image/png');
+
+    stopWebcam();
+  });
+
+  function stopWebcam() {
+    if (mediaStream) {
+      mediaStream.getTracks().forEach(track => track.stop());
+      mediaStream = null;
+    }
+    webcamStream.style.display = 'none';
+    btnCaptureCamera.style.display = 'none';
+  }
+
+  // Sound Toggle
+  const btnSound = document.getElementById('btn-sound-toggle');
+  btnSound.addEventListener('click', () => {
+    sounds.enabled = !sounds.enabled;
+    btnSound.textContent = sounds.enabled ? '🔊 Âm thanh' : '🔇 Đã Tắt';
+    btnSound.style.color = sounds.enabled ? '#2f3542' : '#e74c3c';
+  });
+
+  /* =========================================================================
+     MAIN GAME ANIMATION LOOP
+     ========================================================================= */
+  function gameLoop() {
+    ctx.clearRect(0, 0, width, height);
+
+    // Update & Draw Dummy
+    dummy.update();
+    dummy.draw(ctx);
+
+    // Update & Draw Flying Projectiles
+    for (let i = flyingProjectiles.length - 1; i >= 0; i--) {
+      const proj = flyingProjectiles[i];
+      const alive = proj.update();
+      if (!alive) {
+        flyingProjectiles.splice(i, 1);
+      } else {
+        proj.draw(ctx);
+      }
+    }
+
+    // Update & Draw Particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.update();
+      p.draw(ctx);
+      if (p.life <= 0) {
+        particles.splice(i, 1);
+      }
+    }
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  requestAnimationFrame(gameLoop);
+  </script>
+</body>
+</html>
