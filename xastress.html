@@ -156,7 +156,7 @@
       transform: translateY(1px) scale(0.96);
     }
 
-    .btn-upload {
+    .btn-profile {
       background: linear-gradient(135deg, #0984e3, #74b9ff);
       color: white;
     }
@@ -363,26 +363,105 @@
       100% { opacity: 0; transform: translate(-50%, -70px) scale(1); }
     }
 
-    /* HEALTH & RAGE BAR IN ARENA */
+    /* SPEECH BUBBLE FROM DUMMY */
+    .speech-bubble {
+      position: absolute;
+      background: white;
+      color: #2f3542;
+      border: 3px solid #2f3542;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 800;
+      z-index: 120;
+      pointer-events: none;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+      transform: translate(-50%, -100%);
+      animation: bubblePop 1.6s ease-out forwards;
+      white-space: nowrap;
+    }
+
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 10px 8px 0;
+      border-style: solid;
+      border-color: #2f3542 transparent;
+      display: block;
+      width: 0;
+    }
+
+    @keyframes bubblePop {
+      0% { opacity: 0; transform: translate(-50%, -70%) scale(0.5); }
+      15% { opacity: 1; transform: translate(-50%, -110%) scale(1.1); }
+      30% { opacity: 1; transform: translate(-50%, -105%) scale(1); }
+      80% { opacity: 1; transform: translate(-50%, -105%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -130%) scale(0.8); }
+    }
+
+    /* HEALTH & TARGET NAME HUD */
     .character-hud {
       position: absolute;
-      top: 82px;
+      top: 80px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 80;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
-      background: rgba(255,255,255,0.92);
-      padding: 8px 18px;
-      border-radius: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      gap: 5px;
+      background: rgba(255,255,255,0.94);
+      padding: 8px 22px;
+      border-radius: 24px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.15);
       border: 2px solid white;
     }
 
+    .target-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .target-name-tag {
+      font-family: 'Bungee', cursive;
+      font-size: 17px;
+      color: #2f3542;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+
+    .target-name-tag:hover {
+      color: var(--primary);
+    }
+
+    .gender-pill {
+      font-family: 'Nunito', sans-serif;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+    }
+
+    .gender-pill.male {
+      background: #74b9ff;
+      color: #0984e3;
+    }
+
+    .gender-pill.female {
+      background: #ffcccc;
+      color: #d63031;
+    }
+
     .hp-bar-outer {
-      width: 250px;
+      width: 260px;
       height: 18px;
       background: #dfe4ea;
       border-radius: 10px;
@@ -416,11 +495,11 @@
       color: #57606f;
     }
 
-    /* MODAL FOR FACE UPLOAD / CAMERA / CUSTOMIZE */
+    /* MODAL: PROFILE, NAME, GENDER & FACE */
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.65);
+      background: rgba(0, 0, 0, 0.68);
       backdrop-filter: blur(8px);
       z-index: 1000;
       display: flex;
@@ -438,8 +517,8 @@
 
     .modal-card {
       background: white;
-      width: 90%;
-      max-width: 580px;
+      width: 92%;
+      max-width: 600px;
       max-height: 90vh;
       border-radius: 28px;
       padding: 26px;
@@ -489,6 +568,86 @@
       color: white;
     }
 
+    /* NAME & GENDER INPUTS */
+    .profile-section {
+      background: #f1f2f6;
+      border-radius: 20px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: #57606f;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .input-text {
+      width: 100%;
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 2px solid #ced6e0;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #2f3542;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-text:focus {
+      border-color: var(--primary);
+    }
+
+    .gender-selector {
+      display: flex;
+      gap: 12px;
+    }
+
+    .gender-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 14px;
+      border: 2px solid #ced6e0;
+      background: white;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+
+    .gender-btn.active {
+      border-color: var(--primary);
+      background: #ffeaa7;
+      box-shadow: 0 4px 12px rgba(255, 71, 87, 0.2);
+    }
+
+    .gender-btn[data-gender="male"].active {
+      border-color: #0984e3;
+      background: #dff9fb;
+    }
+
+    .gender-btn[data-gender="female"].active {
+      border-color: #e056fd;
+      background: #ffeaa7;
+    }
+
     .face-preview-container {
       display: flex;
       gap: 18px;
@@ -500,8 +659,8 @@
     }
 
     .face-circle-preview {
-      width: 140px;
-      height: 140px;
+      width: 130px;
+      height: 130px;
       border-radius: 50%;
       border: 4px solid var(--primary);
       overflow: hidden;
@@ -522,7 +681,7 @@
     .face-controls {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 9px;
       flex: 1;
     }
 
@@ -530,20 +689,20 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
     }
 
     .control-row input[type="range"] {
-      width: 130px;
+      width: 120px;
       accent-color: var(--primary);
     }
 
     .presets-title {
       font-weight: 800;
-      font-size: 14px;
+      font-size: 13px;
       color: #747d8c;
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
     .preset-faces {
@@ -556,12 +715,12 @@
       cursor: pointer;
       border: 2px solid #e4e7eb;
       background: white;
-      border-radius: 16px;
+      border-radius: 14px;
       padding: 6px 12px;
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 800;
       transition: all 0.15s;
     }
@@ -621,7 +780,7 @@
     /* COMIC COMBO DISPLAY */
     .combo-banner {
       position: absolute;
-      top: 150px;
+      top: 155px;
       left: 50%;
       transform: translateX(-50%) scale(0);
       z-index: 85;
@@ -726,8 +885,8 @@
     </div>
 
     <div class="top-actions">
-      <button id="btn-open-face-modal" class="btn btn-upload" title="Thay đổi khuôn mặt nhân vật">
-        📷 Thay Mặt
+      <button id="btn-open-profile-modal" class="btn btn-profile" title="Đặt tên, chọn giới tính và đổi mặt nhân vật">
+        👤 Đặt Tên & Mặt
       </button>
       <button id="btn-heal" class="btn btn-heal" title="Hồi phục và lau sạch thương tích">
         🩹 Hồi Máu
@@ -816,18 +975,24 @@
 
   <!-- VICTIM STATUS & HEALTH HUD -->
   <div class="character-hud">
-    <div class="victim-status" id="victim-status-text">Tình trạng: Còn nguyên vẹn, đang cười khẩy! 😏</div>
+    <div class="target-header">
+      <div id="target-name-display" class="target-name-tag" title="Bấm để đổi tên">
+        <span id="target-gender-icon">👨‍💼</span> <span id="target-name-text">Sếp Khó Tính</span>
+      </div>
+      <span id="target-gender-pill" class="gender-pill male">Nam ♂</span>
+    </div>
     <div class="hp-bar-outer">
       <div id="hp-bar-fill" class="hp-bar-inner"></div>
       <div id="hp-bar-val" class="hp-bar-text">100 / 100 HP</div>
     </div>
+    <div class="victim-status" id="victim-status-text">Đang cười khẩy thách thức! 😏</div>
   </div>
 
   <div id="combo-banner" class="combo-banner">🔥 5x COMBO! ĐẬP NỮA ĐI! 🔥</div>
 
   <!-- INSTRUCTION TOOLTIP -->
   <div class="instruction-tooltip">
-    <span>💡 <b>Cách chơi:</b> Bấm chuột để đánh, hoặc giữ Shift + Kéo chuột để túm nộm quăng quật! Bấm nút "📷 Thay Mặt" để gắn mặt bạn bè / sếp!</span>
+    <span>💡 <b>Cách chơi:</b> Bấm chuột để đập nộm! Bấm nút "👤 Đặt Tên & Mặt" để đổi tên bạn bè/sếp & chọn giới tính Nam/Nữ!</span>
   </div>
 
   <!-- CANVAS ARENA -->
@@ -838,12 +1003,32 @@
     <span id="weapon-cursor-emoji" style="font-size: 54px;">🔨</span>
   </div>
 
-  <!-- MODAL: FACE UPLOAD & CUSTOMIZATION -->
+  <!-- MODAL: PROFILE, NAME, GENDER & FACE UPLOAD -->
   <div id="face-modal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 class="modal-title">🎭 Gắn Khuôn Mặt Cho Nhân Vật</h3>
+        <h3 class="modal-title">🎭 Hồ Sơ & Khuôn Mặt Người Nộm</h3>
         <button id="modal-close-btn" class="modal-close">✕</button>
+      </div>
+
+      <!-- NAME & GENDER INPUT -->
+      <div class="profile-section">
+        <div class="form-group">
+          <label class="form-label" for="dummy-name-input">🏷️ Tên Người Nộm (Sếp, Bạn Bè, Người Yêu Cũ...):</label>
+          <input type="text" id="dummy-name-input" class="input-text" maxlength="30" value="Sếp Khó Tính" placeholder="Nhập tên người bạn muốn trút giận...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">⚧ Chọn Giới Tính:</label>
+          <div class="gender-selector">
+            <button type="button" class="gender-btn active" data-gender="male">
+              <span>👨 Nam (♂)</span>
+            </button>
+            <button type="button" class="gender-btn" data-gender="female">
+              <span>👩 Nữ (♀)</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="face-preview-container">
@@ -873,7 +1058,7 @@
       <div class="upload-btns-row">
         <input type="file" id="face-file-input" accept="image/*" style="display: none;">
         <button id="btn-trigger-upload" class="btn btn-upload">
-          📁 Tải Ảnh Từ Máy Tính Lên
+          📁 Tải Ảnh Từ Máy Tính
         </button>
         <button id="btn-webcam" class="btn btn-screenshot">
           📸 Chụp Bằng Camera
@@ -887,34 +1072,38 @@
 
       <div class="presets-title">Hoặc chọn nhanh khuôn mặt mẫu:</div>
       <div class="preset-faces">
-        <button class="preset-face-btn" data-preset="boss">
+        <button class="preset-face-btn" data-preset="boss" data-name="Sếp Khó Tính" data-gender="male">
           <span style="font-size: 22px;">👨‍💼</span> Sếp khó tính
         </button>
-        <button class="preset-face-btn" data-preset="troll">
-          <span style="font-size: 22px;">🤪</span> Thánh Troll
+        <button class="preset-face-btn" data-preset="female-boss" data-name="Bà Chị Đồng Nghiệp" data-gender="female">
+          <span style="font-size: 22px;">👩‍🦰</span> Chị Đồng Nghiệp
         </button>
-        <button class="preset-face-btn" data-preset="ex">
-          <span style="font-size: 22px;">💔</span> Người yêu cũ
+        <button class="preset-face-btn" data-preset="troll" data-name="Thằng Bạn Thân" data-gender="male">
+          <span style="font-size: 22px;">🤪</span> Thằng Bạn Thân
         </button>
-        <button class="preset-face-btn" data-preset="dummy">
-          <span style="font-size: 22px;">🤖</span> Nộm rơm gốc
+        <button class="preset-face-btn" data-preset="ex" data-name="Người Yêu Cũ" data-gender="female">
+          <span style="font-size: 22px;">💔</span> Người Yêu Cũ
+        </button>
+        <button class="preset-face-btn" data-preset="dummy" data-name="Nộm Rơm Mặc Định" data-gender="male">
+          <span style="font-size: 22px;">🤖</span> Nộm Rơm
         </button>
       </div>
 
-      <button id="btn-apply-face" class="btn btn-heal" style="justify-content: center; font-size: 16px; padding: 12px; margin-top: 6px;">
-        ✅ Hoàn Tất & Áp Dụng Mặt Này!
+      <button id="btn-apply-profile" class="btn btn-heal" style="justify-content: center; font-size: 16px; padding: 12px; margin-top: 6px;">
+        ✅ Hoàn Tất & Lưu Người Nộm!
       </button>
     </div>
   </div>
 
   <script>
   /* =========================================================================
-     AUDIO SYNTHESIS ENGINE (Web Audio API - Crisp & Hilarious)
+     AUDIO SYNTHESIS ENGINE (PITCH MODULATION BASED ON GENDER)
      ========================================================================= */
   class SoundFX {
     constructor() {
       this.ctx = null;
       this.enabled = true;
+      this.pitchMultiplier = 1.0; // 1.0 for Male, 1.38 for Female
     }
 
     init() {
@@ -927,6 +1116,10 @@
       }
     }
 
+    setGender(gender) {
+      this.pitchMultiplier = (gender === 'female') ? 1.35 : 1.0;
+    }
+
     playSqueak() {
       if (!this.enabled) return;
       this.init();
@@ -934,10 +1127,14 @@
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
+      const f1 = 450 * this.pitchMultiplier;
+      const f2 = 1150 * this.pitchMultiplier;
+      const f3 = 700 * this.pitchMultiplier;
+
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(450, now);
-      osc.frequency.exponentialRampToValueAtTime(1150, now + 0.09);
-      osc.frequency.exponentialRampToValueAtTime(700, now + 0.2);
+      osc.frequency.setValueAtTime(f1, now);
+      osc.frequency.exponentialRampToValueAtTime(f2, now + 0.09);
+      osc.frequency.exponentialRampToValueAtTime(f3, now + 0.2);
 
       gain.gain.setValueAtTime(0.35, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
@@ -952,7 +1149,6 @@
       if (!this.enabled) return;
       this.init();
       const now = this.ctx.currentTime;
-      // White noise burst for sharp slap
       const bufferSize = Math.floor(this.ctx.sampleRate * 0.1);
       const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
       const output = buffer.getChannelData(0);
@@ -964,7 +1160,7 @@
 
       const filter = this.ctx.createBiquadFilter();
       filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(1900, now);
+      filter.frequency.setValueAtTime(1900 * (this.pitchMultiplier > 1 ? 1.2 : 1.0), now);
       filter.Q.setValueAtTime(1.6, now);
 
       const gain = this.ctx.createGain();
@@ -984,9 +1180,12 @@
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
+      const f1 = 180 * this.pitchMultiplier;
+      const f2 = 40 * this.pitchMultiplier;
+
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(180, now);
-      osc.frequency.exponentialRampToValueAtTime(40, now + 0.16);
+      osc.frequency.setValueAtTime(f1, now);
+      osc.frequency.exponentialRampToValueAtTime(f2, now + 0.16);
 
       gain.gain.setValueAtTime(0.85, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
@@ -1025,7 +1224,7 @@
       const gain = this.ctx.createGain();
 
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(450, now);
+      osc.frequency.setValueAtTime(450 * this.pitchMultiplier, now);
       osc.frequency.exponentialRampToValueAtTime(80, now + 0.18);
 
       gain.gain.setValueAtTime(0.5, now);
@@ -1045,8 +1244,8 @@
       const gain = this.ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(260, now);
-      osc.frequency.exponentialRampToValueAtTime(750, now + 0.11);
+      osc.frequency.setValueAtTime(260 * this.pitchMultiplier, now);
+      osc.frequency.exponentialRampToValueAtTime(750 * this.pitchMultiplier, now + 0.11);
 
       gain.gain.setValueAtTime(0.4, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.13);
@@ -1065,9 +1264,9 @@
       const gain = this.ctx.createGain();
 
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(90, now);
-      osc.frequency.linearRampToValueAtTime(180, now + 0.08);
-      osc.frequency.linearRampToValueAtTime(50, now + 0.22);
+      osc.frequency.setValueAtTime(90 * this.pitchMultiplier, now);
+      osc.frequency.linearRampToValueAtTime(180 * this.pitchMultiplier, now + 0.08);
+      osc.frequency.linearRampToValueAtTime(50 * this.pitchMultiplier, now + 0.22);
 
       gain.gain.setValueAtTime(0.4, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.24);
@@ -1103,7 +1302,7 @@
       if (!this.enabled) return;
       this.init();
       const now = this.ctx.currentTime;
-      const tones = [500, 630, 510, 660, 520, 720];
+      const tones = [500, 630, 510, 660, 520, 720].map(f => f * this.pitchMultiplier);
       tones.forEach((freq, idx) => {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
@@ -1139,6 +1338,31 @@
         <circle cx="132" cy="98" r="8" fill="#d63031"/>
         <path d="M 60 135 Q 100 120 100 145 Q 100 120 140 135 Q 155 160 100 152 Q 45 160 60 135 Z" fill="#2f3542"/>
         <path d="M 75 160 Q 100 190 125 160 Z" fill="#c0392b"/>
+      </svg>`;
+    } else if (type === 'female-boss') {
+      svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+        <circle cx="100" cy="100" r="95" fill="#f8a5c2"/>
+        <!-- Long eyelashes -->
+        <ellipse cx="65" cy="95" rx="14" ry="14" fill="#fff"/>
+        <circle cx="68" cy="95" r="7" fill="#2f3542"/>
+        <path d="M 50 82 Q 65 74 80 82" stroke="#2f3542" stroke-width="4" fill="none"/>
+        <line x1="53" y1="78" x2="48" y2="70" stroke="#2f3542" stroke-width="3"/>
+        <line x1="65" y1="76" x2="65" y2="67" stroke="#2f3542" stroke-width="3"/>
+        <line x1="77" y1="78" x2="82" y2="70" stroke="#2f3542" stroke-width="3"/>
+
+        <ellipse cx="135" cy="95" rx="14" ry="14" fill="#fff"/>
+        <circle cx="132" cy="95" r="7" fill="#2f3542"/>
+        <path d="M 120 82 Q 135 74 150 82" stroke="#2f3542" stroke-width="4" fill="none"/>
+        <line x1="123" y1="78" x2="118" y2="70" stroke="#2f3542" stroke-width="3"/>
+        <line x1="135" y1="76" x2="135" y2="67" stroke="#2f3542" stroke-width="3"/>
+        <line x1="147" y1="78" x2="152" y2="70" stroke="#2f3542" stroke-width="3"/>
+
+        <!-- Pink cheeks -->
+        <ellipse cx="46" cy="120" rx="14" ry="8" fill="#e056fd" opacity="0.6"/>
+        <ellipse cx="154" cy="120" rx="14" ry="8" fill="#e056fd" opacity="0.6"/>
+
+        <!-- Red lipstick smirk -->
+        <path d="M 70 145 Q 100 165 130 145 Q 100 152 70 145 Z" fill="#eb4d4b"/>
       </svg>`;
     } else if (type === 'troll') {
       svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
@@ -1193,6 +1417,12 @@
     dummy.restX = width / 2;
     dummy.restY = height * 0.52;
   });
+
+  // Dummy Profile: Name & Gender
+  let dummyProfile = {
+    name: 'Sếp Khó Tính',
+    gender: 'male' // 'male' or 'female'
+  };
 
   // Current Weapon & Specs
   let currentWeapon = 'hammer';
@@ -1278,7 +1508,6 @@
     }
 
     update() {
-      // Spring force returning to resting position
       if (!this.isDragging) {
         const fx = (this.restX - this.x) * this.k;
         const fy = (this.restY - this.y) * this.k;
@@ -1354,6 +1583,8 @@
     }
 
     draw(ctx) {
+      const isFemale = (dummyProfile.gender === 'female');
+
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.angle);
@@ -1382,50 +1613,77 @@
         ctx.stroke();
       }
 
-      // 1. LEGS
-      ctx.fillStyle = '#2c3e50';
+      // 1. LEGS & SHOES (Color adapted to gender)
+      const pantsColor = isFemale ? '#fd79a8' : '#2c3e50';
+      const shoeColor = isFemale ? '#e84393' : '#e74c3c';
+
+      ctx.fillStyle = pantsColor;
       ctx.beginPath();
       ctx.roundRect(-42, 60, 26, 75, 12);
       ctx.fill();
-      ctx.fillStyle = '#e74c3c';
+
+      ctx.fillStyle = shoeColor;
       ctx.beginPath();
       ctx.ellipse(-30, 138, 20, 10, -0.1, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = '#2c3e50';
+      ctx.fillStyle = pantsColor;
       ctx.beginPath();
       ctx.roundRect(16, 60, 26, 75, 12);
       ctx.fill();
-      ctx.fillStyle = '#e74c3c';
+
+      ctx.fillStyle = shoeColor;
       ctx.beginPath();
       ctx.ellipse(28, 138, 20, 10, 0.1, 0, Math.PI * 2);
       ctx.fill();
 
-      // 2. TORSO / BODY
-      ctx.fillStyle = '#3498db';
+      // 2. TORSO / BODY (Male: Blue suit/target, Female: Pink/Purple dress with polka dots)
+      const bodyColor = isFemale ? '#ff9ff3' : '#3498db';
+      const bodyBorder = isFemale ? '#f368e0' : '#2980b9';
+
+      ctx.fillStyle = bodyColor;
       ctx.beginPath();
-      ctx.roundRect(-this.bodyWidth / 2, -50, this.bodyWidth, this.bodyHeight, 22);
+      ctx.roundRect(-this.bodyWidth / 2, -50, this.bodyWidth, this.bodyHeight, isFemale ? 16 : 22);
       ctx.fill();
-      ctx.strokeStyle = '#2980b9';
+      ctx.strokeStyle = bodyBorder;
       ctx.lineWidth = 4;
       ctx.stroke();
 
-      // Target icon on chest
-      ctx.fillStyle = 'white';
-      ctx.beginPath();
-      ctx.arc(0, 0, 20, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#e74c3c';
-      ctx.beginPath();
-      ctx.arc(0, 0, 14, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = 'white';
-      ctx.beginPath();
-      ctx.arc(0, 0, 7, 0, Math.PI * 2);
-      ctx.fill();
+      if (isFemale) {
+        // Female cute dress skirt flare
+        ctx.fillStyle = '#ff78cb';
+        ctx.beginPath();
+        ctx.moveTo(-this.bodyWidth / 2 - 8, 45);
+        ctx.lineTo(this.bodyWidth / 2 + 8, 45);
+        ctx.lineTo(this.bodyWidth / 2 + 18, 70);
+        ctx.lineTo(-this.bodyWidth / 2 - 18, 70);
+        ctx.closePath();
+        ctx.fill();
+
+        // Cute heart on chest
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(-8, -5, 10, Math.PI, 0);
+        ctx.arc(8, -5, 10, Math.PI, 0);
+        ctx.lineTo(0, 18);
+        ctx.closePath();
+        ctx.fill();
+      } else {
+        // Male tie or target
+        ctx.fillStyle = '#e74c3c';
+        // Necktie
+        ctx.beginPath();
+        ctx.moveTo(-10, -50);
+        ctx.lineTo(10, -50);
+        ctx.lineTo(14, 0);
+        ctx.lineTo(0, 20);
+        ctx.lineTo(-14, 0);
+        ctx.closePath();
+        ctx.fill();
+      }
 
       // 3. ARMS
-      ctx.strokeStyle = '#2980b9';
+      ctx.strokeStyle = bodyBorder;
       ctx.lineWidth = 16;
       ctx.lineCap = 'round';
 
@@ -1435,7 +1693,7 @@
       ctx.quadraticCurveTo(-75 + leftArmWave, 0, -65, 45);
       ctx.stroke();
 
-      ctx.fillStyle = '#f1c40f';
+      ctx.fillStyle = isFemale ? '#fd79a8' : '#f1c40f';
       ctx.beginPath();
       ctx.arc(-65, 48, 14, 0, Math.PI * 2);
       ctx.fill();
@@ -1459,6 +1717,20 @@
       ctx.translate(this.headOffset.x, this.headOffset.y);
       ctx.rotate(this.headAngle);
 
+      // Female Hair Behind (Pigtails / Ponytails)
+      if (isFemale) {
+        ctx.fillStyle = '#f0932b';
+        // Left pigtail
+        ctx.beginPath();
+        ctx.arc(-55, -20, 24, 0, Math.PI * 2);
+        ctx.fill();
+        // Right pigtail
+        ctx.beginPath();
+        ctx.arc(55, -20, 24, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Clip Face Image
       ctx.beginPath();
       ctx.arc(0, 0, this.headRadius, 0, Math.PI * 2);
       ctx.closePath();
@@ -1482,22 +1754,42 @@
         ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
         ctx.restore();
       } else {
-        ctx.fillStyle = '#ffeaa7';
+        ctx.fillStyle = isFemale ? '#ffeaa7' : '#ffeaa7';
         ctx.fill();
       }
 
       ctx.restore(); // end clip
 
       // Head Border
-      ctx.strokeStyle = '#d63031';
+      ctx.strokeStyle = isFemale ? '#e84393' : '#d63031';
       ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.arc(0, 0, this.headRadius, 0, Math.PI * 2);
       ctx.stroke();
 
+      // Female Accessories: Pink Ribbon Bow on top
+      if (isFemale) {
+        ctx.save();
+        ctx.translate(0, -52);
+        ctx.fillStyle = '#ff4757';
+        // Left loop
+        ctx.beginPath();
+        ctx.ellipse(-14, 0, 14, 8, -0.2, 0, Math.PI * 2);
+        ctx.fill();
+        // Right loop
+        ctx.beginPath();
+        ctx.ellipse(14, 0, 14, 8, 0.2, 0, Math.PI * 2);
+        ctx.fill();
+        // Center knot
+        ctx.fillStyle = '#ffd32a';
+        ctx.beginPath();
+        ctx.arc(0, 0, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
       // DAMAGE OVERLAYS ON HEAD
       if (this.damageLevel >= 1) {
-        // Bandage
         ctx.save();
         ctx.translate(25, -28);
         ctx.rotate(0.3);
@@ -1514,13 +1806,11 @@
       }
 
       if (this.damageLevel >= 2) {
-        // Bruise
         ctx.fillStyle = 'rgba(142, 68, 173, 0.45)';
         ctx.beginPath();
         ctx.ellipse(-26, 10, 16, 12, 0.2, 0, Math.PI * 2);
         ctx.fill();
 
-        // Big bump
         ctx.fillStyle = '#ff7675';
         ctx.beginPath();
         ctx.arc(-20, -52, 14, 0, Math.PI * 2);
@@ -1531,7 +1821,6 @@
       }
 
       if (this.damageLevel >= 3) {
-        // Orbiting dizzy stars
         const starTime = Date.now() * 0.006;
         for (let s = 0; s < 3; s++) {
           const starAngle = starTime + (s * Math.PI * 2) / 3;
@@ -1545,7 +1834,7 @@
 
       ctx.restore(); // end Head
 
-      // 6. STUCK ITEMS (Arrows, Darts, Tomatoes)
+      // 6. STUCK ITEMS
       for (const stick of stickies) {
         ctx.save();
         ctx.translate(stick.relX, stick.relY);
@@ -1609,7 +1898,7 @@
   userFace.img.src = createSvgAvatar('boss');
 
   /* =========================================================================
-     PARTICLES, PROJECTILES & COMIC POPUPS
+     PARTICLES, PROJECTILES, SPEECH BUBBLES
      ========================================================================= */
   class Particle {
     constructor(x, y, emoji, vx, vy, life = 40) {
@@ -1647,7 +1936,6 @@
     }
   }
 
-  // Flying projectile that shoots from screen edge/bottom to target
   class Projectile {
     constructor(startX, startY, targetX, targetY, weaponKey) {
       this.x = startX;
@@ -1668,9 +1956,8 @@
       this.y += this.vy;
       const dist = Math.hypot(this.targetX - this.x, this.targetY - this.y);
       if (dist < 32) {
-        // Reached target
         applyHitEffect(this.targetX, this.targetY, this.weaponKey);
-        return false; // remove
+        return false;
       }
       return true;
     }
@@ -1735,6 +2022,44 @@
     setTimeout(() => num.remove(), 800);
   }
 
+  // Funny speech bubble from dummy reacting with their name!
+  let lastSpeechTime = 0;
+  function maybeTriggerVictimSpeech() {
+    const now = Date.now();
+    if (now - lastSpeechTime < 2400) return; // avoid bubble spam
+    lastSpeechTime = now;
+
+    const name = dummyProfile.name || 'Tôi';
+    const isFemale = (dummyProfile.gender === 'female');
+
+    const maleLines = [
+      `Đau quá, tha cho ${name} đi! 😭`,
+      `Tôi là ${name} mà, sao nỡ đánh thế?! 🤕`,
+      `${name} xin chừa, mai tăng lương! 🙏`,
+      `Á á, gãy hết răng của ${name} rồi! 🦷`,
+      `Nhẹ tay thôi, ${name} xin lỗi được chưa?! 😵`
+    ];
+
+    const femaleLines = [
+      `Huhu đau quá, tha cho ${name} đi! 😭`,
+      `Trôi hết phấn son của ${name} rồi nè! 💅`,
+      `${name} giận đấy, đồ tồi! 💔`,
+      `Á á, hỏng hết kiểu tóc của ${name} rồi! 🎀`,
+      `Đừng đánh nữa, ${name} ngoan mà! 🥺`
+    ];
+
+    const lines = isFemale ? femaleLines : maleLines;
+    const speech = lines[Math.floor(Math.random() * lines.length)];
+
+    const bubble = document.createElement('div');
+    bubble.className = 'speech-bubble';
+    bubble.textContent = speech;
+    bubble.style.left = `${dummy.x}px`;
+    bubble.style.top = `${dummy.y - 150}px`;
+    document.body.appendChild(bubble);
+    setTimeout(() => bubble.remove(), 1700);
+  }
+
   /* =========================================================================
      ATTACK / HIT EXECUTION
      ========================================================================= */
@@ -1742,13 +2067,11 @@
     const w = weapons[currentWeapon];
 
     if (w.isRanged) {
-      // Shoot projectile towards target from bottom/sides
       const startX = clientX < width / 2 ? 80 : width - 80;
       const startY = height - 100;
       flyingProjectiles.push(new Projectile(startX, startY, clientX, clientY, currentWeapon));
       sounds.playWhoosh();
     } else {
-      // Melee attack immediately
       applyHitEffect(clientX, clientY, currentWeapon);
     }
   }
@@ -1757,14 +2080,12 @@
     const w = weapons[weaponKey];
     const hitTarget = dummy.containsPoint(clientX, clientY);
 
-    // Screen Shake on strong hits
     if (w.power >= 14) {
       document.body.classList.remove('shake-screen');
       void document.body.offsetWidth;
       document.body.classList.add('shake-screen');
     }
 
-    // Play specific sound
     if (w.sound === 'squeak') sounds.playSqueak();
     else if (w.sound === 'slap') sounds.playSlap();
     else if (w.sound === 'punch') sounds.playPunch();
@@ -1774,13 +2095,11 @@
     else if (w.sound === 'electric') sounds.playElectric();
     else if (w.sound === 'giggle') sounds.playGiggle();
 
-    // Trigger cursor swing animation
     const cursor = document.getElementById('weapon-cursor');
     cursor.classList.remove('swinging');
     void cursor.offsetWidth;
     cursor.classList.add('swinging');
 
-    // Direction from dummy center to click
     const dx = clientX - dummy.x;
     const dy = clientY - dummy.y;
     const impulseStrength = w.power * 1.5;
@@ -1797,7 +2116,6 @@
       dummy.tickleTimer = 35;
     }
 
-    // Attach stickies if hit dummy
     if (hitTarget) {
       const rx = (clientX - dummy.x) * 0.8;
       const ry = (clientY - dummy.y) * 0.8;
@@ -1811,19 +2129,21 @@
         stickies.push({ type: 'egg', relX: rx, relY: ry, angle: 0 });
       }
       if (stickies.length > 20) stickies.shift();
+
+      // Trigger dialogue speech bubble randomly
+      if (Math.random() < 0.45) {
+        maybeTriggerVictimSpeech();
+      }
     }
 
-    // Spawn FX & Floating damage
     spawnHitFx(clientX, clientY, weaponKey);
     spawnComicPop(clientX, clientY - 30, w.comic);
     spawnDamageNumber(clientX, clientY - 20, Math.floor(w.power * 5));
 
-    // Update Stats & Health
     totalHits++;
     totalGold += w.power * 10;
     currentHp = Math.max(0, currentHp - Math.floor(w.power * 0.8));
 
-    // Combo system
     currentCombo++;
     if (currentCombo > maxCombo) maxCombo = currentCombo;
     clearTimeout(comboTimeout);
@@ -1837,25 +2157,26 @@
   }
 
   function updateDamageLevel() {
+    const name = dummyProfile.name || 'Người nộm';
     if (currentHp <= 25) {
       dummy.damageLevel = 3;
-      document.getElementById('victim-status-text').textContent = 'Tình trạng: Choáng váng nặng, thấy ngàn vì sao! 😵';
+      document.getElementById('victim-status-text').textContent = `${name}: Choáng váng nặng, thấy ngàn vì sao! 😵`;
     } else if (currentHp <= 50) {
       dummy.damageLevel = 2;
-      document.getElementById('victim-status-text').textContent = 'Tình trạng: Mắt bầm tím, u một cục tướng! 🤕';
+      document.getElementById('victim-status-text').textContent = `${name}: Mắt bầm tím, u một cục tướng! 🤕`;
     } else if (currentHp <= 75) {
       dummy.damageLevel = 1;
-      document.getElementById('victim-status-text').textContent = 'Tình trạng: Dán băng cá nhân, bắt đầu rén! 😰';
+      document.getElementById('victim-status-text').textContent = `${name}: Dán băng cá nhân, bắt đầu rén! 😰`;
     } else {
       dummy.damageLevel = 0;
-      document.getElementById('victim-status-text').textContent = 'Tình trạng: Còn nguyên vẹn, đang cười khẩy! 😏';
+      document.getElementById('victim-status-text').textContent = `${name}: Còn nguyên vẹn, đang cười khẩy! 😏`;
     }
   }
 
   function updateComboBanner() {
     const banner = document.getElementById('combo-banner');
     if (currentCombo >= 3) {
-      banner.textContent = `🔥 ${currentCombo}x COMBO! ${currentCombo >= 10 ? 'SIÊU XẢ GIẬN!' : 'ĐẬP NỮA ĐI!'} 🔥`;
+      banner.textContent = `🔥 ${currentCombo}x COMBO! CHO ${dummyProfile.name.toUpperCase()} BIẾT TAY! 🔥`;
       banner.classList.add('visible');
     } else {
       banner.classList.remove('visible');
@@ -1872,6 +2193,16 @@
     const pct = Math.max(0, Math.min(100, (currentHp / maxHp) * 100));
     hpBar.style.width = `${pct}%`;
     hpVal.textContent = `${currentHp} / ${maxHp} HP`;
+
+    // Target Info
+    document.getElementById('target-name-text').textContent = dummyProfile.name;
+    const isMale = (dummyProfile.gender === 'male');
+    const genderPill = document.getElementById('target-gender-pill');
+    genderPill.className = `gender-pill ${isMale ? 'male' : 'female'}`;
+    genderPill.textContent = isMale ? 'Nam ♂' : 'Nữ ♀';
+    document.getElementById('target-gender-icon').textContent = isMale ? '👨‍💼' : '👩‍🦰';
+
+    sounds.setGender(dummyProfile.gender);
 
     updateComboBanner();
   }
@@ -1909,27 +2240,23 @@
 
   // Screenshot / Save Troll Image
   document.getElementById('btn-screenshot').addEventListener('click', () => {
-    // Render current frame to temp canvas with text watermarks
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = width;
     tempCanvas.height = height;
     const tCtx = tempCanvas.getContext('2d');
 
-    // Draw background
     tCtx.fillStyle = '#ff7675';
     tCtx.fillRect(0, 0, width, height);
 
-    // Draw dummy onto temp canvas
     dummy.draw(tCtx);
 
-    // Add watermark
-    tCtx.font = 'bold 24px Nunito, sans-serif';
-    tCtx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    tCtx.font = 'bold 26px Nunito, sans-serif';
+    tCtx.fillStyle = 'rgba(255, 255, 255, 0.95)';
     tCtx.textAlign = 'center';
-    tCtx.fillText('🥊 Xả Stress Cực Mạnh - Đã Bị Ăn Đòn Tơi Tả! 🥊', width / 2, 60);
+    tCtx.fillText(`🥊 Nạn Nhân: ${dummyProfile.name} (${dummyProfile.gender === 'male' ? 'Nam' : 'Nữ'}) Đã Bị Ăn Đòn! 🥊`, width / 2, 60);
 
     const link = document.createElement('a');
-    link.download = `xa-stress-troll-${Date.now()}.png`;
+    link.download = `xa-stress-${dummyProfile.name}-${Date.now()}.png`;
     link.href = tempCanvas.toDataURL('image/png');
     link.click();
   });
@@ -1956,7 +2283,6 @@
     weaponCursor.style.left = `${e.clientX}px`;
     weaponCursor.style.top = `${e.clientY}px`;
 
-    // Handle Dragging Ragdoll
     if (dummy.isDragging) {
       dummy.x = e.clientX - dummy.dragOffset.x;
       dummy.y = e.clientY - dummy.dragOffset.y;
@@ -1989,7 +2315,6 @@
     }
   });
 
-  // Touch Support
   canvas.addEventListener('touchstart', (e) => {
     const touch = e.touches[0];
     handlePlayerAttack(touch.clientX, touch.clientY);
@@ -1997,12 +2322,16 @@
   }, { passive: false });
 
   /* =========================================================================
-     MODAL: FACE CUSTOMIZER & CAMERA
+     MODAL: NAME, GENDER, PROFILE & FACE CUSTOMIZER
      ========================================================================= */
   const faceModal = document.getElementById('face-modal');
-  const btnOpenModal = document.getElementById('btn-open-face-modal');
+  const btnOpenModal = document.getElementById('btn-open-profile-modal');
+  const targetNameDisplay = document.getElementById('target-name-display');
   const btnCloseModal = document.getElementById('modal-close-btn');
   const facePreviewImg = document.getElementById('face-preview-img');
+
+  const dummyNameInput = document.getElementById('dummy-name-input');
+  const genderBtns = document.querySelectorAll('.gender-btn');
 
   const scaleInput = document.getElementById('face-scale');
   const offsetXInput = document.getElementById('face-offset-x');
@@ -2014,7 +2343,7 @@
   const btnWebcam = document.getElementById('btn-webcam');
   const webcamStream = document.getElementById('webcam-stream');
   const btnCaptureCamera = document.getElementById('btn-capture-camera');
-  const btnApplyFace = document.getElementById('btn-apply-face');
+  const btnApplyProfile = document.getElementById('btn-apply-profile');
 
   let mediaStream = null;
 
@@ -2023,10 +2352,17 @@
     facePreviewImg.style.transform = `scale(${userFace.scale}) translate(${userFace.offsetX}px, ${userFace.offsetY}px) rotate(${userFace.rotate}deg)`;
   }
 
-  btnOpenModal.addEventListener('click', () => {
+  function openProfileModal() {
+    dummyNameInput.value = dummyProfile.name;
+    genderBtns.forEach(b => {
+      b.classList.toggle('active', b.dataset.gender === dummyProfile.gender);
+    });
     faceModal.classList.add('active');
     updateModalPreview();
-  });
+  }
+
+  btnOpenModal.addEventListener('click', openProfileModal);
+  targetNameDisplay.addEventListener('click', openProfileModal);
 
   function closeModal() {
     faceModal.classList.remove('active');
@@ -2034,7 +2370,32 @@
   }
 
   btnCloseModal.addEventListener('click', closeModal);
-  btnApplyFace.addEventListener('click', closeModal);
+
+  // Gender Buttons in Modal
+  genderBtns.forEach(b => {
+    b.addEventListener('click', () => {
+      genderBtns.forEach(btn => btn.classList.remove('active'));
+      b.classList.add('active');
+      dummyProfile.gender = b.dataset.gender;
+      sounds.setGender(dummyProfile.gender);
+    });
+  });
+
+  // Apply Changes
+  btnApplyProfile.addEventListener('click', () => {
+    const enteredName = dummyNameInput.value.trim();
+    if (enteredName) {
+      dummyProfile.name = enteredName;
+    }
+    const activeGenderBtn = document.querySelector('.gender-btn.active');
+    if (activeGenderBtn) {
+      dummyProfile.gender = activeGenderBtn.dataset.gender;
+    }
+    updateDamageLevel();
+    updateUI();
+    closeModal();
+    spawnComicPop(dummy.x, dummy.y - 120, [`ĐÃ ĐỔI: ${dummyProfile.name.toUpperCase()}!`]);
+  });
 
   // Sliders
   scaleInput.addEventListener('input', (e) => {
@@ -2058,6 +2419,17 @@
   document.querySelectorAll('.preset-face-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const presetType = btn.dataset.preset;
+      const presetName = btn.dataset.name;
+      const presetGender = btn.dataset.gender;
+
+      if (presetName) {
+        dummyNameInput.value = presetName;
+      }
+      if (presetGender) {
+        dummyProfile.gender = presetGender;
+        genderBtns.forEach(b => b.classList.toggle('active', b.dataset.gender === presetGender));
+      }
+
       userFace.img.onload = () => {
         userFace.isLoaded = true;
         updateModalPreview();
@@ -2145,17 +2517,18 @@
     btnSound.style.color = sounds.enabled ? '#2f3542' : '#e74c3c';
   });
 
+  // Init UI
+  updateUI();
+
   /* =========================================================================
      MAIN GAME ANIMATION LOOP
      ========================================================================= */
   function gameLoop() {
     ctx.clearRect(0, 0, width, height);
 
-    // Update & Draw Dummy
     dummy.update();
     dummy.draw(ctx);
 
-    // Update & Draw Flying Projectiles
     for (let i = flyingProjectiles.length - 1; i >= 0; i--) {
       const proj = flyingProjectiles[i];
       const alive = proj.update();
@@ -2166,7 +2539,6 @@
       }
     }
 
-    // Update & Draw Particles
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i];
       p.update();
