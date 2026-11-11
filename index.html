@@ -3211,11 +3211,17 @@ H. Nam Trực: 400_449`;
     } catch(e) {}
     populateBranchModeDropdowns();
 
-    parseDonViText(DEFAULT_DONVI_TEXT);
     try {
         const savedReg = localStorage.getItem('zengRegions');
-        if (savedReg) parseDonViText(savedReg);
-    } catch(e) {}
+        if (savedReg) {
+            regionDefinitions = {};
+            parseDonViText(savedReg);
+        } else {
+            parseDonViText(DEFAULT_DONVI_TEXT);
+        }
+    } catch(e) {
+        parseDonViText(DEFAULT_DONVI_TEXT);
+    }
     populateRegionDropdowns();
 
     function docso(numberStr) {
@@ -7396,6 +7402,9 @@ H. Nam Trực: 400_449`;
                 if (table === 'config_donvi') {
                     const lines = validItems.map(it => `${it.key.trim()}: ${it.val.trim()}`).join('\n');
                     localStorage.setItem('zengRegions', lines);
+                    regionDefinitions = {};
+                    parseDonViText(lines);
+                    populateRegionDropdowns();
                 } else if (table === 'config_xemma') {
                     const lines = validItems.map(it => `${it.key.trim()}: ${it.val.trim()}`).join('\n');
                     localStorage.setItem('zengXemMa', lines);
@@ -7429,8 +7438,11 @@ H. Nam Trực: 400_449`;
             const resD = await fetch('donvi.txt');
             if (resD.ok) {
                 const txtD = await resD.text();
-                parseDonViText(txtD);
-                populateRegionDropdowns();
+                if (!localStorage.getItem('zengRegions') && Object.keys(regionDefinitions).length === 0) {
+                    regionDefinitions = {};
+                    parseDonViText(txtD);
+                    populateRegionDropdowns();
+                }
             }
         } catch(e) {}
 
@@ -7440,8 +7452,10 @@ H. Nam Trực: 400_449`;
                 const docs = [];
                 snapDonVi.forEach(doc => docs.push(doc.data()));
                 docs.sort((a, b) => (a.thu_tu || 0) - (b.thu_tu || 0));
+                regionDefinitions = {};
                 docs.forEach(item => {
                     const name = (item.ten_to || '').trim();
+                    if (!name) return;
                     const rules = [];
                     (item.quy_tac || '').split(/[+,]/).forEach(it => {
                         const p = it.trim().split(/[-_]/);
@@ -7454,11 +7468,7 @@ H. Nam Trực: 400_449`;
                     });
                     if (rules.length) regionDefinitions[name] = rules;
                 });
-                if (typeof syncUnitHierarchyToRegionDefinitions === 'function') {
-                    syncUnitHierarchyToRegionDefinitions();
-                } else {
-                    populateRegionDropdowns();
-                }
+                populateRegionDropdowns();
             }
         } catch (e) {
             console.warn("Lỗi tải config_donvi từ Firebase:", e);
@@ -10296,7 +10306,10 @@ H. Nam Trực: 400_449`;
             if (fixedDcThuongTru !== oldDcThuongTru) changed = true;
 
             const oldDonVi = String(item.don_vi_quan_ly || '');
-            const fixedDonVi = fixDistortedVietnamese(oldDonVi);
+            let fixedDonVi = fixDistortedVietnamese(oldDonVi);
+            if (/^tổ\s*([123])\s*[-–]?\s*cn\s*bắc/i.test(fixedDonVi)) {
+                fixedDonVi = 'Tổ ' + fixedDonVi.match(/\d+/)[0] + ' - CN Nam';
+            }
             if (fixedDonVi !== oldDonVi) changed = true;
 
             const norm = normalizeAgentDirItem({
@@ -10385,14 +10398,16 @@ H. Nam Trực: 400_449`;
         const isNam = /\b(cn\s*nam|c\.nhanh\s*nam|chi\s*nhanh\s*nam|nam\s*nd)\b/i.test(norm);
         const isBac = /\b(cn\s*bac|c\.nhanh\s*bac|chi\s*nhanh\s*bac|bac\s*nd)\b/i.test(norm);
 
-        // 1. Cấp 3 mặc định: "<Tên cán bộ> tổ <Số>..." (VD: "Dũng tổ 6", "Dũng tổ 6 - CN Bắc")
+        // 1. Cấp 3 mặc định: Tên cán bộ tổ Số... (VD: "Dũng tổ 1", "Dũng tổ 6", "Dũng tổ 6 - CN Bắc")
         const memberMatch = raw.match(/^(.+?)\s*[-–]?\s*\btổ\s*(\d+)\b(.*)$/i);
         if (memberMatch) {
             const prefix = memberMatch[1].trim();
             const teamNum = memberMatch[2].trim();
             const prefixNorm = removeVietnameseTones(prefix).toLowerCase().trim();
             if (prefix && prefixNorm !== 'to' && !/^tổ$/i.test(prefix)) {
-                const branchSide = isNam ? 'NAM' : 'BAC';
+                const numVal = parseInt(teamNum, 10);
+                const defaultSide = (!isNaN(numVal) && numVal >= 1 && numVal <= 3) ? 'NAM' : 'BAC';
+                const branchSide = isBac ? 'BAC' : (isNam ? 'NAM' : defaultSide);
                 const memberClean = prefix + ' tổ ' + teamNum;
                 const teamCanonical = 'Tổ ' + teamNum + ' - ' + (branchSide === 'NAM' ? 'CN Nam' : 'CN Bắc');
                 return {
@@ -10403,11 +10418,13 @@ H. Nam Trực: 400_449`;
             }
         }
 
-        // 2. Cấp 2 mặc định: "Tổ <Số>..." (VD: "Tổ 6 - CN Bắc", "Tổ 6 - CNBắc(Doanh số)")
+        // 2. Cấp 2 mặc định: Tổ Số... (VD: "Tổ 1", "Tổ 1 - CN Nam", "Tổ 6 - CN Bắc", "Tổ 6 - CNBắc(Doanh số)")
         const teamMatch = raw.match(/^\btổ\s*(\d+)\b(.*)$/i);
         if (teamMatch) {
             const teamNum = teamMatch[1].trim();
-            const branchSide = isNam ? 'NAM' : 'BAC';
+            const numVal = parseInt(teamNum, 10);
+            const defaultSide = (!isNaN(numVal) && numVal >= 1 && numVal <= 3) ? 'NAM' : 'BAC';
+            const branchSide = isBac ? 'BAC' : (isNam ? 'NAM' : defaultSide);
             const teamCanonical = 'Tổ ' + teamNum + ' - ' + (branchSide === 'NAM' ? 'CN Nam' : 'CN Bắc');
             return {
                 name: teamCanonical,
@@ -10447,6 +10464,9 @@ H. Nam Trực: 400_449`;
 
         ensureNode('Chi nhánh Bắc', '');
         ensureNode('Chi nhánh Nam', '');
+        ensureNode('Tổ 1 - CN Nam', 'Chi nhánh Nam');
+        ensureNode('Tổ 2 - CN Nam', 'Chi nhánh Nam');
+        ensureNode('Tổ 3 - CN Nam', 'Chi nhánh Nam');
         ensureNode('Tổ 4 - CN Bắc', 'Chi nhánh Bắc');
         ensureNode('Tổ 5 - CN Bắc', 'Chi nhánh Bắc');
         ensureNode('Tổ 6 - CN Bắc', 'Chi nhánh Bắc');
@@ -10481,6 +10501,115 @@ H. Nam Trực: 400_449`;
         });
 
         return Array.from(map.values());
+    }
+
+    function sanitizeAndMigrateHierarchy(hierList, agentList) {
+        if (!Array.isArray(hierList)) return { hierList: [], changed: false };
+        let changed = false;
+
+        const hasNam = hierList.some(u => /^chi\s*nhánh\s*nam$/i.test(u.name));
+        const hasBac = hierList.some(u => /^chi\s*nhánh\s*bắc$/i.test(u.name));
+        if (!hasNam) {
+            hierList.unshift({ name: 'Chi nhánh Nam', parent: '', rules: '' });
+            changed = true;
+        }
+        if (!hasBac) {
+            hierList.unshift({ name: 'Chi nhánh Bắc', parent: '', rules: '' });
+            changed = true;
+        }
+
+        const renameMap = new Map();
+        renameMap.set('tổ 1 - cn bắc', 'Tổ 1 - CN Nam');
+        renameMap.set('tổ 2 - cn bắc', 'Tổ 2 - CN Nam');
+        renameMap.set('tổ 3 - cn bắc', 'Tổ 3 - CN Nam');
+
+        hierList.forEach(u => {
+            if (!u || !u.name) return;
+            const key = u.name.trim().toLowerCase();
+
+            if (renameMap.has(key)) {
+                u.name = renameMap.get(key);
+                u.parent = 'Chi nhánh Nam';
+                changed = true;
+            } else if (/^tổ\s*([123])\s*[-–]?\s*cn\s*bắc/i.test(u.name)) {
+                const num = u.name.match(/\d+/)[0];
+                u.name = 'Tổ ' + num + ' - CN Nam';
+                u.parent = 'Chi nhánh Nam';
+                changed = true;
+            } else if (/^tổ\s*([123])\s*[-–]?\s*cn\s*nam/i.test(u.name)) {
+                if (u.parent !== 'Chi nhánh Nam') {
+                    u.parent = 'Chi nhánh Nam';
+                    changed = true;
+                }
+            } else if (/^tổ\s*([456])\s*[-–]?\s*cn\s*bắc/i.test(u.name)) {
+                if (u.parent !== 'Chi nhánh Bắc') {
+                    u.parent = 'Chi nhánh Bắc';
+                    changed = true;
+                }
+            }
+
+            const m3 = u.name.match(/^(.+?)\s*[-–]?\s*\btổ\s*([123])\b/i);
+            if (m3 && !/^tổ$/i.test(m3[1].trim())) {
+                const teamNum = m3[2];
+                const expectedParent = 'Tổ ' + teamNum + ' - CN Nam';
+                if (u.parent !== expectedParent) {
+                    u.parent = expectedParent;
+                    changed = true;
+                }
+            }
+
+            if (u.parent && renameMap.has(u.parent.trim().toLowerCase())) {
+                u.parent = renameMap.get(u.parent.trim().toLowerCase());
+                changed = true;
+            }
+        });
+
+        [1, 2, 3].forEach(num => {
+            const tName = 'Tổ ' + num + ' - CN Nam';
+            if (!hierList.some(u => u.name.toLowerCase() === tName.toLowerCase())) {
+                hierList.push({ name: tName, parent: 'Chi nhánh Nam', rules: '' });
+                changed = true;
+            }
+        });
+        [4, 5, 6].forEach(num => {
+            const tName = 'Tổ ' + num + ' - CN Bắc';
+            if (!hierList.some(u => u.name.toLowerCase() === tName.toLowerCase())) {
+                hierList.push({ name: tName, parent: 'Chi nhánh Bắc', rules: '' });
+                changed = true;
+            }
+        });
+
+        const dedupMap = new Map();
+        hierList.forEach(u => {
+            const k = u.name.trim().toLowerCase();
+            if (!dedupMap.has(k)) {
+                dedupMap.set(k, u);
+            } else {
+                changed = true;
+                const ex = dedupMap.get(k);
+                if (!ex.parent && u.parent) ex.parent = u.parent;
+                if (!ex.rules && u.rules) ex.rules = u.rules;
+            }
+        });
+        const finalHier = Array.from(dedupMap.values());
+
+        if (Array.isArray(agentList)) {
+            agentList.forEach(ag => {
+                if (!ag || !ag.don_vi_quan_ly) return;
+                const dvRaw = String(ag.don_vi_quan_ly).trim();
+                const dvKey = dvRaw.toLowerCase();
+                if (renameMap.has(dvKey)) {
+                    ag.don_vi_quan_ly = renameMap.get(dvKey);
+                    changed = true;
+                } else if (/^tổ\s*([123])\s*[-–]?\s*cn\s*bắc/i.test(dvRaw)) {
+                    const num = dvRaw.match(/\d+/)[0];
+                    ag.don_vi_quan_ly = 'Tổ ' + num + ' - CN Nam';
+                    changed = true;
+                }
+            });
+        }
+
+        return { hierList: finalHier, changed };
     }
 
     function findUnitNode(unitName) {
@@ -10589,35 +10718,10 @@ H. Nam Trực: 400_449`;
         return maxD;
     }
 
-    // Đồng bộ cây phân cấp sang regionDefinitions để bộ lọc "Lọc đơn vị" ở Bảng Báo Cáo Tổng Hợp hoạt động ở mọi cấp
+    // Cây phân cấp tổ của Danh sách Đại lý tách biệt hoàn toàn với Cấu hình Đơn vị ở Bảng Tổng Hợp
     function syncUnitHierarchyToRegionDefinitions() {
-        if (!Array.isArray(unitHierarchyList) || unitHierarchyList.length === 0) return;
-        unitHierarchyList.forEach(u => {
-            if (u.rules) {
-                const parsed = parseRulesString(u.rules);
-                if (parsed.length > 0) {
-                    regionDefinitions[u.name] = parsed;
-                }
-            }
-        });
-        // Với các đơn vị cấp cha (VD: Chi nhánh Bắc, Tổ 6 - CN Bắc, hoặc cấp cha mới tạo), tổng hợp toàn bộ dải số của các cấp con
-        unitHierarchyList.forEach(u => {
-            const descSet = getUnitDescendantsSet(u.name);
-            const combinedRules = [];
-            unitHierarchyList.forEach(child => {
-                if (descSet.has(child.name.toLowerCase()) && child.rules) {
-                    combinedRules.push(...parseRulesString(child.rules));
-                }
-            });
-            if (combinedRules.length > 0) {
-                regionDefinitions[u.name] = combinedRules;
-            } else if (!regionDefinitions[u.name]) {
-                regionDefinitions[u.name] = [];
-            }
-        });
-        if (typeof populateRegionDropdowns === 'function') {
-            populateRegionDropdowns();
-        }
+        // Giữ nguyên regionDefinitions chuẩn của Bảng Tổng Hợp, không tự ý gộp danh sách tổ vào
+        return;
     }
 
     // Hàm cung cấp tập quy tắc lọc (bao gồm mọi cấp con + danh sách đại lý đã gán vào đơn vị đó) cho Bảng Báo Cáo Tổng Hợp
@@ -10761,6 +10865,11 @@ H. Nam Trực: 400_449`;
             console.warn('Lỗi đọc cache Danh sách Đại lý:', e);
         }
 
+        const migLocal = sanitizeAndMigrateHierarchy(unitHierarchyList, agentDirectoryList);
+        unitHierarchyList = migLocal.hierList;
+        if (migLocal.changed) saveAgentDirToLocalCache();
+        syncUnitHierarchyToRegionDefinitions();
+
         renderAgentDirColumnCheckboxes();
     }
 
@@ -10892,9 +11001,16 @@ H. Nam Trực: 400_449`;
                 if (data && Array.isArray(data.agents)) {
                     const cleaned = cleanAndMergeSubCodesInList(data.agents);
                     agentDirectoryList = cleaned.list;
+                    const migFb = sanitizeAndMigrateHierarchy(unitHierarchyList, agentDirectoryList);
+                    unitHierarchyList = migFb.hierList;
+                    syncUnitHierarchyToRegionDefinitions();
                     sortAgentDirList();
-                    if (cleaned.changed) saveAgentDirectoryToFirebase().catch(() => {});
-                    sortAgentDirList();
+                    if (cleaned.changed || migFb.changed) saveAgentDirectoryToFirebase().catch(() => {});
+                } else {
+                    const migFb = sanitizeAndMigrateHierarchy(unitHierarchyList, agentDirectoryList);
+                    unitHierarchyList = migFb.hierList;
+                    syncUnitHierarchyToRegionDefinitions();
+                    if (migFb.changed) saveAgentDirectoryToFirebase().catch(() => {});
                 }
                 saveAgentDirToLocalCache();
             }
@@ -10921,6 +11037,12 @@ H. Nam Trực: 400_449`;
         document.body.classList.add('viewing-agent-dir');
         showSection('agentDirectorySection');
         loadAgentDirFromLocalCache();
+        const migOpen = sanitizeAndMigrateHierarchy(unitHierarchyList, agentDirectoryList);
+        unitHierarchyList = migOpen.hierList;
+        if (migOpen.changed) {
+            saveAgentDirToLocalCache();
+            syncUnitHierarchyToRegionDefinitions();
+        }
         renderAgentDirColumnCheckboxes();
         populateAgentDirFilterDropdowns();
         renderAgentDirectoryTable();
@@ -11610,6 +11732,12 @@ H. Nam Trực: 400_449`;
     }
 
     function populateAgentDirFilterDropdowns() {
+        const migPop = sanitizeAndMigrateHierarchy(unitHierarchyList, agentDirectoryList);
+        unitHierarchyList = migPop.hierList;
+        if (migPop.changed) {
+            saveAgentDirToLocalCache();
+            syncUnitHierarchyToRegionDefinitions();
+        }
         const unitSel = document.getElementById('agentDirFilterUnit');
         const wardSel = document.getElementById('agentDirFilterWard');
         const groupSel = document.getElementById('agentDirGroupBy');
